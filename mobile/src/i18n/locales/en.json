@@ -43,17 +43,53 @@
   },
   "profile": {
     "title": "Profile",
-    "emptyTitle": "Your account",
-    "emptyBody": "Log in with your phone number to join groups and track your savings.",
     "language": "Language",
     "serverStatus": "Server status",
     "serverOk": "Connected",
     "serverDegraded": "Database not connected",
     "serverDown": "Cannot reach the server",
-    "checking": "Checking…"
+    "checking": "Checking…",
+    "accountTitle": "Your account",
+    "accountBody": "Add your name, photo and city in the next update.",
+    "phone": "Mobile number",
+    "logout": "Log out",
+    "logoutConfirmTitle": "Log out of SaathMein?",
+    "logoutConfirmBody": "You will need a new OTP to log in again.",
+    "cancel": "Cancel"
   },
   "errors": {
     "network": "Cannot reach SaathMein right now. Check your internet connection.",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "otpLimit": "Too many code requests. Please wait a few minutes and try again.",
+    "invalidPhone": "Enter a valid 10-digit Indian mobile number.",
+    "accountSuspended": "This account is suspended. Please contact SaathMein support.",
+    "loginUnavailable": "Login is not available right now. Please try again later.",
+    "serviceUnavailable": "SaathMein is temporarily unavailable. Please try again in a minute.",
+    "invalidCode": "That code is not correct. Check the SMS and try again.",
+    "codeExpired": "This code has expired. Please request a new one.",
+    "tooManyAttempts": "Too many attempts. Please wait a while before trying again.",
+    "phoneAuthUnavailable": "Phone login is not available in this build."
+  },
+  "language": {
+    "title": "Choose your language",
+    "subtitle": "You can change this later in Profile.",
+    "continue": "Continue"
+  },
+  "auth": {
+    "phoneTitle": "Enter your mobile number",
+    "phoneSubtitle": "We will send a 6-digit code by SMS.",
+    "phoneLabel": "Mobile number",
+    "sendCode": "Send code",
+    "terms": "By continuing, you agree to SaathMein's Terms of Use and Privacy Policy.",
+    "otpTitle": "Enter the code",
+    "otpSentTo": "Sent by SMS to {{phone}}",
+    "otpLabel": "6-digit code",
+    "changeNumber": "Change number",
+    "verify": "Verify and continue",
+    "resendIn": "Resend code in {{seconds}} s",
+    "resend": "Resend code",
+    "codeResent": "A new code is on its way.",
+    "unavailableTitle": "Phone login needs the SaathMein app build",
+    "unavailableBody": "Expo Go cannot send OTP SMS. Install the SaathMein development build to log in."
   }
 }

@@ -75,8 +75,22 @@ const pick = (source = {}, keys = []) =>
     return result;
   }, {});
 
+const DURATION_UNITS_MS = { s: 1000, m: 60 * 1000, h: 60 * 60 * 1000, d: 24 * 60 * 60 * 1000 };
+
+/**
+ * Parse a duration string like "15m", "8h", "30d" or "45s" into milliseconds.
+ * @param {string} value - Duration with a single unit suffix
+ * @returns {number} Milliseconds, or NaN when the format is invalid
+ */
+const parseDurationToMs = (value) => {
+  const match = /^(\d+)\s*([smhd])$/.exec(String(value).trim());
+  if (!match) return Number.NaN;
+  return Number(match[1]) * DURATION_UNITS_MS[match[2]];
+};
+
 module.exports = {
   DEFAULT_PAGE_SIZE,
+  parseDurationToMs,
   MAX_PAGE_SIZE,
   getPagination,
   buildPaginationMeta,

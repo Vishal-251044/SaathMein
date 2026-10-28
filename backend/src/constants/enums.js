@@ -76,6 +76,20 @@ const STAFF_ROLE = Object.freeze({
   SUPPORT: 'support',
 });
 
+/**
+ * App roles carried in buyer/seller access tokens (PRD §8.2). Every account is a buyer;
+ * "seller" is added when the user belongs to a verified seller (Day 5).
+ * Group leader is a per-group permission, not a token role.
+ */
+const APP_ROLE = Object.freeze({ BUYER: 'buyer', SELLER: 'seller' });
+
+/** JWT audiences — a token for one audience is never accepted by another. */
+const TOKEN_AUDIENCE = Object.freeze({
+  APP: 'saathmein-app', // buyer app + dealer dashboard
+  STAFF: 'saathmein-staff', // owner / admin console
+  STAFF_2FA: 'saathmein-staff-2fa', // short-lived token between password and 2FA steps
+});
+
 /** Account status for buyers and sellers. */
 const ACCOUNT_STATUS = Object.freeze({
   ACTIVE: 'active',
@@ -129,6 +143,8 @@ module.exports = {
   PAYMENT_STATUS,
   LEDGER_TYPE,
   STAFF_ROLE,
+  APP_ROLE,
+  TOKEN_AUDIENCE,
   ACCOUNT_STATUS,
   KYC_STATUS,
   SELLER_PLAN,

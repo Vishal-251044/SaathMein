@@ -12,4 +12,5 @@ module.exports = {
   Bid: require('./bid.model'),
   Payment: require('./payment.model'),
   Ledger: require('./ledger.model'),
+  Session: require('./session.model'),
 };

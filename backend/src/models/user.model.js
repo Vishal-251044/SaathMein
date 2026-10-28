@@ -44,8 +44,23 @@ const userSchema = new Schema(
 
     // Admin console access (PRD §8.2). Absent for buyers and dealers.
     staffRole: { type: String, enum: values(STAFF_ROLE) },
+    // TOTP secret, AES-256-GCM encrypted (ADL-2). Pending = set up but not yet confirmed.
     twoFactorSecret: { type: String, select: false },
+    twoFactorPendingSecret: { type: String, select: false },
     twoFactorEnabled: { type: Boolean, default: false },
+    // Last accepted TOTP time step — a code can never be used twice
+    twoFactorLastStep: { type: Number, select: false },
+    // One-time backup codes, stored as keyed hashes
+    twoFactorBackupCodes: {
+      type: [{ _id: false, hash: String, usedAt: Date }],
+      select: false,
+      default: undefined,
+    },
+
+    // Login lockout after repeated failures (ADL-4)
+    failedLoginCount: { type: Number, default: 0, select: false },
+    lockUntil: { type: Date, select: false },
+    passwordChangedAt: Date,
 
     status: { type: String, enum: values(ACCOUNT_STATUS), default: ACCOUNT_STATUS.ACTIVE },
     referralCode: { type: String, trim: true, uppercase: true },

@@ -74,6 +74,13 @@ describe('Error handling and security middleware', () => {
     expect(res.body.error.code).toBe('INVALID_JSON');
   });
 
+  it('returns 503 DATABASE_UNAVAILABLE for API routes while MongoDB is down', async () => {
+    const res = await request(app).post('/api/auth/otp/request').send({ phone: '+919876543210' });
+
+    expect(res.status).toBe(503);
+    expect(res.body.error.code).toBe('DATABASE_UNAVAILABLE');
+  });
+
   it('sets security headers and hides x-powered-by', async () => {
     const res = await request(app).get('/api/health');
 

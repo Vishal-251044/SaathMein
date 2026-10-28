@@ -63,20 +63,36 @@ Notes:
 ### Day 2 — Phone OTP Auth, Roles & Admin Login (Tue 27 Oct)
 **Done when:** a new user logs in with OTP and stays logged in after restarting the app; the Owner logs in at /admin/login with password + 2FA; buyers get 403 on admin APIs.
 
-- [ ] Mobile: phone number and OTP screens (Firebase Auth)
-- [ ] Mobile: secure token storage (expo-secure-store), auth store, auto refresh
-- [ ] Mobile: protected routes and logout
-- [ ] Mobile: language picker on first launch
-- [ ] Backend: `POST /auth/otp/verify` (Firebase ID token → own JWT, access 15 min, refresh 30 days with rotation)
-- [ ] Backend: requireAuth and requireRole middleware (buyer, seller, staff)
-- [ ] Backend: OTP abuse limits per phone and device
-- [ ] Backend: admin auth `POST /admin/auth/login` + TOTP 2FA (otplib), 8 h staff session, 30 min idle logout
-- [ ] Backend: requireStaff(role) for Owner, Admin, Deal Manager, Finance, Support
-- [ ] Web: /admin/login page with 2FA step; admin layout shell
-- [ ] Backend: `npm run create-owner` script from env secrets
-- [ ] Data: unique index on users.phone
+- [x] Mobile: phone number and OTP screens (Firebase Auth)
+- [x] Mobile: secure token storage (expo-secure-store), auth store, auto refresh
+- [x] Mobile: protected routes and logout
+- [x] Mobile: language picker on first launch
+- [x] Backend: `POST /auth/otp/verify` (Firebase ID token → own JWT, access 15 min, refresh 30 days with rotation)
+- [x] Backend: requireAuth and requireRole middleware (buyer, seller, staff)
+- [x] Backend: OTP abuse limits per phone and device
+- [x] Backend: admin auth `POST /admin/auth/login` + TOTP 2FA (otplib), 8 h staff session, 30 min idle logout
+- [x] Backend: requireStaff(role) for Owner, Admin, Deal Manager, Finance, Support
+- [x] Web: /admin/login page with 2FA step; admin layout shell
+- [x] Backend: `npm run create-owner` script from env secrets
+- [x] Data: unique index on users.phone
 - [ ] Firebase: Phone Auth, SHA-1 / SHA-256 for debug and release keys
-- [ ] Tests: token service and staff permissions
+- [x] Tests: token service and staff permissions
+
+Notes:
+- Built 28 Oct 2026. Backend: 68 tests pass (token service, refresh rotation + reuse detection, staff permissions incl. "buyers get 403 on admin APIs", 2FA, lockout, OTP limits, full staff login flow).
+- Refresh tokens are opaque `<sessionId>.<random>` strings; only an HMAC is stored (`sessions` collection, TTL index). Reusing an old refresh token revokes the whole session.
+- App sessions slide (30 days from last refresh); staff sessions are absolute 8 h and end after 30 min without API activity (checked on every staff request).
+- Staff refresh token = httpOnly `sm_staff_rt` cookie (path /api/admin/auth); access token kept in memory only. Cookie routes require the `X-Requested-With` header (CSRF guard).
+- 2FA: TOTP secrets AES-256-GCM encrypted with `TWO_FACTOR_ENCRYPTION_KEY`; codes can't be replayed; 10 one-time backup codes; 5 wrong passwords/codes → 15 min lock. First staff login forces 2FA setup (setup key shown as text + otpauth link — a QR code needs a QR library, not added).
+- OTP limits: 3 per 10 min per phone (PRD), 5 per 10 min per device, 20 per hour per IP; Indian mobiles only (+91 6–9xxxxxxxxx). Firebase itself sends the SMS — also enable SMS region policy (India only) + App Check in Firebase to stop direct SMS abuse.
+- Library added: `@react-native-firebase/app` + `auth` (native Firebase phone OTP — the PRD's chosen service), `expo-dev-client`, `expo-crypto`. Phone login needs an EAS development build; it does not work in Expo Go (the app shows a notice).
+- Firebase native plugins are switched on by `mobile/app.config.ts` only when `google-services.json` exists.
+- API now answers 503 `DATABASE_UNAVAILABLE` (instead of 500) while MongoDB is not connected.
+- Backend tests run with `node --experimental-vm-modules` (otplib / firebase-admin ship ESM-only dependencies).
+- PENDING (owner): Firebase project, Phone Auth, Android app `com.saathmein.app` with SHA-1/SHA-256 from `eas credentials`, `google-services.json` → `mobile/`, service-account key → `backend/.env`.
+- PENDING (owner): fill the Day 2 secrets in `backend/.env`, then `npm run create-owner`.
+- PENDING (Day 5): log staff logins to the audit log; new-device email alert (ADL-4) once the email service exists.
+- Not verified end-to-end yet: needs MongoDB + Firebase + a development build on a phone.
 
 ### Day 3 — Profile, City & Interest Onboarding (Wed 28 Oct)
 **Done when:** a new user completes onboarding; city, budget, timeline and interests are stored; Hindi and Marathi screens display correctly.
