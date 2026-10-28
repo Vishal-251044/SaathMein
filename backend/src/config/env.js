@@ -58,6 +58,11 @@ const envSchema = z.object({
   FIREBASE_CLIENT_EMAIL: z.string().default(''),
   FIREBASE_PRIVATE_KEY: z.string().default(''),
 
+  // Cloudinary — avatars (Day 3), product images, KYC docs, invoices
+  CLOUDINARY_CLOUD_NAME: z.string().default(''),
+  CLOUDINARY_API_KEY: z.string().default(''),
+  CLOUDINARY_API_SECRET: z.string().default(''),
+
   // Owner account — read only by `npm run create-owner` (ADL-3)
   OWNER_EMAIL: z.string().default(''),
   OWNER_PASSWORD: z.string().default(''),
@@ -169,6 +174,16 @@ const config = Object.freeze({
       Boolean(env.FIREBASE_PROJECT_ID) &&
       !env.FIREBASE_PROJECT_ID.startsWith('your_') &&
       firebasePrivateKey.includes('BEGIN PRIVATE KEY'),
+  },
+  cloudinary: {
+    cloudName: env.CLOUDINARY_CLOUD_NAME,
+    apiKey: env.CLOUDINARY_API_KEY,
+    apiSecret: env.CLOUDINARY_API_SECRET,
+    isConfigured: [
+      env.CLOUDINARY_CLOUD_NAME,
+      env.CLOUDINARY_API_KEY,
+      env.CLOUDINARY_API_SECRET,
+    ].every((value) => value && !/^your_.*_here$/.test(value)),
   },
   owner: {
     email: env.OWNER_EMAIL,

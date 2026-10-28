@@ -1,11 +1,13 @@
 /**
  * API router — mounts every feature router under /api.
- * Add new feature routers here as they are built (users on Day 3, catalog on Day 4, ...).
+ * Add new feature routers here as they are built (catalog products on Day 4, ...).
  */
 const { Router } = require('express');
 const { requireDatabase } = require('../middlewares/database.middleware');
 const healthRoutes = require('./health.routes');
 const authRoutes = require('./auth.routes');
+const userRoutes = require('./user.routes');
+const catalogRoutes = require('./catalog.routes');
 const adminRoutes = require('./admin');
 
 const router = Router();
@@ -15,6 +17,9 @@ router.use('/health', healthRoutes);
 
 // Feature routers need MongoDB (unknown paths still fall through to the 404 handler)
 router.use('/auth', requireDatabase, authRoutes);
+router.use('/users', requireDatabase, userRoutes);
 router.use('/admin', requireDatabase, adminRoutes);
+router.use(['/categories', '/cities'], requireDatabase);
+router.use(catalogRoutes);
 
 module.exports = router;

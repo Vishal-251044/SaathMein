@@ -13,4 +13,5 @@ module.exports = {
   Payment: require('./payment.model'),
   Ledger: require('./ledger.model'),
   Session: require('./session.model'),
+  DemandSignal: require('./demandSignal.model'),
 };

@@ -18,7 +18,10 @@ module.exports = [
     },
     rules: {
       'no-console': 'warn', // use utils/logger.js
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
       eqeqeq: ['error', 'always', { null: 'ignore' }],
       'prefer-const': 'error',
     },

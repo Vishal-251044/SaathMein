@@ -26,7 +26,7 @@ const sessionSchema = new Schema(
     revokedAt: Date,
     revokedReason: {
       type: String,
-      enum: ['logout', 'reuse_detected', 'idle_timeout', 'suspended', 'admin'],
+      enum: ['logout', 'reuse_detected', 'idle_timeout', 'suspended', 'admin', 'account_deleted'],
     },
 
     // Device context (Trust AI and new-device alerts)

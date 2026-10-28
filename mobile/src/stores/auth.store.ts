@@ -27,7 +27,11 @@ interface AuthState {
   bootstrap: () => Promise<void>;
   completeLogin: (result: LoginResult) => Promise<void>;
   refreshUser: () => Promise<void>;
+  /** Replace the cached user after a profile change from the API. */
+  setUser: (user: AppUser) => void;
   logout: () => Promise<void>;
+  /** End the local session after the account was deleted on the server. */
+  clearAfterAccountDeletion: () => Promise<void>;
 }
 
 /**
@@ -114,6 +118,14 @@ export const useAuthStore = create<AuthState>((set, get) => {
       if (get().status !== 'signedIn') return;
       const { user } = await authService.getMe();
       set({ user });
+    },
+
+    setUser: (user) => set({ user }),
+
+    clearAfterAccountDeletion: async () => {
+      await clearLocalSession();
+      await signOutOfFirebase();
+      set({ status: 'signedOut', user: null });
     },
 
     logout: async () => {

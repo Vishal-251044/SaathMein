@@ -1,7 +1,8 @@
 /**
- * Admin area layout (/admin/*). Provides the staff session to every admin page.
- * Not linked from the public site and hidden from search engines (ADL-1).
+ * Admin area layout (/admin/*). Provides the server-data cache and the staff session to
+ * every admin page. Not linked from the public site and hidden from search engines (ADL-1).
  */
+import QueryProvider from '@/context/QueryProvider';
 import { AdminAuthProvider } from '@/context/AdminAuthContext';
 
 export const metadata = {
@@ -15,5 +16,9 @@ export const metadata = {
  * @returns {JSX.Element}
  */
 export default function AdminLayout({ children }) {
-  return <AdminAuthProvider>{children}</AdminAuthProvider>;
+  return (
+    <QueryProvider>
+      <AdminAuthProvider>{children}</AdminAuthProvider>
+    </QueryProvider>
+  );
 }

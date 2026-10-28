@@ -41,10 +41,16 @@ const rulesSchema = new Schema(
 
 const categorySchema = new Schema(
   {
-    name: { type: String, required: true, trim: true, maxlength: 80 },
+    name: { type: String, required: true, trim: true, maxlength: 80 }, // English
+    nameTranslations: {
+      hi: { type: String, trim: true, maxlength: 80 },
+      mr: { type: String, trim: true, maxlength: 80 },
+    },
     slug: { type: String, required: true, trim: true, lowercase: true },
     parentId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
     icon: { type: String, trim: true }, // Lucide icon name, e.g. "car", "smartphone"
+    // Popular brands offered in interest onboarding until real products exist (Day 4)
+    featuredBrands: [{ type: String, trim: true, maxlength: 60 }],
     rules: { type: rulesSchema, default: () => ({}) },
     order: { type: Number, default: 0 },
     active: { type: Boolean, default: true },

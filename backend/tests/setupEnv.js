@@ -15,3 +15,7 @@ process.env.STAFF_JWT_REFRESH_SECRET = 'test-staff-refresh-secret-0123456789abcd
 process.env.TWO_FACTOR_ENCRYPTION_KEY = 'a'.repeat(64);
 process.env.FIREBASE_PROJECT_ID = '';
 process.env.FIREBASE_PRIVATE_KEY = '';
+// Test-only Cloudinary credentials (signing is local; no network calls are made)
+process.env.CLOUDINARY_CLOUD_NAME = 'saathmein-test';
+process.env.CLOUDINARY_API_KEY = '123456789012345';
+process.env.CLOUDINARY_API_SECRET = 'test-cloudinary-secret';

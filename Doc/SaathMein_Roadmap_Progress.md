@@ -97,17 +97,31 @@ Notes:
 ### Day 3 — Profile, City & Interest Onboarding (Wed 28 Oct)
 **Done when:** a new user completes onboarding; city, budget, timeline and interests are stored; Hindi and Marathi screens display correctly.
 
-- [ ] Mobile: onboarding city (location permission or manual), area / pincode
-- [ ] Mobile: interest picker (categories → brands / products, budget slider, timeline)
-- [ ] Mobile: profile edit (name, photo, language), delete account
-- [ ] Mobile: home placeholder showing chosen interests
-- [ ] Backend: `GET/PATCH /users/me`, `POST /users/me/interests`, `DELETE /users/me`
-- [ ] Backend: Cloudinary signed upload for avatars
-- [ ] Backend: demandSignals collection recording interests
+- [x] Mobile: onboarding city (location permission or manual), area / pincode
+- [x] Mobile: interest picker (categories → brands / products, budget slider, timeline)
+- [x] Mobile: profile edit (name, photo, language), delete account
+- [x] Mobile: home placeholder showing chosen interests
+- [x] Backend: `GET/PATCH /users/me`, `POST /users/me/interests`, `DELETE /users/me`
+- [x] Backend: Cloudinary signed upload for avatars
+- [x] Backend: demandSignals collection recording interests
 - [ ] Cloudinary account and upload presets
-- [ ] Seed: Pune cities and areas
-- [ ] Seed: category tree with rules (token, sizes, deadlines, commission)
-- [ ] Web: Admin Cities page
+- [x] Seed: Pune cities and areas
+- [x] Seed: category tree with rules (token, sizes, deadlines, commission)
+- [x] Web: Admin Cities page
+
+Notes:
+- Built 28 Oct 2026. Backend: 94 tests pass (location matching, profile/interests/deletion, signed avatar uploads, admin cities permissions, seed data sanity).
+- DECISION (Vishal, 28 Oct): all categories active at launch except groceries (PRD Q1/Q10). Car commission flat ₹5,000 per car (PRD Q4). Other defaults: bikes flat ₹1,000, electronics/appliances 3%, solar/interiors 2.5%, groceries 4.5%, gym/courses 5%; back-out fee ₹99 (₹0 for groceries). All editable in admin later.
+- Seeds: `npm run seed` (= `seed:cities` + `seed:categories`). Pune has 37 areas with Hindi/Marathi names and pincodes (several areas share a pincode — e.g. 411014 Kharadi/Viman Nagar — so auto-detect only pre-selects an area when the pincode is unique). Re-running never overwrites admin changes; `seed:categories -- --reset-rules` restores default rules on purpose.
+- `GET /categories` and `GET /cities` (+ `/cities/match`) were built today because onboarding needs them (roadmap lists them on Day 4). Day 4 still adds products, search and admin category editing.
+- Added to the data model: `category.nameTranslations`, `category.featuredBrands` (brand choices until products exist on Day 4), `city/area.nameTranslations`, `user.interests.brands`, `user.onboardingCompletedAt`, `demandSignals` (TTL 180 days).
+- Onboarding: first login → city & area ("Use my location" or manual) → interests (skippable) → Home. Language picked on first launch is saved to the account.
+- Avatars: signed direct upload to Cloudinary (public id fixed to `saathmein/avatars/<userId>`, resized on upload), response signature verified by the API. No upload preset needed. Photos resized to 512 px on the phone first.
+- Account deletion erases personal data and keeps an anonymous stub (needed later for payment/ledger history); ends all sessions; removes demand signals, photo and the Firebase user. PENDING (Day 7): block deletion while a token is held.
+- PRD ACC-5 also mentions "data export" — not in the roadmap; not built yet.
+- PENDING (Day 5): audit log for admin city/area changes.
+- PENDING (owner): Cloudinary account + `CLOUDINARY_*` in `backend/.env`; run `npm run seed` once MongoDB is set.
+- Not verified on a real phone yet (needs MongoDB, Firebase and a development build).
 
 ### Day 4 — Catalog: Categories, Products & Search (Thu 29 Oct)
 **Done when:** admin imports products with a CSV; a user searches "activa" with a typo and opens the product page with its Pune price.

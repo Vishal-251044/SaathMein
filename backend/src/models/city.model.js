@@ -7,6 +7,7 @@ const { pointSchema } = require('./shared.schemas');
 const areaSchema = new Schema(
   {
     name: { type: String, required: true, trim: true }, // e.g. "Kothrud"
+    nameTranslations: { hi: { type: String, trim: true }, mr: { type: String, trim: true } },
     slug: { type: String, required: true, trim: true, lowercase: true },
     pincodes: [{ type: String, trim: true, match: /^\d{6}$/ }],
     location: pointSchema,
@@ -18,6 +19,7 @@ const areaSchema = new Schema(
 const citySchema = new Schema(
   {
     name: { type: String, required: true, trim: true }, // e.g. "Pune"
+    nameTranslations: { hi: { type: String, trim: true }, mr: { type: String, trim: true } },
     slug: { type: String, required: true, trim: true, lowercase: true },
     state: { type: String, required: true, trim: true },
     location: pointSchema, // city centre, used for auto-detect

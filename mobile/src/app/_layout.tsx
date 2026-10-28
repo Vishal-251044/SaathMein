@@ -1,8 +1,9 @@
 /**
  * Root layout: loads fonts, saved settings and the saved session behind the splash screen,
  * wraps the app in its providers, and guards routes:
- * - signed out → (auth): language (first launch) → phone → OTP
- * - signed in  → (tabs)
+ * - signed out              → (auth): language (first launch) → phone → OTP
+ * - signed in, not onboarded → onboarding: city → interests (Day 3)
+ * - signed in, onboarded     → (tabs) and profile edit screens
  */
 import '../global.css';
 import '@/i18n';
@@ -31,6 +32,10 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
   const isSettingsHydrated = useSettingsStore((state) => state.isHydrated);
   const authStatus = useAuthStore((state) => state.status);
+  // User is null when the profile could not load yet (offline start): show the app, not onboarding
+  const needsOnboarding = useAuthStore((state) =>
+    Boolean(state.user && !state.user.onboardingCompletedAt),
+  );
 
   useEffect(() => {
     useSettingsStore
@@ -60,8 +65,14 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <ThemeRoot>
             <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Protected guard={isSignedIn}>
+              <Stack.Protected guard={isSignedIn && !needsOnboarding}>
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="edit-profile" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="edit-city" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="edit-interests" options={{ animation: 'slide_from_right' }} />
+              </Stack.Protected>
+              <Stack.Protected guard={isSignedIn && needsOnboarding}>
+                <Stack.Screen name="onboarding" />
               </Stack.Protected>
               <Stack.Protected guard={!isSignedIn}>
                 <Stack.Screen name="(auth)" />

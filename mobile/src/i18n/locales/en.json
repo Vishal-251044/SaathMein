@@ -3,7 +3,11 @@
     "appName": "SaathMein",
     "tagline": "Buy together. Save together.",
     "retry": "Try again",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "loading": "Loading…",
+    "continue": "Continue",
+    "save": "Save",
+    "back": "Back"
   },
   "tabs": {
     "home": "Home",
@@ -22,7 +26,11 @@
     "stepBid": "Verified dealers bid. The lowest price wins",
     "stepSave": "Everyone buys at the winning price",
     "emptyTitle": "Groups are on the way",
-    "emptyBody": "Open groups near you will show up here as soon as they start."
+    "emptyBody": "Open groups near you will show up here as soon as they start.",
+    "greetingName": "Namaste, {{name}}",
+    "yourInterests": "You are looking for",
+    "editInterests": "Edit interests",
+    "noInterests": "Tell us what you plan to buy and we will show you the right groups."
   },
   "search": {
     "title": "Search",
@@ -49,13 +57,26 @@
     "serverDegraded": "Database not connected",
     "serverDown": "Cannot reach the server",
     "checking": "Checking…",
-    "accountTitle": "Your account",
-    "accountBody": "Add your name, photo and city in the next update.",
-    "phone": "Mobile number",
     "logout": "Log out",
     "logoutConfirmTitle": "Log out of SaathMein?",
     "logoutConfirmBody": "You will need a new OTP to log in again.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "editTitle": "Edit profile",
+    "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove",
+    "photoPermissionDenied": "Allow photo access in Settings to choose a profile picture.",
+    "name": "Your name",
+    "nameTooShort": "Name must be at least 2 characters.",
+    "addName": "Add your name",
+    "city": "City and area",
+    "interests": "Interests",
+    "notSet": "Not set",
+    "interestCount_one": "{{count}} category",
+    "interestCount_other": "{{count}} categories",
+    "deleteAccount": "Delete account",
+    "deleteConfirmTitle": "Delete your account?",
+    "deleteConfirmBody": "Your profile, photo and interests are erased permanently. This cannot be undone."
   },
   "errors": {
     "network": "Cannot reach SaathMein right now. Check your internet connection.",
@@ -68,7 +89,13 @@
     "invalidCode": "That code is not correct. Check the SMS and try again.",
     "codeExpired": "This code has expired. Please request a new one.",
     "tooManyAttempts": "Too many attempts. Please wait a while before trying again.",
-    "phoneAuthUnavailable": "Phone login is not available in this build."
+    "phoneAuthUnavailable": "Phone login is not available in this build.",
+    "validation": "Some details are not valid. Please check and try again.",
+    "cityUnavailable": "This city is not available yet.",
+    "areaUnavailable": "Pick your area from the list.",
+    "invalidCategory": "One of the chosen categories is no longer available. Please choose again.",
+    "uploadsUnavailable": "Photo upload is not available right now.",
+    "uploadFailed": "The photo could not be uploaded. Please try again."
   },
   "language": {
     "title": "Choose your language",
@@ -91,5 +118,40 @@
     "codeResent": "A new code is on its way.",
     "unavailableTitle": "Phone login needs the SaathMein app build",
     "unavailableBody": "Expo Go cannot send OTP SMS. Install the SaathMein development build to log in."
+  },
+  "city": {
+    "title": "Where do you live?",
+    "subtitle": "We show groups and dealers in your city.",
+    "changeTitle": "Change city",
+    "useMyLocation": "Use my location",
+    "detected": "Found your area. Check it and continue.",
+    "detectedPickArea": "Found your city. Now pick your area.",
+    "notInLaunchCity": "SaathMein is in Pune for now. Pick your area below, or come back when we reach your city.",
+    "permissionDenied": "Location is off for SaathMein. Pick your area from the list instead.",
+    "locationUnavailable": "Could not find your location. Pick your area from the list.",
+    "cityTitle": "City",
+    "areaTitle": "Your area in {{city}}",
+    "searchArea": "Search area or pincode",
+    "noAreaMatch": "No area matches. Try another spelling or your pincode.",
+    "pincode": "Pincode",
+    "pincodeHint": "Optional. Helps us find groups near you.",
+    "pincodeInvalid": "Pincode must be 6 digits."
+  },
+  "interests": {
+    "title": "What do you plan to buy?",
+    "subtitle": "Pick what you need. We will show you the right groups first.",
+    "editTitle": "Your interests",
+    "categoriesTitle": "Categories",
+    "brandsTitle": "Favourite brands",
+    "budgetTitle": "Budget",
+    "budgetMin": "From",
+    "budgetMax": "Up to",
+    "budgetHint": "Drag to set a range between {{min}} and {{max}}.",
+    "timelineTitle": "When do you plan to buy?",
+    "timelineThisMonth": "This month",
+    "timelineOneToThree": "In 1–3 months",
+    "timelineExploring": "Just exploring",
+    "save": "Save and continue",
+    "skip": "Skip for now"
   }
 }

@@ -14,10 +14,14 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules --no-warnings=ExperimentalWarning node_modules/jest/bin/jest.js",
-    "create-owner": "node src/scripts/create-owner.js"
+    "create-owner": "node src/scripts/create-owner.js",
+    "seed:cities": "node src/scripts/seed-cities.js",
+    "seed:categories": "node src/scripts/seed-categories.js",
+    "seed": "npm run seed:cities && npm run seed:categories"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",

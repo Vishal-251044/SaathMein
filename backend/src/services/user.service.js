@@ -11,20 +11,31 @@ const { APP_ROLE } = require('../constants/enums');
  * @param {Object} user - User document
  * @returns {Object} Safe public profile
  */
-const toAppUser = (user) => ({
-  id: String(user._id),
-  name: user.name || null,
-  phone: user.phone || null,
-  email: user.email || null,
-  avatar: user.avatar?.url ? { url: user.avatar.url } : null,
-  cityId: user.cityId ? String(user.cityId) : null,
-  area: user.area || null,
-  pincode: user.pincode || null,
-  language: user.language,
-  interests: user.interests || {},
-  walletBalancePaise: user.walletBalancePaise ?? 0,
-  createdAt: user.createdAt,
-});
+const toAppUser = (user) => {
+  const interests = user.interests || {};
+  return {
+    id: String(user._id),
+    name: user.name || null,
+    phone: user.phone || null,
+    email: user.email || null,
+    avatar: user.avatar?.url ? { url: user.avatar.url } : null,
+    cityId: user.cityId ? String(user.cityId) : null,
+    area: user.area || null,
+    pincode: user.pincode || null,
+    language: user.language,
+    interests: {
+      categories: (interests.categories || []).map(String),
+      products: (interests.products || []).map(String),
+      brands: interests.brands || [],
+      budgetMinPaise: interests.budgetMinPaise ?? null,
+      budgetMaxPaise: interests.budgetMaxPaise ?? null,
+      timeline: interests.timeline || null,
+    },
+    onboardingCompletedAt: user.onboardingCompletedAt || null,
+    walletBalancePaise: user.walletBalancePaise ?? 0,
+    createdAt: user.createdAt,
+  };
+};
 
 /**
  * Shape a staff user for the admin console.

@@ -1,11 +1,12 @@
 /**
- * Profile tab. Day 2: the logged-in account, language switcher, logout and (in development
- * builds) the backend connection status. Name, photo and city editing arrive on Day 3.
+ * Profile tab (ACC-2, ACC-5): photo, name, phone, city and interests with edit links,
+ * language, logout, delete account, and (development builds) backend status.
  */
-import { CircleUserRound, LogOut } from 'lucide-react-native';
-import { useEffect } from 'react';
+import { router, type Href } from 'expo-router';
+import { ChevronRight, Heart, LogOut, MapPin, Pencil, Trash2 } from 'lucide-react-native';
+import { type ComponentType, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, View } from 'react-native';
+import { Alert, type ColorValue, Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { LanguageSwitcher } from '@/components/features/LanguageSwitcher';
@@ -13,32 +14,91 @@ import { ServerStatusCard } from '@/components/features/ServerStatusCard';
 import { Screen } from '@/components/layout/Screen';
 import { ScreenHeader } from '@/components/layout/ScreenHeader';
 import { AppText } from '@/components/ui/AppText';
+import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Notice } from '@/components/ui/Notice';
+import { useCities } from '@/hooks/useCatalog';
+import { useDeleteAccount } from '@/hooks/useProfile';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuthStore } from '@/stores/auth.store';
 import { enterUp } from '@/utils/animations';
+import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatIndianPhone } from '@/utils/genericFunctions';
+import { localizedName } from '@/utils/localize';
+
+type IconType = ComponentType<{ size?: number; color?: ColorValue; strokeWidth?: number }>;
+
+/** One tappable settings row. */
+function ProfileRow({
+  icon: Icon,
+  label,
+  value,
+  href,
+}: {
+  icon: IconType;
+  label: string;
+  value?: string;
+  href: Href;
+}) {
+  const { colors } = useThemeColors();
+  return (
+    <Pressable
+      onPress={() => router.push(href)}
+      accessibilityRole="button"
+      accessibilityLabel={value ? `${label}, ${value}` : label}
+      className="min-h-14 flex-row items-center gap-3 px-4 py-3"
+    >
+      <Icon size={20} color={colors.muted} strokeWidth={2} />
+      <View className="flex-1">
+        <AppText variant="bodyStrong">{label}</AppText>
+        {value ? <AppText variant="caption">{value}</AppText> : null}
+      </View>
+      <ChevronRight size={20} color={colors.muted} strokeWidth={2} />
+    </Pressable>
+  );
+}
 
 /**
  * @returns Profile screen
  */
 export default function ProfileScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useThemeColors();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const refreshUser = useAuthStore((state) => state.refreshUser);
+  const deleteAccount = useDeleteAccount();
+  const { data: cities } = useCities();
 
   // Started offline: load the profile once the API is reachable
   useEffect(() => {
     if (!user) refreshUser().catch(() => {});
   }, [user, refreshUser]);
 
+  const city = cities?.find((item) => item.id === user?.cityId);
+  const area = city?.areas.find((item) => item.name === user?.area);
+  const place = [localizedName(area, i18n.language), localizedName(city, i18n.language)]
+    .filter(Boolean)
+    .join(', ');
+  const interestCount = user?.interests.categories.length ?? 0;
+
   /** Ask before logging out (the user will need a new OTP). */
   const confirmLogout = () => {
     Alert.alert(t('profile.logoutConfirmTitle'), t('profile.logoutConfirmBody'), [
       { text: t('profile.cancel'), style: 'cancel' },
       { text: t('profile.logout'), style: 'destructive', onPress: () => logout() },
+    ]);
+  };
+
+  /** Deletion is permanent, so it needs an explicit confirmation (ACC-5). */
+  const confirmDelete = () => {
+    Alert.alert(t('profile.deleteConfirmTitle'), t('profile.deleteConfirmBody'), [
+      { text: t('profile.cancel'), style: 'cancel' },
+      {
+        text: t('profile.deleteAccount'),
+        style: 'destructive',
+        onPress: () => deleteAccount.mutate(),
+      },
     ]);
   };
 
@@ -50,18 +110,46 @@ export default function ProfileScreen() {
         entering={enterUp(0)}
         className="flex-row items-center gap-4 rounded-card border border-line bg-surface p-5"
       >
-        <View className="h-14 w-14 items-center justify-center rounded-full bg-bg-band">
-          <CircleUserRound size={30} color={colors.muted} strokeWidth={1.8} />
-        </View>
+        <Avatar url={user?.avatar?.url} name={user?.name} size={64} />
         <View className="flex-1">
-          <AppText variant="label">{t('profile.phone')}</AppText>
-          <AppText variant="heading" mono className="mt-0.5">
+          <AppText variant="heading" numberOfLines={1}>
+            {user?.name || t('profile.addName')}
+          </AppText>
+          <AppText variant="caption" mono className="mt-0.5">
             {formatIndianPhone(user?.phone)}
           </AppText>
-          <AppText variant="caption" className="mt-1">
-            {t('profile.accountBody')}
-          </AppText>
         </View>
+        <Pressable
+          onPress={() => router.push('/edit-profile')}
+          accessibilityRole="button"
+          accessibilityLabel={t('profile.editTitle')}
+          className="h-12 w-12 items-center justify-center rounded-button bg-bg-band"
+        >
+          <Pencil size={18} color={colors.ink} strokeWidth={2} />
+        </Pressable>
+      </Animated.View>
+
+      <Animated.View
+        entering={enterUp(1)}
+        className="mt-4 overflow-hidden rounded-card border border-line bg-surface"
+      >
+        <ProfileRow
+          icon={MapPin}
+          label={t('profile.city')}
+          value={place || t('profile.notSet')}
+          href="/edit-city"
+        />
+        <View className="border-t border-line" />
+        <ProfileRow
+          icon={Heart}
+          label={t('profile.interests')}
+          value={
+            interestCount
+              ? t('profile.interestCount', { count: interestCount })
+              : t('profile.notSet')
+          }
+          href="/edit-interests"
+        />
       </Animated.View>
 
       <AppText variant="heading" className="mb-3 mt-8">
@@ -78,13 +166,24 @@ export default function ProfileScreen() {
         </>
       ) : null}
 
-      <Button
-        label={t('profile.logout')}
-        icon={LogOut}
-        variant="secondary"
-        onPress={confirmLogout}
-        className="mt-10"
-      />
+      <View className="mt-10 gap-3">
+        <Button
+          label={t('profile.logout')}
+          icon={LogOut}
+          variant="secondary"
+          onPress={confirmLogout}
+        />
+        {deleteAccount.error ? (
+          <Notice message={t(getErrorMessageKey(deleteAccount.error))} />
+        ) : null}
+        <Button
+          label={t('profile.deleteAccount')}
+          icon={Trash2}
+          variant="ghost"
+          onPress={confirmDelete}
+          loading={deleteAccount.isPending}
+        />
+      </View>
     </Screen>
   );
 }

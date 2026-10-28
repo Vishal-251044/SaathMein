@@ -1,11 +1,14 @@
 /**
  * LanguageSwitcher — segmented control for English / हिन्दी / मराठी (ACC-2).
  * Each option is written in its own script so users can always find their language.
+ * The choice is saved on the phone and, when logged in, on the account.
  */
 import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/components/ui/AppText';
-import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '@/i18n';
+import { useUpdateProfile } from '@/hooks/useProfile';
+import { type AppLanguage, LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from '@/i18n';
+import { useAuthStore } from '@/stores/auth.store';
 import { useSettingsStore } from '@/stores/settings.store';
 import { cx } from '@/utils/genericFunctions';
 
@@ -15,6 +18,15 @@ import { cx } from '@/utils/genericFunctions';
 export function LanguageSwitcher() {
   const language = useSettingsStore((state) => state.language);
   const setLanguage = useSettingsStore((state) => state.setLanguage);
+  const isSignedIn = useAuthStore((state) => state.status === 'signedIn');
+  const updateProfile = useUpdateProfile();
+
+  /** Switch the UI now; sync to the account in the background. */
+  const choose = (code: AppLanguage) => {
+    if (code === language) return;
+    setLanguage(code);
+    if (isSignedIn) updateProfile.mutate({ language: code });
+  };
 
   return (
     <View className="flex-row gap-1 rounded-button bg-bg-band p-1" accessibilityRole="radiogroup">
@@ -23,7 +35,7 @@ export function LanguageSwitcher() {
         return (
           <Pressable
             key={code}
-            onPress={() => setLanguage(code)}
+            onPress={() => choose(code)}
             accessibilityRole="radio"
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={LANGUAGE_LABELS[code]}

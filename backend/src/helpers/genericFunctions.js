@@ -88,9 +88,28 @@ const parseDurationToMs = (value) => {
   return Number(match[1]) * DURATION_UNITS_MS[match[2]];
 };
 
+const EARTH_RADIUS_KM = 6371;
+
+/**
+ * Great-circle distance between two points (haversine).
+ * @param {[number, number]} from - [longitude, latitude]
+ * @param {[number, number]} to - [longitude, latitude]
+ * @returns {number} Distance in kilometres
+ */
+const distanceKm = ([lng1, lat1], [lng2, lat2]) => {
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a));
+};
+
 module.exports = {
   DEFAULT_PAGE_SIZE,
   parseDurationToMs,
+  distanceKm,
   MAX_PAGE_SIZE,
   getPagination,
   buildPaginationMeta,

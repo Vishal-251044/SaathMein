@@ -40,3 +40,15 @@ export const formatBps = (bps) => `${Number((bps / 100).toFixed(2))}%`;
  * @returns {string} Counter text
  */
 export const formatMemberCount = (count, target) => `${count} of ${target}`;
+
+/**
+ * Parse a comma/space separated list of pincodes, keeping valid unique 6-digit codes.
+ * @param {string} text - e.g. "411038, 411052 411038"
+ * @returns {{ pincodes: string[], invalid: string[] }} Valid codes and rejected entries
+ */
+export const parsePincodes = (text = '') => {
+  const entries = text.split(/[\s,]+/).filter(Boolean);
+  const pincodes = [...new Set(entries.filter((entry) => /^[1-9]\d{5}$/.test(entry)))];
+  const invalid = entries.filter((entry) => !/^[1-9]\d{5}$/.test(entry));
+  return { pincodes, invalid };
+};

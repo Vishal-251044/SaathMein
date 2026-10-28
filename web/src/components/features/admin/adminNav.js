@@ -19,7 +19,7 @@ import {
 
 export const ADMIN_NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: 'all' },
-  { label: 'Cities', icon: MapPin, availableOn: 'Day 3', roles: ['admin', 'deal_manager'] },
+  { label: 'Cities', href: '/admin/cities', icon: MapPin, roles: ['admin', 'deal_manager'] },
   { label: 'Catalog', icon: Package, availableOn: 'Day 4', roles: ['admin', 'deal_manager'] },
   { label: 'Sellers', icon: Store, availableOn: 'Day 5', roles: ['admin', 'deal_manager'] },
   {

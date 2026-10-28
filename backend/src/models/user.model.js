@@ -17,6 +17,8 @@ const interestsSchema = new Schema(
   {
     categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
     products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+    // Brands picked during onboarding, before products exist (ACC-3 "products or brands")
+    brands: [{ type: String, trim: true, maxlength: 60 }],
     budgetMinPaise: { type: Number, validate: paiseValidator },
     budgetMaxPaise: { type: Number, validate: paiseValidator },
     timeline: { type: String, enum: values(BUYING_TIMELINE) },
@@ -69,6 +71,9 @@ const userSchema = new Schema(
     trustScore: { type: Number, min: 0, max: 100, default: 50 },
     deviceIds: [{ type: String, trim: true }],
     lastLoginAt: Date,
+    // Set when the user saves or skips interest onboarding (ACC-3)
+    onboardingCompletedAt: Date,
+    deletedAt: Date,
   },
   { timestamps: true },
 );

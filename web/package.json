@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.105.0",
     "axios": "^1.21.0",
     "clsx": "^2.1.1",
     "framer-motion": "^14.7.1",
