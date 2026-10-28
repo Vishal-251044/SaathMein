@@ -1,0 +1,7 @@
+# Normalise line endings to LF in the repo (Windows checkouts stay consistent)
+* text=auto eol=lf
+
+*.pdf binary
+*.png binary
+*.jpg binary
+*.ttf binary

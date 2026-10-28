@@ -1,0 +1,7 @@
+/*
+ * Global Tailwind entry for NativeWind. Imported once in src/app/_layout.tsx.
+ * Theme colours are CSS variables provided by components/layout/ThemeRoot.tsx.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

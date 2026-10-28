@@ -1,0 +1,106 @@
+/*
+ * Global styles: Tailwind, Sunrise tokens mapped to Tailwind theme utilities,
+ * brand gradient utilities and base element styles.
+ */
+@import 'tailwindcss';
+@import '../styles/tokens.css';
+
+@theme inline {
+  /* Colours → bg-*, text-*, border-* utilities */
+  --color-bg: var(--sm-bg);
+  --color-bg-band: var(--sm-bg-band);
+  --color-surface: var(--sm-surface);
+  --color-surface-raised: var(--sm-surface-raised);
+  --color-ink: var(--sm-ink);
+  --color-muted: var(--sm-muted);
+  --color-line: var(--sm-border);
+  --color-primary: var(--sm-primary);
+  --color-saffron: var(--sm-saffron);
+  --color-coral: var(--sm-coral);
+  --color-violet: var(--sm-violet);
+  --color-savings: var(--sm-savings);
+  --color-savings-soft: var(--sm-savings-soft);
+  --color-ai: var(--sm-ai);
+  --color-ai-soft: var(--sm-ai-soft);
+  --color-warning: var(--sm-warning);
+  --color-danger: var(--sm-danger);
+
+  /* Shape: 20 px cards, 14 px buttons, pill chips */
+  --radius-card: 20px;
+  --radius-button: 14px;
+
+  --shadow-card: var(--sm-shadow-card);
+  --shadow-pop: var(--sm-shadow-pop);
+
+  /* Fonts (loaded with next/font in app/layout.js) */
+  --font-sans: var(--font-jakarta), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* Brand gradients */
+@utility bg-sunrise {
+  background-image: var(--sm-gradient-sunrise);
+}
+@utility bg-saathi {
+  background-image: var(--sm-gradient-ai);
+}
+@utility text-sunrise {
+  background-image: var(--sm-gradient-sunrise);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/*
+ * CSS-only entrance for above-the-fold content: it runs before JavaScript loads, so the
+ * hero is never hidden while the page hydrates. Below-the-fold reveals use Framer Motion.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-rise {
+  animation: rise-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--sm-bg);
+    color: var(--sm-ink);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--sm-primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(255 90 60 / 0.2);
+  }
+}
+
+/* Respect users who turn motion off (Framer Motion also checks this via useReducedMotion) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

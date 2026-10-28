@@ -1,0 +1,59 @@
+{
+  "common": {
+    "appName": "SaathMein",
+    "tagline": "Buy together. Save together.",
+    "retry": "Try again",
+    "comingSoon": "Coming soon"
+  },
+  "tabs": {
+    "home": "Home",
+    "search": "Search",
+    "groups": "My Groups",
+    "saathi": "Saathi",
+    "profile": "Profile"
+  },
+  "home": {
+    "greeting": "Namaste",
+    "subtitle": "Groups in Pune that save you money",
+    "heroTitle": "Buy together. Save together.",
+    "heroBody": "Join a group for the same product. Dealers bid, and the lowest price wins for everyone.",
+    "howTitle": "How it works",
+    "stepJoin": "Join a group with a small refundable token",
+    "stepBid": "Verified dealers bid. The lowest price wins",
+    "stepSave": "Everyone buys at the winning price",
+    "emptyTitle": "Groups are on the way",
+    "emptyBody": "Open groups near you will show up here as soon as they start."
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search bikes, phones, cars…",
+    "emptyTitle": "Find a product or group",
+    "emptyBody": "Search by brand or model, like Activa or iPhone."
+  },
+  "groups": {
+    "title": "My Groups",
+    "emptyTitle": "You have not joined a group yet",
+    "emptyBody": "Groups you join or start will appear here with live updates."
+  },
+  "saathi": {
+    "title": "Saathi",
+    "badge": "AI assistant",
+    "emptyTitle": "Your shopping companion",
+    "emptyBody": "Ask Saathi in English, Hindi or Marathi to find products, groups and the best time to buy."
+  },
+  "profile": {
+    "title": "Profile",
+    "emptyTitle": "Your account",
+    "emptyBody": "Log in with your phone number to join groups and track your savings.",
+    "language": "Language",
+    "serverStatus": "Server status",
+    "serverOk": "Connected",
+    "serverDegraded": "Database not connected",
+    "serverDown": "Cannot reach the server",
+    "checking": "Checking…"
+  },
+  "errors": {
+    "network": "Cannot reach SaathMein right now. Check your internet connection.",
+    "generic": "Something went wrong. Please try again."
+  }
+}

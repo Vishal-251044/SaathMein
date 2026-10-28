@@ -1,0 +1,75 @@
+/*
+ * SaathMein "Sunrise" design tokens (PRD §14.1) for the dealer dashboard and admin console.
+ * Raw values live in CSS variables (switched for dark mode); Tailwind utilities map to
+ * them in globals.css via @theme. Never use one-off colours in components.
+ *
+ * Colour meaning is strict: mint = money saved, violet = AI. Nothing else uses them.
+ */
+
+:root {
+  /* Brand (same in both modes) */
+  --sm-saffron: #ff8a1f;
+  --sm-coral: #ff4d5e;
+  --sm-violet: #b43cf5;
+  --sm-primary: #ff5a3c; /* solid fallback for the Sunrise gradient */
+  --sm-gradient-sunrise: linear-gradient(135deg, #ff8a1f 0%, #ff4d5e 52%, #b43cf5 100%);
+
+  /* Light mode (default) */
+  --sm-bg: #ffffff;
+  --sm-bg-band: #f7f5f1; /* warm grey section bands */
+  --sm-surface: #ffffff;
+  --sm-surface-raised: #ffffff;
+  --sm-ink: #12131f;
+  --sm-muted: #6b7085;
+  --sm-border: #e9e6e1;
+  --sm-savings: #10b981;
+  --sm-savings-soft: #e7f8f1;
+  --sm-ai: #7c5cff;
+  --sm-ai-soft: #f1edff;
+  --sm-gradient-ai: linear-gradient(135deg, #7c5cff 0%, #b43cf5 100%);
+  --sm-warning: #f59e0b;
+  --sm-danger: #ef4444;
+  --sm-shadow-card: 0 1px 2px rgb(18 19 31 / 0.04), 0 8px 24px rgb(18 19 31 / 0.06);
+  --sm-shadow-pop: 0 12px 32px rgb(255 77 94 / 0.28);
+
+  color-scheme: light;
+}
+
+/* Dark mode values, shared by the system preference and an explicit data-theme="dark" */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --sm-bg: #12131f;
+    --sm-bg-band: #171826;
+    --sm-surface: #1c1d2b;
+    --sm-surface-raised: #24253a;
+    --sm-ink: #f4f4f8;
+    --sm-muted: #a3a7b8;
+    --sm-border: #2c2d42;
+    --sm-savings: #34d399;
+    --sm-savings-soft: rgb(52 211 153 / 0.12);
+    --sm-ai: #9b85ff;
+    --sm-ai-soft: rgb(155 133 255 / 0.14);
+    --sm-warning: #fbbf24;
+    --sm-danger: #f87171;
+    --sm-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --sm-bg: #12131f;
+  --sm-bg-band: #171826;
+  --sm-surface: #1c1d2b;
+  --sm-surface-raised: #24253a;
+  --sm-ink: #f4f4f8;
+  --sm-muted: #a3a7b8;
+  --sm-border: #2c2d42;
+  --sm-savings: #34d399;
+  --sm-savings-soft: rgb(52 211 153 / 0.12);
+  --sm-ai: #9b85ff;
+  --sm-ai-soft: rgb(155 133 255 / 0.14);
+  --sm-warning: #fbbf24;
+  --sm-danger: #f87171;
+  --sm-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}

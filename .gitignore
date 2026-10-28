@@ -1,0 +1,39 @@
+# ===== SaathMein — root .gitignore =====
+# Each app (mobile/, web/, backend/) also has its own .gitignore.
+
+# Environment files (keep only the .example templates)
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.next/
+out/
+.expo/
+coverage/
+
+# Native builds and signing keys
+*.keystore
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editors and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
