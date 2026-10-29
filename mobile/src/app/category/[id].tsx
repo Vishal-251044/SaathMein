@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { ProductList } from '@/components/features/ProductList';
+import { RequestProductButton } from '@/components/features/RequestProductButton';
 import { StackHeader } from '@/components/layout/StackHeader';
 import { useCategories } from '@/hooks/useCatalog';
 import { localizedName } from '@/utils/localize';
@@ -28,6 +29,7 @@ export default function CategoryScreen() {
         header={<View className="h-4" />}
         emptyTitle={t('catalog.emptyCategoryTitle')}
         emptyBody={t('catalog.emptyCategoryBody')}
+        emptyAction={<RequestProductButton categoryId={id} />}
       />
     </View>
   );

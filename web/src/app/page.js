@@ -1,6 +1,6 @@
 /**
  * Public landing page. Buyers use the Android app; this page explains SaathMein and
- * points dealers to the dealer dashboard (opens on Day 5).
+ * points dealers to the dealer dashboard.
  */
 import { ShieldCheck, Store, Wallet } from 'lucide-react';
 import SiteHeader from '@/components/layout/SiteHeader';
@@ -9,6 +9,7 @@ import FadeIn from '@/components/animations/FadeIn';
 import Button from '@/components/ui/Button';
 import GroupPreviewCard from '@/components/features/GroupPreviewCard';
 import HowItWorks from '@/components/features/HowItWorks';
+import { ROUTES } from '@/utils/constants';
 
 const DEALER_POINTS = [
   {
@@ -93,9 +94,18 @@ export default function HomePage() {
                 For dealers and shops
               </h2>
               <p className="mt-3 max-w-2xl text-muted">
-                Give us your best price for a full group of confirmed buyers. The dealer dashboard
-                opens to verified dealers in Pune soon.
+                Give us your best price for a full group of confirmed buyers. Register your
+                business, finish KYC once, and bid on group orders in Pune.
               </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button href={ROUTES.SELLER_REGISTER} size="lg">
+                  <Store className="size-5" strokeWidth={2} aria-hidden="true" />
+                  Register your business
+                </Button>
+                <Button href={ROUTES.SELLER_LOGIN} variant="secondary" size="lg">
+                  Dealer login
+                </Button>
+              </div>
             </FadeIn>
 
             <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">

@@ -64,6 +64,22 @@ export async function listProducts({
 }
 
 /**
+ * Most wanted products in the buyer's city (Home rail).
+ * @param cityId - Buyer's city (defaults to the launch city on the server)
+ * @param limit - How many cards
+ * @returns Product cards, most popular first
+ */
+export async function listPopularProducts(
+  cityId: string | null,
+  limit = 10,
+): Promise<ProductPage['products']> {
+  const data = await unwrap<{ products: ProductPage['products'] }>(
+    api.get('/products', { params: { sort: 'popular', cityId: cityId || undefined, limit } }),
+  );
+  return data.products;
+}
+
+/**
  * Product page data with prices for the buyer's city.
  * @param productId - Product id
  * @param cityId - Buyer's city (defaults to the launch city on the server)

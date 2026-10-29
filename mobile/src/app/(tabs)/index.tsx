@@ -1,6 +1,7 @@
 /**
- * Home tab: greeting and city, promise card, category grid (Day 4), chosen interests
- * (placeholder until real group sections arrive on Day 11) and how it works.
+ * Home tab: greeting and city, promise card, category grid (Day 4), "Popular in {city}"
+ * product rail (Day 5), chosen interests (placeholder until real group sections arrive on
+ * Day 11) and how it works.
  */
 import { MapPin, UsersRound } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +13,7 @@ import { EmptyState } from '@/components/features/EmptyState';
 import { HeroCard } from '@/components/features/HeroCard';
 import { HowItWorksSteps } from '@/components/features/HowItWorksSteps';
 import { InterestsSummaryCard } from '@/components/features/InterestsSummaryCard';
+import { PopularProductsRail } from '@/components/features/PopularProductsRail';
 import { Screen } from '@/components/layout/Screen';
 import { AppText } from '@/components/ui/AppText';
 import { LogoMark } from '@/components/ui/LogoMark';
@@ -62,6 +64,8 @@ export default function HomeScreen() {
         {t('home.browseCategories')}
       </AppText>
       <CategoryGrid />
+
+      <PopularProductsRail cityName={localizedName(city, i18n.language) || t('catalog.yourCity')} />
 
       {user ? (
         <View className="mt-8">

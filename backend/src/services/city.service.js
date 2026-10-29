@@ -136,6 +136,14 @@ const findCityOrThrow = async (cityId) => {
 };
 
 /**
+ * One city in the admin shape (also the "before" snapshot for the audit log).
+ * @param {string} cityId - City id
+ * @returns {Promise<Object>} Admin city
+ * @throws {ApiError} 404
+ */
+const getAdminCity = async (cityId) => toAdminCity(await findCityOrThrow(cityId));
+
+/**
  * Throw if another area in the city already has this name. (Pincodes may be shared:
  * one Indian pincode often covers several neighbourhoods.)
  * @param {Object} city - City document
@@ -242,6 +250,7 @@ module.exports = {
   getActiveCityAndArea,
   matchLocation,
   listAllCities,
+  getAdminCity,
   createCity,
   updateCity,
   addArea,

@@ -154,18 +154,31 @@ Notes:
 ### Day 5 — Dealer Login, Onboarding & Dashboard v1 (Fri 30 Oct)
 **Done when:** a dealer signs up and logs in, finishes KYC, gets a Razorpay Route linked account in test mode and is approved in admin; the approval appears in the audit log.
 
-- [ ] Mobile: seller profile card component (rating, verified badge, distance)
-- [ ] Mobile: "Request a missing product" form
-- [ ] Mobile: Home polish with real categories and products
-- [ ] Backend: `POST /seller/register`, `POST /seller/kyc` (GST, PAN, address, photos, dealer proof)
-- [ ] Backend: seller staff invites
-- [ ] Backend: Razorpay Route linked-account creation (test mode)
-- [ ] Backend: coverage cities + categories, sellers.geo 2dsphere
-- [ ] Backend: admin approve / reject with reason; email notifications
-- [ ] Web: dealer sign up, login (email / phone OTP + password), KYC wizard, profile, coverage, team
-- [ ] Web: Admin Sellers KYC queue with document preview
-- [ ] Backend: audit-log middleware (every admin write recorded)
+- [x] Mobile: seller profile card component (rating, verified badge, distance)
+- [x] Mobile: "Request a missing product" form
+- [x] Mobile: Home polish with real categories and products
+- [x] Backend: `POST /seller/register`, `POST /seller/kyc` (GST, PAN, address, photos, dealer proof)
+- [x] Backend: seller staff invites
+- [x] Backend: Razorpay Route linked-account creation (test mode)
+- [x] Backend: coverage cities + categories, sellers.geo 2dsphere
+- [x] Backend: admin approve / reject with reason; email notifications
+- [x] Web: dealer sign up, login (email / phone OTP + password), KYC wizard, profile, coverage, team
+- [x] Web: Admin Sellers KYC queue with document preview
+- [x] Backend: audit-log middleware (every admin write recorded)
 - [ ] Razorpay test mode account; request Route activation
+
+Notes:
+- Built 30 Oct 2026. Backend: 176 tests pass (dealer sign-up/login/lockout, email codes, KYC rules incl. PAN↔GSTIN and dealer proof for vehicles, forged upload rejected, Razorpay Route setup with mocked SDK incl. resume after failure, approve/reject rules, team rules, audit middleware + redaction, dealer and admin permission matrix, audit entry on approval, popular products). Web builds; mobile typecheck + lint pass.
+- DECISION (Claude, needs Vishal's OK): dealer login is **email + password** only. The business mobile is stored as a contact, not a login, because it is not OTP-verified on the web; phone OTP login for dealers (PRD wording) is deferred. Endpoints live under `/api/seller/auth/*` (register = `/api/seller/auth/register`). Dealer refresh token is an httpOnly cookie (`sm_seller_rt`), separate from the admin session.
+- One dealer team per person; the owner manages KYC, bank, profile and team; staff (invited by email, 7-day link) get the "seller" role and read access. Max 20 per team.
+- KYC: GST, PAN, shop photo required (+ authorised dealer certificate for Cars/EVs and Two-wheelers). Documents are private (Cloudinary `authenticated`), staff open them with 10-minute links. Resubmitting after "sent back" needs the documents uploaded again.
+- Razorpay Route: submitting KYC creates the linked account → stakeholder → Route product → settlement bank. Bank details go to Razorpay only (we keep last 4 digits + IFSC). Every step is resumable; errors show in Admin → Sellers with "Retry" (retry also refreshes the activation status). Admin approval is blocked until the account exists and the bank is set. Business category/subcategory sent to Razorpay come from `RAZORPAY_ROUTE_CATEGORY` / `RAZORPAY_ROUTE_SUBCATEGORY` (defaults `ecommerce` / `ecommerce_marketplace`) — confirm with Razorpay.
+- Emails (Resend over HTTPS, no SDK): verification code, KYC submitted/approved/sent back, team invite, "KYC waiting" to reviewers. Without `RESEND_API_KEY` emails are written to the API log (dev).
+- Audit log: every successful admin write (cities, categories, products, images, CSV imports, seller review, product requests) plus staff logins; secrets redacted; before/after keep changed fields only. Viewer: `GET /api/admin/audit-logs` (Owner/Admin) and the Activity card on a seller. Full audit page stays on Day 13. Closes the Day 2/3/4 audit PENDING items (staff logout and new-device alert still PENDING).
+- Mobile: product page shows "Verified dealers in {city}"; "Request this product" from empty search, empty category and Profile; Home has a "Popular in {city}" rail (`GET /products?sort=popular`: distinct buyers' views/interest in the last 30 days, topped up alphabetically). Distance on dealer cards appears once the app sends the buyer's location (Day 11 discovery).
+- Admin → Product requests inbox (buyer and dealer requests, mark added/rejected).
+- PENDING (owner): Razorpay test account + Route activation; fill `RAZORPAY_*`, `RESEND_API_KEY`, `EMAIL_FROM`, `SELLER_WEB_URL` in `backend/.env`.
+- Not verified end-to-end yet (needs MongoDB, Razorpay test keys and Cloudinary).
 
 ### Day 6 — Groups Core & Lifecycle State Machine (Sat 31 Oct)
 **Done when:** a user creates a group, a second user finds it in the list and on the product page, and the deadline job expires a test group correctly.
@@ -414,3 +427,4 @@ Notes:
 | 27 Oct 2026 | Theme is "Sunrise" (PRD §14.1), not "Saffron Night" | Day 1 |
 | 27 Oct 2026 | Auction bids stored in `bids` + `auctionDealers` (PRD §13); no separate `offers` collection | Days 1, 9, 18 |
 | 27 Oct 2026 | Build started 27 Oct (planned 26 Oct) — schedule is one day behind | All |
+| 30 Oct 2026 | Dealer login = email + password; business phone is a contact only (dealer phone OTP deferred) — pending Vishal's OK | Days 5, 9 |

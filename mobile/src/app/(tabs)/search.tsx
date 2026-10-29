@@ -9,6 +9,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ProductList } from '@/components/features/ProductList';
+import { RequestProductButton } from '@/components/features/RequestProductButton';
 import { AppText } from '@/components/ui/AppText';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useRecentSearches } from '@/hooks/useRecentSearches';
@@ -122,6 +123,7 @@ export default function SearchScreen() {
           header={<View className="h-3" />}
           emptyTitle={t('search.noResultsTitle', { query })}
           emptyBody={t('search.noResultsBody')}
+          emptyAction={<RequestProductButton query={query} />}
           onOpenProduct={() => add(query)}
         />
       ) : (

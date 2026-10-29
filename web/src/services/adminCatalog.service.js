@@ -2,7 +2,7 @@
  * Admin catalog service — /api/admin/categories and /api/admin/products (CAT-1 to CAT-3).
  * Money is integer paise and percentages are basis points in every request and response.
  */
-import api, { ApiClientError } from '@/services/api';
+import api, { uploadToCloudinary } from '@/services/api';
 
 /* ----------------------------- Categories ----------------------------- */
 
@@ -55,21 +55,12 @@ export const updateProduct = async (productId, changes) =>
  * @returns {Promise<Object>} Updated product
  */
 export const uploadProductImage = async (productId, file) => {
-  const { uploadUrl, fields } = (
-    await api.post(`/admin/products/${productId}/images/upload-params`)
-  ).data;
-  const form = new FormData();
-  Object.entries(fields).forEach(([key, value]) => form.append(key, String(value)));
-  form.append('file', file);
-
-  const response = await fetch(uploadUrl, { method: 'POST', body: form });
-  if (!response.ok) {
-    throw new ApiClientError('The image could not be uploaded. Use JPG, PNG or WebP.', {
-      status: response.status,
-      code: 'UPLOAD_FAILED',
-    });
-  }
-  const uploaded = await response.json();
+  const params = (await api.post(`/admin/products/${productId}/images/upload-params`)).data;
+  const uploaded = await uploadToCloudinary(
+    params,
+    file,
+    'The image could not be uploaded. Use JPG, PNG or WebP.',
+  );
   return (
     await api.post(`/admin/products/${productId}/images`, {
       publicId: uploaded.public_id,

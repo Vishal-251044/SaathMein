@@ -1,10 +1,12 @@
 /**
  * Admin catalog controller — categories with rules, products, images and CSV import
- * (CAT-1 to CAT-3). Owner, Admin and Deal Manager.
+ * (CAT-1 to CAT-3). Owner, Admin and Deal Manager. Every write describes itself for the
+ * audit log (ADL-5).
  */
 const asyncHandler = require('../../utils/asyncHandler');
 const { sendSuccess } = require('../../utils/ApiResponse');
 const ApiError = require('../../utils/ApiError');
+const { setAudit, diffSnapshots } = require('../../services/audit.service');
 const categoryService = require('../../services/category.service');
 const productAdmin = require('../../services/catalog/productAdmin.service');
 const productImport = require('../../services/catalog/productImport.service');
@@ -20,12 +22,25 @@ const listCategories = asyncHandler(async (req, res) => {
 /** POST /api/admin/categories */
 const createCategory = asyncHandler(async (req, res) => {
   const category = await categoryService.createCategory(req.body);
+  setAudit(req, {
+    action: 'category.create',
+    targetType: 'category',
+    targetId: category.id,
+    after: category,
+  });
   return sendSuccess(res, { statusCode: 201, message: 'Category created', data: { category } });
 });
 
 /** PATCH /api/admin/categories/:categoryId */
 const updateCategory = asyncHandler(async (req, res) => {
+  const before = await categoryService.getAdminCategory(req.params.categoryId);
   const category = await categoryService.updateCategory(req.params.categoryId, req.body);
+  setAudit(req, {
+    action: 'category.update',
+    targetType: 'category',
+    targetId: category.id,
+    ...diffSnapshots(before, category),
+  });
   return sendSuccess(res, { message: 'Category updated', data: { category } });
 });
 
@@ -46,16 +61,29 @@ const getProduct = asyncHandler(async (req, res) => {
 /** POST /api/admin/products */
 const createProduct = asyncHandler(async (req, res) => {
   const product = await productAdmin.createProduct(req.body, req.staff.userId);
+  setAudit(req, {
+    action: 'product.create',
+    targetType: 'product',
+    targetId: product.id,
+    after: product,
+  });
   return sendSuccess(res, { statusCode: 201, message: 'Product created', data: { product } });
 });
 
 /** PATCH /api/admin/products/:productId */
 const updateProduct = asyncHandler(async (req, res) => {
+  const before = await productAdmin.getAdminProduct(req.params.productId);
   const product = await productAdmin.updateProduct(
     req.params.productId,
     req.body,
     req.staff.userId,
   );
+  setAudit(req, {
+    action: 'product.update',
+    targetType: 'product',
+    targetId: product.id,
+    ...diffSnapshots(before, product),
+  });
   return sendSuccess(res, { message: 'Product updated', data: { product } });
 });
 
@@ -68,6 +96,12 @@ const getImageUploadParams = asyncHandler(async (req, res) => {
 /** POST /api/admin/products/:productId/images — attach a verified upload */
 const addImage = asyncHandler(async (req, res) => {
   const product = await productAdmin.addProductImage(req.params.productId, req.body);
+  setAudit(req, {
+    action: 'product.image.add',
+    targetType: 'product',
+    targetId: product.id,
+    after: { publicId: req.body.publicId },
+  });
   return sendSuccess(res, { message: 'Image added', data: { product } });
 });
 
@@ -77,6 +111,12 @@ const removeImage = asyncHandler(async (req, res) => {
     req.params.productId,
     req.validatedQuery.url,
   );
+  setAudit(req, {
+    action: 'product.image.remove',
+    targetType: 'product',
+    targetId: product.id,
+    before: { url: req.validatedQuery.url },
+  });
   return sendSuccess(res, { message: 'Image removed', data: { product } });
 });
 
@@ -92,6 +132,12 @@ const importProducts = asyncHandler(async (req, res) => {
   const report = await productImport.importProductsCsv(req.body, {
     dryRun: req.validatedQuery.dryRun === 'true',
     staffUserId: req.staff.userId,
+  });
+  const { failedRows, ...summary } = report;
+  setAudit(req, {
+    action: report.dryRun ? 'product.import.check' : 'product.import',
+    targetType: 'product',
+    after: { ...summary, failedRows: failedRows.length },
   });
   const message = report.dryRun ? 'Check finished — nothing was saved' : 'Import finished';
   return sendSuccess(res, { message, data: { report } });

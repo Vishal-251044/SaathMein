@@ -1,6 +1,6 @@
 /**
- * Product page (CAT-2, DIS-4): images, variants with the user's city price, specs, open
- * groups in the city and the "Start a group" call to action.
+ * Product page (CAT-2, DIS-4, TRU-1): images, variants with the user's city price, specs,
+ * open groups in the city, verified dealers in the city and the "Start a group" call to action.
  * Until group creation exists (Day 6) the CTA records the user's interest (demand signal)
  * and says so — it never pretends a group was created.
  */
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/features/EmptyState';
 import { PriceBlock } from '@/components/features/PriceBlock';
 import { ProductImageCarousel } from '@/components/features/ProductImageCarousel';
+import { VerifiedDealersSection } from '@/components/features/VerifiedDealersSection';
 import { StackHeader } from '@/components/layout/StackHeader';
 import { AppText } from '@/components/ui/AppText';
 import { Button } from '@/components/ui/Button';
@@ -150,6 +151,8 @@ export default function ProductScreen() {
                   body={t('catalog.noGroupBody', { city: cityName })}
                 />
               </View>
+
+              <VerifiedDealersSection categoryId={product.categoryId} cityName={cityName} />
             </View>
           </ScrollView>
 

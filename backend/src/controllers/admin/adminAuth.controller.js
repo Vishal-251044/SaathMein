@@ -10,6 +10,7 @@ const { parseCookies } = require('../../utils/cookies');
 const staffAuthService = require('../../services/auth/staffAuth.service');
 const User = require('../../models/user.model');
 const { toStaffUser } = require('../../services/user.service');
+const { recordAudit } = require('../../services/audit.service');
 
 const REFRESH_COOKIE = 'sm_staff_rt';
 const REFRESH_COOKIE_PATH = '/api/admin/auth';
@@ -62,6 +63,20 @@ const verifyTwoFactor = asyncHandler(async (req, res) => {
     context: { ip: req.ip, userAgent: req.get('user-agent') },
   });
   const session = applySessionCookie(res, tokens);
+  // Staff logins are recorded in the audit log (ADL-5); /auth runs before the audit middleware
+  await recordAudit({
+    actorId: staff.id,
+    actorRole: staff.role,
+    action: 'staff.login',
+    targetType: 'staff',
+    targetId: staff.id,
+    method: req.method,
+    path: req.originalUrl.split('?')[0],
+    statusCode: 200,
+    ip: req.ip,
+    userAgent: req.get('user-agent')?.slice(0, 300),
+    requestId: req.id,
+  });
   return sendSuccess(res, {
     message: 'Logged in',
     data: { staff, ...session, ...(backupCodes ? { backupCodes } : {}) },

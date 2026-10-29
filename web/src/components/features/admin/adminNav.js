@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   MapPin,
   Shapes,
+  Inbox,
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
@@ -23,7 +24,13 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'Cities', href: '/admin/cities', icon: MapPin, roles: ['admin', 'deal_manager'] },
   { label: 'Categories', href: '/admin/catalog', icon: Shapes, roles: ['admin', 'deal_manager'] },
   { label: 'Products', href: '/admin/products', icon: Package, roles: ['admin', 'deal_manager'] },
-  { label: 'Sellers', icon: Store, availableOn: 'Day 5', roles: ['admin', 'deal_manager'] },
+  { label: 'Sellers', href: '/admin/sellers', icon: Store, roles: ['admin', 'deal_manager'] },
+  {
+    label: 'Product requests',
+    href: '/admin/product-requests',
+    icon: Inbox,
+    roles: ['admin', 'deal_manager'],
+  },
   {
     label: 'Groups',
     icon: UsersRound,

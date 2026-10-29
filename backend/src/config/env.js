@@ -63,6 +63,21 @@ const envSchema = z.object({
   CLOUDINARY_API_KEY: z.string().default(''),
   CLOUDINARY_API_SECRET: z.string().default(''),
 
+  // Razorpay — Route linked accounts for dealers (Day 5), payments from Day 7
+  RAZORPAY_KEY_ID: z.string().default(''),
+  RAZORPAY_KEY_SECRET: z.string().default(''),
+  RAZORPAY_WEBHOOK_SECRET: z.string().default(''),
+  // Business category sent when creating a dealer's linked account (Razorpay business categories)
+  RAZORPAY_ROUTE_CATEGORY: z.string().default('ecommerce'),
+  RAZORPAY_ROUTE_SUBCATEGORY: z.string().default('ecommerce_marketplace'),
+
+  // Email (Resend) — dealer verification codes, KYC updates, staff invites
+  RESEND_API_KEY: z.string().default(''),
+  EMAIL_FROM: z.string().default('SaathMein <no-reply@saathmein.in>'),
+
+  // Public URL of the dealer dashboard (links in emails, e.g. team invites)
+  SELLER_WEB_URL: z.string().default('http://localhost:3000/seller'),
+
   // Owner account — read only by `npm run create-owner` (ADL-3)
   OWNER_EMAIL: z.string().default(''),
   OWNER_PASSWORD: z.string().default(''),
@@ -185,6 +200,24 @@ const config = Object.freeze({
       env.CLOUDINARY_API_SECRET,
     ].every((value) => value && !/^your_.*_here$/.test(value)),
   },
+  razorpay: {
+    keyId: env.RAZORPAY_KEY_ID,
+    keySecret: env.RAZORPAY_KEY_SECRET,
+    webhookSecret: env.RAZORPAY_WEBHOOK_SECRET,
+    routeCategory: env.RAZORPAY_ROUTE_CATEGORY,
+    routeSubcategory: env.RAZORPAY_ROUTE_SUBCATEGORY,
+    isConfigured:
+      /^rzp_(test|live)_/.test(env.RAZORPAY_KEY_ID) &&
+      Boolean(env.RAZORPAY_KEY_SECRET) &&
+      !/^your_.*_here$/.test(env.RAZORPAY_KEY_SECRET),
+    isLiveMode: env.RAZORPAY_KEY_ID.startsWith('rzp_live_'),
+  },
+  email: {
+    resendApiKey: env.RESEND_API_KEY,
+    from: env.EMAIL_FROM,
+    isConfigured: env.RESEND_API_KEY.startsWith('re_'),
+  },
+  sellerWebUrl: env.SELLER_WEB_URL.replace(/\/+$/, ''),
   owner: {
     email: env.OWNER_EMAIL,
     password: env.OWNER_PASSWORD,

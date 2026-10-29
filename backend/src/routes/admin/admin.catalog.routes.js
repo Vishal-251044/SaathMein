@@ -11,7 +11,6 @@ const { STAFF_ROLE } = require('../../constants/enums');
 
 const router = express.Router();
 
-// TODO(Day 5): audit-log middleware on every write below
 // Scoped to these paths: this router is mounted at /api/admin, so an unscoped guard would
 // also block other staff roles from modules mounted after it
 router.use(['/categories', '/products'], requireStaff(STAFF_ROLE.ADMIN, STAFF_ROLE.DEAL_MANAGER));

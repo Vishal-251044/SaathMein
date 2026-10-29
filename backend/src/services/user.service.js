@@ -3,6 +3,7 @@
  * Never return a raw user document: it can contain secrets (password hash, 2FA data).
  */
 const User = require('../models/user.model');
+const SellerStaff = require('../models/sellerStaff.model');
 const ApiError = require('../utils/ApiError');
 const { APP_ROLE } = require('../constants/enums');
 
@@ -52,12 +53,15 @@ const toStaffUser = (user) => ({
 });
 
 /**
- * App roles for a user (PRD §8.2). Everyone is a buyer; "seller" is added on Day 5 when
- * seller membership exists.
- * @param {Object} _user - User document
- * @returns {string[]} Roles for the access token
+ * App roles for a user (PRD §8.2). Everyone is a buyer; members of a seller team (owner or
+ * staff) are also "seller". Whether the seller may bid is checked separately (KYC approved).
+ * @param {Object} user - User document
+ * @returns {Promise<string[]>} Roles for the access token
  */
-const getAppRoles = (_user) => [APP_ROLE.BUYER];
+const getAppRoles = async (user) => {
+  const isSellerMember = await SellerStaff.exists({ userId: user._id, status: 'active' });
+  return isSellerMember ? [APP_ROLE.BUYER, APP_ROLE.SELLER] : [APP_ROLE.BUYER];
+};
 
 /**
  * Load a user by id.

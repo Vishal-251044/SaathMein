@@ -17,10 +17,18 @@ export const ADMIN_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 /** Refresh the 15-minute staff access token a little before it expires. */
 export const ADMIN_TOKEN_REFRESH_MS = 13 * 60 * 1000;
 
+/** Refresh the 15-minute dealer access token a little before it expires. */
+export const SELLER_TOKEN_REFRESH_MS = 13 * 60 * 1000;
+
 /** Top-level route paths. Admin is intentionally not linked from public pages (ADL-1). */
 export const ROUTES = Object.freeze({
   HOME: '/',
   SELLER: '/seller',
+  SELLER_LOGIN: '/seller/login',
+  SELLER_REGISTER: '/seller/register',
+  SELLER_KYC: '/seller/kyc',
+  SELLER_PROFILE: '/seller/profile',
+  SELLER_TEAM: '/seller/team',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
 });
@@ -32,4 +40,47 @@ export const STAFF_ROLE_LABELS = Object.freeze({
   deal_manager: 'Deal Manager',
   finance: 'Finance',
   support: 'Support',
+});
+
+/** Dealer business types (match the API and Razorpay Route business_type). */
+export const BUSINESS_TYPE_OPTIONS = Object.freeze([
+  { value: 'proprietorship', label: 'Proprietorship' },
+  { value: 'partnership', label: 'Partnership firm' },
+  { value: 'llp', label: 'LLP' },
+  { value: 'private_limited', label: 'Private limited company' },
+  { value: 'public_limited', label: 'Public limited company' },
+]);
+
+/** KYC document types and their labels (TRU-1). */
+export const KYC_DOC_LABELS = Object.freeze({
+  gst_certificate: 'GST registration certificate',
+  pan_card: 'Business PAN card',
+  shop_photo: 'Shop front photo (with name board)',
+  dealer_proof: 'Authorised dealer certificate',
+  address_proof: 'Shop address proof',
+  cancelled_cheque: 'Cancelled cheque',
+  other: 'Other document',
+});
+
+/** Category slugs whose dealers must upload an authorised dealer certificate (TRU-1). */
+export const VEHICLE_CATEGORY_SLUGS = Object.freeze(['cars-evs', 'two-wheelers']);
+
+/** KYC status labels and badge tones. */
+export const KYC_STATUS_META = Object.freeze({
+  not_submitted: { label: 'Not submitted', tone: 'muted' },
+  pending: { label: 'Under review', tone: 'warning' },
+  approved: { label: 'Verified', tone: 'brand' },
+  rejected: { label: 'Changes needed', tone: 'danger' },
+});
+
+/** Razorpay Route linked-account status labels (dealer payouts). */
+export const PAYOUT_STATUS_LABELS = Object.freeze({
+  not_started: 'Not set up',
+  created: 'Account created',
+  requested: 'Activation requested',
+  under_review: 'Razorpay reviewing',
+  needs_clarification: 'Razorpay needs details',
+  activated: 'Active',
+  suspended: 'Suspended',
+  failed: 'Setup failed',
 });

@@ -4,6 +4,8 @@
  */
 const Product = require('../../models/product.model');
 const City = require('../../models/city.model');
+const DemandSignal = require('../../models/demandSignal.model');
+const { Types } = require('mongoose');
 const ApiError = require('../../utils/ApiError');
 const { getPagination } = require('../../helpers/genericFunctions');
 const { searchProductIds } = require('./productSearch.service');
@@ -39,12 +41,53 @@ const findInOrder = async (ids) => {
   return ids.map((id) => byId.get(id)).filter(Boolean);
 };
 
+const POPULAR_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * Most wanted products in a city: distinct buyers who viewed or asked for each product in
+ * the last 30 days, topped up alphabetically so the rail is never empty (Home rail).
+ * @param {string|null} cityId - City id
+ * @param {{ categoryId?: string, limit: number }} options
+ * @returns {Promise<Object[]>} Lean products, most popular first
+ */
+const findPopularProducts = async (cityId, { categoryId, limit }) => {
+  const ranked = cityId
+    ? await DemandSignal.aggregate([
+        {
+          $match: {
+            cityId: new Types.ObjectId(cityId),
+            productId: { $exists: true },
+            ...(categoryId ? { categoryId: new Types.ObjectId(categoryId) } : {}),
+            createdAt: { $gte: new Date(Date.now() - POPULAR_WINDOW_MS) },
+          },
+        },
+        { $group: { _id: { productId: '$productId', userId: '$userId' } } },
+        { $group: { _id: '$_id.productId', buyers: { $sum: 1 } } },
+        { $sort: { buyers: -1 } },
+        { $limit: limit * 2 },
+      ])
+    : [];
+  const popular = (await findInOrder(ranked.map((row) => String(row._id)))).slice(0, limit);
+  if (popular.length >= limit) return popular;
+
+  const filler = await Product.find({
+    active: true,
+    _id: { $nin: popular.map((product) => product._id) },
+    ...(categoryId ? { categoryId } : {}),
+  })
+    .sort({ brand: 1, model: 1 })
+    .limit(limit - popular.length)
+    .lean();
+  return [...popular, ...filler];
+};
+
 /**
  * List or search active products.
- * @param {{ q?: string, categoryId?: string, cityId?: string, page?: string, limit?: string }} query
+ * `sort=popular` (no search text) returns one page of the most wanted products in the city.
+ * @param {{ q?: string, categoryId?: string, cityId?: string, sort?: string, page?: string, limit?: string }} query
  * @returns {Promise<{ products: Object[], meta: Object }>} Cards + pagination
  */
-const listProducts = async ({ q, categoryId, cityId, page, limit }) => {
+const listProducts = async ({ q, categoryId, cityId, sort, page, limit }) => {
   const pagination = getPagination({ page, limit });
   const resolvedCityId = await resolveCityId(cityId);
   const term = q?.trim();
@@ -53,7 +96,10 @@ const listProducts = async ({ q, categoryId, cityId, page, limit }) => {
   let hasNextPage;
   let engine;
 
-  if (term) {
+  if (!term && sort === 'popular') {
+    products = await findPopularProducts(resolvedCityId, { categoryId, limit: pagination.limit });
+    hasNextPage = false;
+  } else if (term) {
     const result = await searchProductIds({
       q: term,
       categoryId,

@@ -145,7 +145,7 @@ const verifyOtpLogin = async ({ idToken, context }) => {
   const tokens = await startSession({
     userId: user._id,
     audience: TOKEN_AUDIENCE.APP,
-    claims: { roles: getAppRoles(user) },
+    claims: { roles: await getAppRoles(user) },
     context,
   });
 
@@ -176,7 +176,7 @@ const refreshAppSession = async (refreshToken, context) => {
     userId: user._id,
     sessionId: session._id,
     audience: TOKEN_AUDIENCE.APP,
-    claims: { roles: getAppRoles(user) },
+    claims: { roles: await getAppRoles(user) },
   });
 
   return {
@@ -203,7 +203,7 @@ const logoutApp = (refreshToken) => revokeByRefreshToken(refreshToken, TOKEN_AUD
 const getCurrentUser = async (userId) => {
   const user = await getUserById(userId);
   assertCanLogin(user);
-  return { user: toAppUser(user), roles: getAppRoles(user) };
+  return { user: toAppUser(user), roles: await getAppRoles(user) };
 };
 
 module.exports = {

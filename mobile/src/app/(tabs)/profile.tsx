@@ -3,7 +3,15 @@
  * language, logout, delete account, and (development builds) backend status.
  */
 import { router, type Href } from 'expo-router';
-import { ChevronRight, Heart, LogOut, MapPin, Pencil, Trash2 } from 'lucide-react-native';
+import {
+  ChevronRight,
+  Heart,
+  LogOut,
+  MapPin,
+  MessageSquarePlus,
+  Pencil,
+  Trash2,
+} from 'lucide-react-native';
 import { type ComponentType, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, type ColorValue, Pressable, View } from 'react-native';
@@ -149,6 +157,13 @@ export default function ProfileScreen() {
               : t('profile.notSet')
           }
           href="/edit-interests"
+        />
+        <View className="border-t border-line" />
+        <ProfileRow
+          icon={MessageSquarePlus}
+          label={t('request.profileRow')}
+          value={t('request.profileRowHint')}
+          href="/request-product"
         />
       </Animated.View>
 

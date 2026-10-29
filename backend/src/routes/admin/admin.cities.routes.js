@@ -10,7 +10,6 @@ const { STAFF_ROLE } = require('../../constants/enums');
 
 const router = Router();
 
-// TODO(Day 5): audit-log middleware on every write below
 router.use(requireStaff(STAFF_ROLE.ADMIN, STAFF_ROLE.DEAL_MANAGER));
 
 router.get('/', controller.listCities);

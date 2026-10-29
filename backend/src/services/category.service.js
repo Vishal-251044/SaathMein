@@ -93,6 +93,18 @@ const listAdminCategories = async () => {
 };
 
 /**
+ * One category in the admin shape (also the "before" snapshot for the audit log).
+ * @param {string} categoryId - Category id
+ * @returns {Promise<Object>} Admin category
+ * @throws {ApiError} 404
+ */
+const getAdminCategory = async (categoryId) => {
+  const category = await Category.findById(categoryId).lean();
+  if (!category) throw ApiError.notFound(`Category not found with id: ${categoryId}`);
+  return toAdminCategory(category);
+};
+
+/**
  * Check a parent: it must exist and be a top-level category (two levels only).
  * @param {string|null} parentId - Parent id
  * @param {string} [selfId] - Category being edited
@@ -168,6 +180,7 @@ module.exports = {
   assertActiveCategories,
   toAdminCategory,
   listAdminCategories,
+  getAdminCategory,
   createCategory,
   updateCategory,
 };

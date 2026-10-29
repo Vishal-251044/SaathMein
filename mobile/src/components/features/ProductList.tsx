@@ -23,6 +23,8 @@ interface ProductListProps {
   header?: ReactElement;
   emptyTitle: string;
   emptyBody: string;
+  /** Action under the empty state (e.g. "Request this product"). */
+  emptyAction?: ReactElement;
   onOpenProduct?: (product: ProductCard) => void;
 }
 
@@ -49,6 +51,7 @@ export function ProductList({
   header,
   emptyTitle,
   emptyBody,
+  emptyAction,
   onOpenProduct,
 }: ProductListProps) {
   const { t } = useTranslation();
@@ -72,7 +75,9 @@ export function ProductList({
         />
       );
     }
-    return <EmptyState icon={PackageSearch} title={emptyTitle} body={emptyBody} />;
+    return (
+      <EmptyState icon={PackageSearch} title={emptyTitle} body={emptyBody} action={emptyAction} />
+    );
   };
 
   return (

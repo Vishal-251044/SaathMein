@@ -43,6 +43,13 @@ const userSchema = new Schema(
 
     // Dealer and staff login (never returned unless explicitly selected)
     passwordHash: { type: String, select: false },
+    // Email ownership check for dealer accounts (6-digit code, stored hashed)
+    emailVerifiedAt: Date,
+    emailVerification: {
+      type: { _id: false, codeHash: String, expiresAt: Date, attempts: Number, sentAt: Date },
+      select: false,
+      default: undefined,
+    },
 
     // Admin console access (PRD §8.2). Absent for buyers and dealers.
     staffRole: { type: String, enum: values(STAFF_ROLE) },

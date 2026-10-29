@@ -31,7 +31,9 @@
     "yourInterests": "You are looking for",
     "editInterests": "Edit interests",
     "noInterests": "Tell us what you plan to buy and we will show you the right groups.",
-    "browseCategories": "Browse categories"
+    "browseCategories": "Browse categories",
+    "popularIn": "Popular in {{city}}",
+    "popularError": "Could not load popular products."
   },
   "search": {
     "title": "Search",
@@ -190,5 +192,35 @@
     "interestSaved": "Saved. Starting groups opens very soon, and we will tell you when people near you want this too.",
     "notFoundTitle": "Product not available",
     "notFoundBody": "This product was removed or is not live yet."
+  },
+  "sellers": {
+    "title": "Verified dealers in {{city}}",
+    "subtitle": "They compete in the live auction when a group fills up.",
+    "verified": "Verified",
+    "newDealer": "New dealer",
+    "rating": "{{rating}} ({{count}})",
+    "ratingA11y": "Rated {{rating}} from {{count}} reviews",
+    "distance": "{{km}} km away",
+    "emptyTitle": "No verified dealers yet",
+    "emptyBody": "We are verifying dealers in your city. Start a group and they will be invited."
+  },
+  "request": {
+    "cta": "Request this product",
+    "title": "Request a product",
+    "intro": "Tell us what you want to buy. We add products many people ask for.",
+    "brand": "Brand",
+    "brandPlaceholder": "For example, Honda",
+    "model": "Model",
+    "modelPlaceholder": "For example, Activa 6G",
+    "category": "Category (optional)",
+    "note": "Note (optional)",
+    "notePlaceholder": "Variant, colour or anything else",
+    "noteHint": "Up to 500 characters",
+    "send": "Send request",
+    "sentTitle": "Request sent",
+    "sentBody": "Thank you. We will let you know when {{name}} is on SaathMein.",
+    "done": "Done",
+    "profileRow": "Request a product",
+    "profileRowHint": "Cannot find what you want?"
   }
 }

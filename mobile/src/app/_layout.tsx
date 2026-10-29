@@ -87,6 +87,7 @@ export default function RootLayout() {
                 <Stack.Screen name="edit-interests" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="category/[id]" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="product/[id]" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="request-product" options={{ animation: 'slide_from_bottom' }} />
               </Stack.Protected>
               <Stack.Protected guard={isSignedIn && needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="onboarding" />

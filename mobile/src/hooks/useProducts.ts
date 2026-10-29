@@ -4,7 +4,12 @@
  */
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 
-import { getProduct, listProducts, registerProductInterest } from '@/services/catalog.service';
+import {
+  getProduct,
+  listPopularProducts,
+  listProducts,
+  registerProductInterest,
+} from '@/services/catalog.service';
 import { useAuthStore } from '@/stores/auth.store';
 
 const PAGE_SIZE = 20;
@@ -52,4 +57,14 @@ export function useProduct(productId: string | undefined) {
 /** @returns Mutation that records "I want this" for a product */
 export function useProductInterest() {
   return useMutation({ mutationFn: registerProductInterest });
+}
+
+/** @returns Query with the most wanted products in the user's city (Home rail) */
+export function usePopularProducts() {
+  const cityId = useAuthStore((state) => state.user?.cityId ?? null);
+  return useQuery({
+    queryKey: ['products', 'popular', cityId],
+    queryFn: () => listPopularProducts(cityId),
+    staleTime: 10 * 60_000,
+  });
 }

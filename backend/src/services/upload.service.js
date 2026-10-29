@@ -142,6 +142,61 @@ const verifyProductImageUpload = (productId, upload) => {
   return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
 };
 
+/* ------------------------------ KYC documents ------------------------------ */
+
+const KYC_FOLDER = 'saathmein/kyc';
+const KYC_FORMATS = 'jpg,jpeg,png,pdf';
+const KYC_PREVIEW_TTL_SECONDS = 10 * 60;
+
+/** @param {string} sellerId @returns {string} Public id prefix for a seller's KYC files */
+const kycPrefix = (sellerId) => `${KYC_FOLDER}/${sellerId}/`;
+
+/**
+ * Signed params for one PRIVATE KYC document (TRU-1). `type: authenticated` means the
+ * file can only be opened with a signed, expiring URL — never a public link.
+ * @param {string} sellerId - Seller the document belongs to
+ * @param {string} docType - e.g. gst_certificate, pan_card, shop_photo
+ * @returns {{ uploadUrl: string, fields: Object }}
+ */
+const createKycUploadParams = (sellerId, docType) => {
+  const cloudinary = requireCloudinary();
+  const params = {
+    timestamp: Math.round(Date.now() / 1000),
+    public_id: `${kycPrefix(sellerId)}${docType}-${randomToken(9)}`,
+    type: 'authenticated',
+    allowed_formats: KYC_FORMATS,
+  };
+  const signature = cloudinary.utils.api_sign_request(params, config.cloudinary.apiSecret);
+  return {
+    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/image/upload`,
+    fields: { ...params, api_key: config.cloudinary.apiKey, signature },
+  };
+};
+
+/**
+ * Verify a KYC upload belongs to this seller and was signed by us.
+ * @param {string} sellerId - Seller id
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ */
+const verifyKycUpload = (sellerId, upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(kycPrefix(sellerId)));
+};
+
+/**
+ * Short-lived link for staff to view a private KYC document (expires in 10 minutes).
+ * @param {{ publicId: string, format?: string }} doc - Stored document
+ * @returns {string|null} Signed URL, or null when Cloudinary is not configured
+ */
+const kycDocumentUrl = ({ publicId, format }) => {
+  const cloudinary = getCloudinary();
+  if (!cloudinary) return null;
+  return cloudinary.utils.private_download_url(publicId, format || 'jpg', {
+    type: 'authenticated',
+    resource_type: 'image',
+    expires_at: Math.round(Date.now() / 1000) + KYC_PREVIEW_TTL_SECONDS,
+  });
+};
+
 /**
  * Delete an image (best effort — a failed delete must never block the user).
  * @param {string} publicId - Cloudinary public id
@@ -164,5 +219,8 @@ module.exports = {
   verifyAvatarUpload,
   createProductImageUploadParams,
   verifyProductImageUpload,
+  createKycUploadParams,
+  verifyKycUpload,
+  kycDocumentUrl,
   deleteImage,
 };

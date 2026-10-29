@@ -18,6 +18,7 @@ const listProductsSchema = {
     q: z.string().trim().max(100).optional(),
     categoryId: objectId.optional(),
     cityId: objectId.optional(),
+    sort: z.enum(['name', 'popular']).optional(),
     page: z.string().regex(/^\d+$/).optional(),
     limit: z.string().regex(/^\d+$/).optional(),
   }),

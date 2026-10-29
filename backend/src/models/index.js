@@ -15,4 +15,8 @@ module.exports = {
   Session: require('./session.model'),
   DemandSignal: require('./demandSignal.model'),
   PriceHistory: require('./priceHistory.model'),
+  SellerStaff: require('./sellerStaff.model'),
+  SellerInvite: require('./sellerInvite.model'),
+  AuditLog: require('./auditLog.model'),
+  ProductRequest: require('./productRequest.model'),
 };
