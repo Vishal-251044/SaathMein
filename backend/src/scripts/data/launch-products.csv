@@ -1,0 +1,318 @@
+category,brand,model,variant,variant_attrs,city,mrp,ex_showroom,on_road,tags,specs,description,image_urls,active,needs_review
+two-wheelers,Honda,Activa 6G,STD,trim=STD,pune,,78000,,scooter;petrol;automatic,Engine=109.51 cc;Fuel=Petrol,,,false,true
+two-wheelers,Honda,Activa 6G,DLX,trim=DLX,pune,,81000,,,,,,false,true
+two-wheelers,Honda,Activa 6G,H-Smart,trim=H-Smart,pune,,84000,,,,,,false,true
+two-wheelers,Honda,Activa 125,,,pune,,82000,,scooter;petrol,,,,false,true
+two-wheelers,Honda,Dio,,,pune,,72000,,scooter;petrol,,,,false,true
+two-wheelers,Honda,Dio 125,,,pune,,85000,,scooter;petrol,,,,false,true
+two-wheelers,Honda,Shine 100,,,pune,,66000,,motorcycle;commuter,,,,false,true
+two-wheelers,Honda,Shine 125,,,pune,,80000,,motorcycle;commuter,,,,false,true
+two-wheelers,Honda,SP 125,,,pune,,87000,,motorcycle;commuter,,,,false,true
+two-wheelers,Honda,Unicorn,,,pune,,110000,,motorcycle,,,,false,true
+two-wheelers,Honda,Hornet 2.0,,,pune,,140000,,motorcycle;sport,,,,false,true
+two-wheelers,Honda,CB350,,,pune,,210000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Honda,H'ness CB350,,,pune,,212000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Honda,Livo,,,pune,,76000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,Splendor Plus,,,pune,,76000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,HF Deluxe,,,pune,,60000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,Passion Plus,,,pune,,77000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,Glamour,,,pune,,85000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,Super Splendor,,,pune,,82000,,motorcycle;commuter,,,,false,true
+two-wheelers,Hero,Xtreme 125R,,,pune,,96000,,motorcycle;sport,,,,false,true
+two-wheelers,Hero,Xtreme 160R 4V,,,pune,,130000,,motorcycle;sport,,,,false,true
+two-wheelers,Hero,Xpulse 200 4V,,,pune,,150000,,motorcycle;adventure,,,,false,true
+two-wheelers,Hero,Destini 125,,,pune,,80000,,scooter;petrol,,,,false,true
+two-wheelers,Hero,Pleasure Plus,,,pune,,72000,,scooter;petrol,,,,false,true
+two-wheelers,Hero,Xoom 110,,,pune,,73000,,scooter;petrol,,,,false,true
+two-wheelers,Hero,Mavrick 440,,,pune,,200000,,motorcycle;roadster,,,,false,true
+two-wheelers,Hero,Vida V1 Pro,,,pune,,125000,,scooter;electric;ev,,,,false,true
+two-wheelers,TVS,Jupiter,,,pune,,77000,,scooter;petrol,,,,false,true
+two-wheelers,TVS,Jupiter 125,,,pune,,82000,,scooter;petrol,,,,false,true
+two-wheelers,TVS,Ntorq 125,,,pune,,87000,,scooter;petrol,,,,false,true
+two-wheelers,TVS,Raider 125,,,pune,,95000,,motorcycle;commuter,,,,false,true
+two-wheelers,TVS,Apache RTR 160 4V,,,pune,,125000,,motorcycle;sport,,,,false,true
+two-wheelers,TVS,Apache RTR 200 4V,,,pune,,145000,,motorcycle;sport,,,,false,true
+two-wheelers,TVS,Apache RR 310,,,pune,,275000,,motorcycle;sport,,,,false,true
+two-wheelers,TVS,Ronin,,,pune,,155000,,motorcycle;cruiser,,,,false,true
+two-wheelers,TVS,Radeon,,,pune,,72000,,motorcycle;commuter,,,,false,true
+two-wheelers,TVS,Star City Plus,,,pune,,74000,,motorcycle;commuter,,,,false,true
+two-wheelers,TVS,Sport,,,pune,,65000,,motorcycle;commuter,,,,false,true
+two-wheelers,TVS,XL100,,,pune,,47000,,moped,,,,false,true
+two-wheelers,TVS,iQube,,,pune,,110000,,scooter;electric;ev,,,,false,true
+two-wheelers,TVS,Zest 110,,,pune,,76000,,scooter;petrol,,,,false,true
+two-wheelers,Bajaj,Pulsar 150,,,pune,,112000,,motorcycle,,,,false,true
+two-wheelers,Bajaj,Pulsar NS200,,,pune,,150000,,motorcycle;sport,,,,false,true
+two-wheelers,Bajaj,Pulsar N160,,,pune,,132000,,motorcycle,,,,false,true
+two-wheelers,Bajaj,Pulsar N250,,,pune,,152000,,motorcycle,,,,false,true
+two-wheelers,Bajaj,Pulsar 125,,,pune,,90000,,motorcycle;commuter,,,,false,true
+two-wheelers,Bajaj,Platina 100,,,pune,,70000,,motorcycle;commuter,,,,false,true
+two-wheelers,Bajaj,CT 110X,,,pune,,70000,,motorcycle;commuter,,,,false,true
+two-wheelers,Bajaj,Dominar 400,,,pune,,230000,,motorcycle;touring,,,,false,true
+two-wheelers,Bajaj,Avenger Cruise 220,,,pune,,140000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Bajaj,Chetak,,,pune,,120000,,scooter;electric;ev,,,,false,true
+two-wheelers,Bajaj,Freedom 125,,,pune,,95000,,motorcycle;cng,,,,false,true
+two-wheelers,Royal Enfield,Classic 350,,,pune,,195000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Royal Enfield,Bullet 350,,,pune,,175000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Royal Enfield,Hunter 350,,,pune,,150000,,motorcycle;roadster,,,,false,true
+two-wheelers,Royal Enfield,Meteor 350,,,pune,,210000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Royal Enfield,Himalayan 450,,,pune,,285000,,motorcycle;adventure,,,,false,true
+two-wheelers,Royal Enfield,Interceptor 650,,,pune,,305000,,motorcycle;roadster,,,,false,true
+two-wheelers,Royal Enfield,Continental GT 650,,,pune,,320000,,motorcycle;cafe-racer,,,,false,true
+two-wheelers,Royal Enfield,Super Meteor 650,,,pune,,365000,,motorcycle;cruiser,,,,false,true
+two-wheelers,Royal Enfield,Guerrilla 450,,,pune,,240000,,motorcycle;roadster,,,,false,true
+two-wheelers,Royal Enfield,Scram 411,,,pune,,210000,,motorcycle;adventure,,,,false,true
+two-wheelers,Suzuki,Access 125,,,pune,,82000,,scooter;petrol,,,,false,true
+two-wheelers,Suzuki,Burgman Street 125,,,pune,,95000,,scooter;petrol,,,,false,true
+two-wheelers,Suzuki,Avenis 125,,,pune,,92000,,scooter;petrol,,,,false,true
+two-wheelers,Suzuki,Gixxer 150,,,pune,,138000,,motorcycle;sport,,,,false,true
+two-wheelers,Suzuki,Gixxer SF 250,,,pune,,195000,,motorcycle;sport,,,,false,true
+two-wheelers,Suzuki,V-Strom SX,,,pune,,215000,,motorcycle;adventure,,,,false,true
+two-wheelers,Yamaha,FZ-S Fi V4,,,pune,,130000,,motorcycle,,,,false,true
+two-wheelers,Yamaha,R15 V4,,,pune,,185000,,motorcycle;sport,,,,false,true
+two-wheelers,Yamaha,MT-15 V2,,,pune,,170000,,motorcycle;sport,,,,false,true
+two-wheelers,Yamaha,Fascino 125,,,pune,,82000,,scooter;petrol,,,,false,true
+two-wheelers,Yamaha,RayZR 125,,,pune,,85000,,scooter;petrol,,,,false,true
+two-wheelers,Yamaha,Aerox 155,,,pune,,150000,,scooter;petrol,,,,false,true
+two-wheelers,Yamaha,FZ-X,,,pune,,136000,,motorcycle,,,,false,true
+two-wheelers,Ather,450X,,,pune,,145000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ather,450S,,,pune,,125000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ather,Rizta,,,pune,,115000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ather,450 Apex,,,pune,,190000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ola Electric,S1 Pro,,,pune,,130000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ola Electric,S1 Air,,,pune,,105000,,scooter;electric;ev,,,,false,true
+two-wheelers,Ola Electric,S1 X,,,pune,,85000,,scooter;electric;ev,,,,false,true
+two-wheelers,KTM,Duke 200,,,pune,,200000,,motorcycle;sport,,,,false,true
+two-wheelers,KTM,Duke 390,,,pune,,310000,,motorcycle;sport,,,,false,true
+two-wheelers,KTM,RC 200,,,pune,,220000,,motorcycle;sport,,,,false,true
+two-wheelers,Jawa,42,,,pune,,195000,,motorcycle;classic,,,,false,true
+two-wheelers,Yezdi,Roadster,,,pune,,210000,,motorcycle;classic,,,,false,true
+two-wheelers,Revolt,RV400,,,pune,,135000,,motorcycle;electric;ev,,,,false,true
+cars-evs,Maruti Suzuki,Alto K10,,,pune,,400000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,S-Presso,,,pune,,430000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Wagon R,,,pune,,560000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Celerio,,,pune,,540000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Swift,,,pune,,650000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Dzire,,,pune,,690000,,car;sedan;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Baleno,,,pune,,670000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Fronx,,,pune,,760000,,car;suv;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Brezza,,,pune,,840000,,car;suv;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Ertiga,,,pune,,880000,,car;muv;7-seater,,,,false,true
+cars-evs,Maruti Suzuki,XL6,,,pune,,1160000,,car;muv;7-seater,,,,false,true
+cars-evs,Maruti Suzuki,Grand Vitara,,,pune,,1100000,,car;suv;hybrid,,,,false,true
+cars-evs,Maruti Suzuki,Invicto,,,pune,,2500000,,car;muv;7-seater;hybrid,,,,false,true
+cars-evs,Maruti Suzuki,Jimny,,,pune,,1270000,,car;suv;4x4,,,,false,true
+cars-evs,Maruti Suzuki,Ignis,,,pune,,590000,,car;hatchback;petrol,,,,false,true
+cars-evs,Maruti Suzuki,Eeco,,,pune,,530000,,car;van,,,,false,true
+cars-evs,Tata,Tiago,,,pune,,500000,,car;hatchback;petrol,,,,false,true
+cars-evs,Tata,Tiago EV,,,pune,,800000,,car;hatchback;electric;ev,,,,false,true
+cars-evs,Tata,Tigor,,,pune,,600000,,car;sedan;petrol,,,,false,true
+cars-evs,Tata,Altroz,,,pune,,660000,,car;hatchback;petrol,,,,false,true
+cars-evs,Tata,Punch,,,pune,,610000,,car;suv;petrol,,,,false,true
+cars-evs,Tata,Punch EV,,,pune,,1000000,,car;suv;electric;ev,,,,false,true
+cars-evs,Tata,Nexon,,,pune,,800000,,car;suv;petrol;diesel,,,,false,true
+cars-evs,Tata,Nexon EV,,,pune,,1250000,,car;suv;electric;ev,,,,false,true
+cars-evs,Tata,Curvv,,,pune,,1000000,,car;suv;coupe,,,,false,true
+cars-evs,Tata,Curvv EV,,,pune,,1750000,,car;suv;coupe;electric;ev,,,,false,true
+cars-evs,Tata,Harrier,,,pune,,1500000,,car;suv;diesel,,,,false,true
+cars-evs,Tata,Safari,,,pune,,1550000,,car;suv;7-seater;diesel,,,,false,true
+cars-evs,Mahindra,XUV 3XO,,,pune,,790000,,car;suv,,,,false,true
+cars-evs,Mahindra,Thar,,,pune,,1150000,,car;suv;4x4,,,,false,true
+cars-evs,Mahindra,Thar Roxx,,,pune,,1300000,,car;suv;4x4,,,,false,true
+cars-evs,Mahindra,Scorpio N,,,pune,,1400000,,car;suv;7-seater,,,,false,true
+cars-evs,Mahindra,Scorpio Classic,,,pune,,1360000,,car;suv;7-seater,,,,false,true
+cars-evs,Mahindra,XUV700,,,pune,,1400000,,car;suv;7-seater,,,,false,true
+cars-evs,Mahindra,Bolero,,,pune,,980000,,car;suv;7-seater,,,,false,true
+cars-evs,Mahindra,Bolero Neo,,,pune,,970000,,car;suv;7-seater,,,,false,true
+cars-evs,Mahindra,BE 6,,,pune,,1890000,,car;suv;electric;ev,,,,false,true
+cars-evs,Mahindra,XEV 9e,,,pune,,2190000,,car;suv;electric;ev,,,,false,true
+cars-evs,Hyundai,Grand i10 Nios,,,pune,,590000,,car;hatchback;petrol,,,,false,true
+cars-evs,Hyundai,i20,,,pune,,710000,,car;hatchback;petrol,,,,false,true
+cars-evs,Hyundai,Exter,,,pune,,610000,,car;suv;petrol,,,,false,true
+cars-evs,Hyundai,Venue,,,pune,,800000,,car;suv,,,,false,true
+cars-evs,Hyundai,Verna,,,pune,,1110000,,car;sedan,,,,false,true
+cars-evs,Hyundai,Creta,,,pune,,1110000,,car;suv,,,,false,true
+cars-evs,Hyundai,Alcazar,,,pune,,1500000,,car;suv;7-seater,,,,false,true
+cars-evs,Hyundai,Tucson,,,pune,,2900000,,car;suv,,,,false,true
+cars-evs,Hyundai,Ioniq 5,,,pune,,4600000,,car;suv;electric;ev,,,,false,true
+cars-evs,Hyundai,Aura,,,pune,,650000,,car;sedan,,,,false,true
+cars-evs,Kia,Sonet,,,pune,,800000,,car;suv,,,,false,true
+cars-evs,Kia,Seltos,,,pune,,1100000,,car;suv,,,,false,true
+cars-evs,Kia,Carens,,,pune,,1060000,,car;muv;7-seater,,,,false,true
+cars-evs,Kia,Carnival,,,pune,,6300000,,car;muv;luxury,,,,false,true
+cars-evs,Kia,EV6,,,pune,,6000000,,car;suv;electric;ev,,,,false,true
+cars-evs,Kia,Syros,,,pune,,900000,,car;suv,,,,false,true
+cars-evs,Toyota,Glanza,,,pune,,690000,,car;hatchback;petrol,,,,false,true
+cars-evs,Toyota,Urban Cruiser Hyryder,,,pune,,1130000,,car;suv;hybrid,,,,false,true
+cars-evs,Toyota,Innova Crysta,,,pune,,1990000,,car;muv;7-seater;diesel,,,,false,true
+cars-evs,Toyota,Innova Hycross,,,pune,,1930000,,car;muv;7-seater;hybrid,,,,false,true
+cars-evs,Toyota,Fortuner,,,pune,,3400000,,car;suv;7-seater,,,,false,true
+cars-evs,Toyota,Rumion,,,pune,,1050000,,car;muv;7-seater,,,,false,true
+cars-evs,Toyota,Camry,,,pune,,4800000,,car;sedan;hybrid,,,,false,true
+cars-evs,MG,Hector,,,pune,,1400000,,car;suv,,,,false,true
+cars-evs,MG,Astor,,,pune,,1100000,,car;suv,,,,false,true
+cars-evs,MG,Comet EV,,,pune,,700000,,car;hatchback;electric;ev,,,,false,true
+cars-evs,MG,Windsor EV,,,pune,,1400000,,car;crossover;electric;ev,,,,false,true
+cars-evs,MG,ZS EV,,,pune,,1900000,,car;suv;electric;ev,,,,false,true
+cars-evs,MG,Gloster,,,pune,,3900000,,car;suv;7-seater,,,,false,true
+cars-evs,Honda,Amaze,,,pune,,800000,,car;sedan;petrol,,,,false,true
+cars-evs,Honda,City,,,pune,,1200000,,car;sedan;petrol,,,,false,true
+cars-evs,Honda,Elevate,,,pune,,1190000,,car;suv;petrol,,,,false,true
+cars-evs,Skoda,Kushaq,,,pune,,1100000,,car;suv,,,,false,true
+cars-evs,Skoda,Slavia,,,pune,,1100000,,car;sedan,,,,false,true
+cars-evs,Skoda,Kylaq,,,pune,,800000,,car;suv,,,,false,true
+cars-evs,Volkswagen,Virtus,,,pune,,1150000,,car;sedan,,,,false,true
+cars-evs,Volkswagen,Taigun,,,pune,,1170000,,car;suv,,,,false,true
+cars-evs,Renault,Kwid,,,pune,,470000,,car;hatchback,,,,false,true
+cars-evs,Renault,Kiger,,,pune,,600000,,car;suv,,,,false,true
+cars-evs,Renault,Triber,,,pune,,600000,,car;muv;7-seater,,,,false,true
+cars-evs,Nissan,Magnite,,,pune,,600000,,car;suv,,,,false,true
+cars-evs,Citroen,C3,,,pune,,620000,,car;hatchback,,,,false,true
+cars-evs,Citroen,Basalt,,,pune,,800000,,car;suv;coupe,,,,false,true
+mobiles-laptops,Apple,iPhone 17,,,pune,82900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 17 Pro,,,pune,134900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 17 Pro Max,,,pune,149900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone Air,,,pune,119900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 16,,,pune,79900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 16 Plus,,,pune,89900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 16 Pro,,,pune,119900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 16 Pro Max,,,pune,144900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 16e,,,pune,59900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,iPhone 15,,,pune,69900,,,phone;5g;ios,,,,false,true
+mobiles-laptops,Apple,MacBook Air 13 M4,,,pune,99900,,,laptop;macos,,,,false,true
+mobiles-laptops,Apple,MacBook Air 15 M4,,,pune,124900,,,laptop;macos,,,,false,true
+mobiles-laptops,Apple,MacBook Pro 14 M4,,,pune,169900,,,laptop;macos,,,,false,true
+mobiles-laptops,Apple,iPad (A16),,,pune,34900,,,tablet;ipados,,,,false,true
+mobiles-laptops,Apple,iPad Air M3,,,pune,59900,,,tablet;ipados,,,,false,true
+mobiles-laptops,Samsung,Galaxy S25,,,pune,80999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy S25+,,,pune,99999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy S25 Ultra,,,pune,129999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy S24 FE,,,pune,59999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy Z Fold7,,,pune,174999,,,phone;5g;foldable,,,,false,true
+mobiles-laptops,Samsung,Galaxy Z Flip7,,,pune,109999,,,phone;5g;foldable,,,,false,true
+mobiles-laptops,Samsung,Galaxy A56,,,pune,41999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy A36,,,pune,32999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy A26,,,pune,24999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy A16,,,pune,18999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy M36,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy M16,,,pune,13999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy F36,,,pune,17499,,,phone;5g;android,,,,false,true
+mobiles-laptops,Samsung,Galaxy Book4,,,pune,70000,,,laptop;windows,,,,false,true
+mobiles-laptops,OnePlus,13,,,pune,69999,,,phone;5g;android,,,,false,true
+mobiles-laptops,OnePlus,13R,,,pune,42999,,,phone;5g;android,,,,false,true
+mobiles-laptops,OnePlus,Nord 5,,,pune,31999,,,phone;5g;android,,,,false,true
+mobiles-laptops,OnePlus,Nord CE5,,,pune,24999,,,phone;5g;android,,,,false,true
+mobiles-laptops,OnePlus,Nord CE4 Lite,,,pune,19999,,,phone;5g;android,,,,false,true
+mobiles-laptops,OnePlus,Pad 2,,,pune,39999,,,tablet;android,,,,false,true
+mobiles-laptops,Xiaomi,Xiaomi 15,,,pune,64999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Redmi Note 14 Pro+,,,pune,29999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Redmi Note 14 Pro,,,pune,23999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Redmi Note 14,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Redmi 14C,,,pune,9999,,,phone;android,,,,false,true
+mobiles-laptops,Xiaomi,Redmi A4,,,pune,8499,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Poco X7 Pro,,,pune,27999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Poco F7,,,pune,31999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Xiaomi,Poco M7 Pro,,,pune,14999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,X200,,,pune,65999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,X200 Pro,,,pune,94999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,V50,,,pune,34999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,V60,,,pune,36999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,T4,,,pune,21999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,Y39,,,pune,16999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Vivo,T4x,,,pune,13999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,Find X8,,,pune,69999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,Reno 14,,,pune,37999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,Reno 14 Pro,,,pune,49999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,F29,,,pune,23999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,A5 Pro,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Oppo,K13,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Realme,GT 7 Pro,,,pune,59999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Realme,14 Pro+,,,pune,29999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Realme,14 Pro,,,pune,24999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Realme,Narzo 80 Pro,,,pune,19999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Realme,C75,,,pune,12999,,,phone;android,,,,false,true
+mobiles-laptops,Realme,P3 Pro,,,pune,23999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Google,Pixel 10,,,pune,79999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Google,Pixel 10 Pro,,,pune,109999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Google,Pixel 9a,,,pune,49999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Google,Pixel 9,,,pune,74999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Motorola,Edge 60 Fusion,,,pune,22999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Motorola,Edge 60 Pro,,,pune,29999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Motorola,G85,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Motorola,Razr 60 Ultra,,,pune,99999,,,phone;5g;foldable,,,,false,true
+mobiles-laptops,Motorola,G96,,,pune,17999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Nothing,Phone (3),,,pune,79999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Nothing,Phone (3a),,,pune,24999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Nothing,Phone (3a) Pro,,,pune,29999,,,phone;5g;android,,,,false,true
+mobiles-laptops,Nothing,CMF Phone 2 Pro,,,pune,18999,,,phone;5g;android,,,,false,true
+mobiles-laptops,iQOO,13,,,pune,54999,,,phone;5g;android,,,,false,true
+mobiles-laptops,iQOO,Neo 10,,,pune,31999,,,phone;5g;android,,,,false,true
+mobiles-laptops,iQOO,Z10,,,pune,21999,,,phone;5g;android,,,,false,true
+mobiles-laptops,HP,Pavilion 15,,,pune,65000,,,laptop;windows,,,,false,true
+mobiles-laptops,HP,Victus 15,,,pune,70000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,HP,15s,,,pune,45000,,,laptop;windows,,,,false,true
+mobiles-laptops,HP,Envy x360,,,pune,95000,,,laptop;windows;2-in-1,,,,false,true
+mobiles-laptops,Dell,Inspiron 15,,,pune,55000,,,laptop;windows,,,,false,true
+mobiles-laptops,Dell,Vostro 3520,,,pune,45000,,,laptop;windows,,,,false,true
+mobiles-laptops,Dell,XPS 13,,,pune,150000,,,laptop;windows,,,,false,true
+mobiles-laptops,Lenovo,IdeaPad Slim 3,,,pune,50000,,,laptop;windows,,,,false,true
+mobiles-laptops,Lenovo,IdeaPad Slim 5,,,pune,70000,,,laptop;windows,,,,false,true
+mobiles-laptops,Lenovo,LOQ,,,pune,75000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,Lenovo,ThinkPad E14,,,pune,70000,,,laptop;windows;business,,,,false,true
+mobiles-laptops,Lenovo,Legion 5,,,pune,120000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,Asus,Vivobook 15,,,pune,45000,,,laptop;windows,,,,false,true
+mobiles-laptops,Asus,Vivobook S14,,,pune,75000,,,laptop;windows,,,,false,true
+mobiles-laptops,Asus,TUF Gaming A15,,,pune,75000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,Asus,ROG Strix G16,,,pune,140000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,Acer,Aspire 7,,,pune,60000,,,laptop;windows,,,,false,true
+mobiles-laptops,Acer,Nitro V,,,pune,70000,,,laptop;windows;gaming,,,,false,true
+mobiles-laptops,MSI,Thin 15,,,pune,65000,,,laptop;windows;gaming,,,,false,true
+appliances,LG,1.5 Ton 5 Star Inverter Split AC,,,pune,50000,,,ac;split;inverter,,,,false,true
+appliances,LG,1 Ton 3 Star Inverter Split AC,,,pune,36000,,,ac;split;inverter,,,,false,true
+appliances,Samsung,1.5 Ton 3 Star Inverter Split AC,,,pune,38000,,,ac;split;inverter,,,,false,true
+appliances,Voltas,1.5 Ton 3 Star Inverter Split AC,,,pune,35000,,,ac;split;inverter,,,,false,true
+appliances,Voltas,1.5 Ton 5 Star Inverter Split AC,,,pune,42000,,,ac;split;inverter,,,,false,true
+appliances,Daikin,1.5 Ton 3 Star Inverter Split AC,,,pune,40000,,,ac;split;inverter,,,,false,true
+appliances,Daikin,1.5 Ton 5 Star Inverter Split AC,,,pune,48000,,,ac;split;inverter,,,,false,true
+appliances,Blue Star,1.5 Ton 3 Star Inverter Split AC,,,pune,37000,,,ac;split;inverter,,,,false,true
+appliances,Blue Star,1 Ton 3 Star Inverter Split AC,,,pune,32000,,,ac;split;inverter,,,,false,true
+appliances,Panasonic,1.5 Ton 5 Star Inverter Split AC,,,pune,46000,,,ac;split;inverter,,,,false,true
+appliances,Lloyd,1.5 Ton 3 Star Inverter Split AC,,,pune,34000,,,ac;split;inverter,,,,false,true
+appliances,Hitachi,1.5 Ton 3 Star Inverter Split AC,,,pune,42000,,,ac;split;inverter,,,,false,true
+appliances,Carrier,1.5 Ton 3 Star Inverter Split AC,,,pune,37000,,,ac;split;inverter,,,,false,true
+appliances,Godrej,1.5 Ton 3 Star Inverter Split AC,,,pune,33000,,,ac;split;inverter,,,,false,true
+appliances,Whirlpool,1.5 Ton 3 Star Inverter Split AC,,,pune,34000,,,ac;split;inverter,,,,false,true
+appliances,Haier,1.5 Ton 3 Star Inverter Split AC,,,pune,33000,,,ac;split;inverter,,,,false,true
+appliances,LG,1.5 Ton 3 Star Window AC,,,pune,32000,,,ac;window,,,,false,true
+appliances,Voltas,1.5 Ton 3 Star Window AC,,,pune,29000,,,ac;window,,,,false,true
+appliances,Samsung,43 inch Crystal 4K UHD Smart TV,,,pune,32000,,,tv;4k;smart-tv,,,,false,true
+appliances,Samsung,55 inch Crystal 4K UHD Smart TV,,,pune,45000,,,tv;4k;smart-tv,,,,false,true
+appliances,Samsung,65 inch QLED 4K Smart TV,,,pune,80000,,,tv;qled;4k;smart-tv,,,,false,true
+appliances,LG,43 inch UHD 4K Smart TV,,,pune,30000,,,tv;4k;smart-tv,,,,false,true
+appliances,LG,55 inch UHD 4K Smart TV,,,pune,45000,,,tv;4k;smart-tv,,,,false,true
+appliances,LG,55 inch OLED B4 Smart TV,,,pune,120000,,,tv;oled;4k;smart-tv,,,,false,true
+appliances,Sony,Bravia 43 inch X75 4K Google TV,,,pune,45000,,,tv;4k;google-tv,,,,false,true
+appliances,Sony,Bravia 55 inch X80 4K Google TV,,,pune,65000,,,tv;4k;google-tv,,,,false,true
+appliances,Sony,Bravia 65 inch X85 4K Google TV,,,pune,100000,,,tv;4k;google-tv,,,,false,true
+appliances,Xiaomi,43 inch X 4K Google TV,,,pune,25000,,,tv;4k;google-tv,,,,false,true
+appliances,Xiaomi,55 inch X Pro QLED Google TV,,,pune,40000,,,tv;qled;google-tv,,,,false,true
+appliances,TCL,55 inch QLED 4K Google TV,,,pune,38000,,,tv;qled;google-tv,,,,false,true
+appliances,TCL,65 inch QLED 4K Google TV,,,pune,55000,,,tv;qled;google-tv,,,,false,true
+appliances,Hisense,55 inch 4K UHD Smart TV,,,pune,35000,,,tv;4k;smart-tv,,,,false,true
+appliances,OnePlus,55 inch Y1S Pro 4K TV,,,pune,36000,,,tv;4k;smart-tv,,,,false,true
+appliances,Acer,50 inch 4K Google TV,,,pune,28000,,,tv;4k;google-tv,,,,false,true
+appliances,LG,260 L 3 Star Double Door Refrigerator,,,pune,30000,,,refrigerator;double-door,,,,false,true
+appliances,Samsung,253 L 3 Star Double Door Refrigerator,,,pune,28000,,,refrigerator;double-door,,,,false,true
+appliances,Whirlpool,265 L 3 Star Double Door Refrigerator,,,pune,27000,,,refrigerator;double-door,,,,false,true
+appliances,Godrej,236 L 2 Star Double Door Refrigerator,,,pune,25000,,,refrigerator;double-door,,,,false,true
+appliances,Haier,258 L 3 Star Double Door Refrigerator,,,pune,26000,,,refrigerator;double-door,,,,false,true
+appliances,LG,190 L 4 Star Single Door Refrigerator,,,pune,18000,,,refrigerator;single-door,,,,false,true
+appliances,Samsung,192 L 3 Star Single Door Refrigerator,,,pune,17000,,,refrigerator;single-door,,,,false,true
+appliances,Samsung,653 L Side-by-Side Refrigerator,,,pune,75000,,,refrigerator;side-by-side,,,,false,true
+appliances,LG,7 kg Front Load Washing Machine,,,pune,32000,,,washing-machine;front-load,,,,false,true
+appliances,Samsung,7 kg Front Load Washing Machine,,,pune,30000,,,washing-machine;front-load,,,,false,true
+appliances,IFB,7 kg Front Load Washing Machine,,,pune,30000,,,washing-machine;front-load,,,,false,true
+appliances,Whirlpool,7 kg Top Load Washing Machine,,,pune,18000,,,washing-machine;top-load,,,,false,true
+appliances,LG,8 kg Top Load Washing Machine,,,pune,22000,,,washing-machine;top-load,,,,false,true
+appliances,Bosch,7 kg Front Load Washing Machine,,,pune,32000,,,washing-machine;front-load,,,,false,true
+appliances,Godrej,7 kg Semi-Automatic Washing Machine,,,pune,12000,,,washing-machine;semi-automatic,,,,false,true
+appliances,Haier,8 kg Top Load Washing Machine,,,pune,20000,,,washing-machine;top-load,,,,false,true

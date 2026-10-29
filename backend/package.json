@@ -17,7 +17,9 @@
     "create-owner": "node src/scripts/create-owner.js",
     "seed:cities": "node src/scripts/seed-cities.js",
     "seed:categories": "node src/scripts/seed-categories.js",
-    "seed": "npm run seed:cities && npm run seed:categories"
+    "seed": "npm run seed:cities && npm run seed:categories",
+    "search:indexes": "node src/scripts/create-search-indexes.js",
+    "import:products": "node src/scripts/import-products.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

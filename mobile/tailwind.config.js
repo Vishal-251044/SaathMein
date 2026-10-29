@@ -17,6 +17,9 @@ const semanticColors = Object.fromEntries(
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
+  // Dark mode comes from ThemeRoot's CSS variables, not `dark:` classes. 'class' also
+  // avoids NativeWind's web crash ("Cannot manually set color scheme ... type 'media'").
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

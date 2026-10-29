@@ -1,23 +1,26 @@
 /**
- * Upload service — signed direct uploads to Cloudinary (ACC-2 avatars; later product
- * images, KYC documents and invoices).
+ * Upload service — signed direct uploads to Cloudinary (avatars, product images; later KYC
+ * documents and invoices).
  *
- * Flow: the API signs exact upload parameters → the app uploads the file straight to
- * Cloudinary → the app sends back Cloudinary's response signature → we verify it, so a
- * client can never attach an image the server did not authorise.
+ * Flow: the API signs exact upload parameters (including the public id) → the client
+ * uploads the file straight to Cloudinary → the client sends back Cloudinary's response
+ * signature → we verify it, so nobody can attach an image the server did not authorise.
  */
 const { getCloudinary } = require('../config/cloudinary');
 const config = require('../config/env');
 const ApiError = require('../utils/ApiError');
-const { safeEqual } = require('../utils/crypto');
+const { randomToken, safeEqual } = require('../utils/crypto');
 const { createLogger } = require('../utils/logger');
 
 const log = createLogger('UploadService');
 
-const AVATAR_FOLDER = 'saathmein/avatars';
-// Resize on upload (incoming transformation): avatars never need more than 512 px
-const AVATAR_INCOMING_TRANSFORMATION = 'c_limit,w_512,h_512,q_auto:good';
-const AVATAR_FORMATS = 'jpg,jpeg,png,webp,heic';
+const IMAGE_FORMATS = 'jpg,jpeg,png,webp,heic';
+
+/** Upload kinds: where files go and how they are resized on upload. */
+const UPLOAD_KINDS = {
+  avatar: { folder: 'saathmein/avatars', transformation: 'c_limit,w_512,h_512,q_auto:good' },
+  product: { folder: 'saathmein/products', transformation: 'c_limit,w_1600,h_1600,q_auto:good' },
+};
 
 /**
  * Get Cloudinary or fail with a clear 503.
@@ -35,24 +38,28 @@ const requireCloudinary = () => {
 };
 
 /** @param {string} userId @returns {string} The only public id a user may upload an avatar to */
-const avatarPublicId = (userId) => `${AVATAR_FOLDER}/${userId}`;
+const avatarPublicId = (userId) => `${UPLOAD_KINDS.avatar.folder}/${userId}`;
+
+/** @param {string} productId @returns {string} Folder (public id prefix) for one product's images */
+const productImagePrefix = (productId) => `${UPLOAD_KINDS.product.folder}/${productId}/`;
 
 /**
- * Create signed parameters for one avatar upload.
- * @param {string} userId - Owner of the avatar
- * @returns {{ uploadUrl: string, fields: Record<string, string|number> }} POST these fields
- *   (plus `file`) as multipart form data to uploadUrl
+ * Sign upload parameters for one file at an exact public id.
+ * @param {string} publicId - Full Cloudinary public id (folder path included)
+ * @param {'avatar'|'product'} kind - Upload kind (resize rules)
+ * @returns {{ uploadUrl: string, fields: Record<string, string|number|boolean> }} POST these fields
+ *   plus `file` as multipart form data to uploadUrl
  */
-const createAvatarUploadParams = (userId) => {
+const createSignedUpload = (publicId, kind) => {
   const cloudinary = requireCloudinary();
   const params = {
     timestamp: Math.round(Date.now() / 1000), // Cloudinary rejects signatures older than 1 hour
     // Full path in public_id (no `folder` param) behaves the same in fixed and dynamic folder modes
-    public_id: avatarPublicId(userId),
+    public_id: publicId,
     overwrite: true,
     invalidate: true,
-    allowed_formats: AVATAR_FORMATS,
-    transformation: AVATAR_INCOMING_TRANSFORMATION,
+    allowed_formats: IMAGE_FORMATS,
+    transformation: UPLOAD_KINDS[kind].transformation,
   };
   const signature = cloudinary.utils.api_sign_request(params, config.cloudinary.apiSecret);
 
@@ -63,35 +70,76 @@ const createAvatarUploadParams = (userId) => {
 };
 
 /**
- * Verify the response Cloudinary returned to the app after an avatar upload.
- * @param {string} userId - Expected owner
+ * Check the signature Cloudinary returned after an upload.
  * @param {{ publicId: string, version: number, signature: string }} upload - From Cloudinary's response
- * @returns {{ publicId: string, url: string }} Verified asset with a face-cropped 256 px URL
- * @throws {ApiError} 400 INVALID_UPLOAD when the asset is not this user's signed upload
+ * @param {(publicId: string) => boolean} isAllowedPublicId - Ownership check
+ * @returns {void}
+ * @throws {ApiError} 400 INVALID_UPLOAD
  */
-const verifyAvatarUpload = (userId, { publicId, version, signature }) => {
+const assertValidUpload = ({ publicId, version, signature }, isAllowedPublicId) => {
   const cloudinary = requireCloudinary();
-  const expectedSignature = cloudinary.utils.api_sign_request(
+  const expected = cloudinary.utils.api_sign_request(
     { public_id: publicId, version },
     config.cloudinary.apiSecret,
   );
-
-  if (publicId !== avatarPublicId(userId) || !safeEqual(signature, expectedSignature)) {
-    log.warn({ userId, publicId }, 'Rejected avatar upload with a bad signature or public id');
+  if (!isAllowedPublicId(publicId) || !safeEqual(signature, expected)) {
+    log.warn({ publicId }, 'Rejected upload with a bad signature or public id');
     throw ApiError.badRequest('The photo upload could not be verified. Please try again.', {
       code: 'INVALID_UPLOAD',
     });
   }
+};
 
-  const url = cloudinary.url(publicId, {
+/**
+ * Delivery URL for a stored image.
+ * @param {string} publicId - Cloudinary public id
+ * @param {number} version - Asset version
+ * @param {Object[]} [transformation] - Extra transformations
+ * @returns {string} HTTPS URL
+ */
+const imageUrl = (publicId, version, transformation = []) =>
+  requireCloudinary().url(publicId, {
     version,
     secure: true,
-    transformation: [
-      { width: 256, height: 256, crop: 'fill', gravity: 'face' },
-      { quality: 'auto', fetch_format: 'auto' },
-    ],
+    transformation: [...transformation, { quality: 'auto', fetch_format: 'auto' }],
   });
-  return { publicId, url };
+
+/* --------------------------------- Avatars --------------------------------- */
+
+/** @param {string} userId @returns Signed params for the user's avatar */
+const createAvatarUploadParams = (userId) => createSignedUpload(avatarPublicId(userId), 'avatar');
+
+/**
+ * Verify an avatar upload.
+ * @param {string} userId - Expected owner
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ * @returns {{ publicId: string, url: string }} Verified asset with a face-cropped 256 px URL
+ */
+const verifyAvatarUpload = (userId, upload) => {
+  assertValidUpload(upload, (publicId) => publicId === avatarPublicId(userId));
+  return {
+    publicId: upload.publicId,
+    url: imageUrl(upload.publicId, upload.version, [
+      { width: 256, height: 256, crop: 'fill', gravity: 'face' },
+    ]),
+  };
+};
+
+/* ----------------------------- Product images ----------------------------- */
+
+/** @param {string} productId @returns Signed params for one new product image */
+const createProductImageUploadParams = (productId) =>
+  createSignedUpload(`${productImagePrefix(productId)}${randomToken(9)}`, 'product');
+
+/**
+ * Verify a product image upload.
+ * @param {string} productId - Product the image must belong to
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ * @returns {{ publicId: string, url: string }} Verified image (apps add size transforms)
+ */
+const verifyProductImageUpload = (productId, upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(productImagePrefix(productId)));
+  return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
 };
 
 /**
@@ -109,4 +157,12 @@ const deleteImage = async (publicId) => {
   }
 };
 
-module.exports = { avatarPublicId, createAvatarUploadParams, verifyAvatarUpload, deleteImage };
+module.exports = {
+  avatarPublicId,
+  productImagePrefix,
+  createAvatarUploadParams,
+  verifyAvatarUpload,
+  createProductImageUploadParams,
+  verifyProductImageUpload,
+  deleteImage,
+};

@@ -30,13 +30,20 @@
     "greetingName": "Namaste, {{name}}",
     "yourInterests": "You are looking for",
     "editInterests": "Edit interests",
-    "noInterests": "Tell us what you plan to buy and we will show you the right groups."
+    "noInterests": "Tell us what you plan to buy and we will show you the right groups.",
+    "browseCategories": "Browse categories"
   },
   "search": {
     "title": "Search",
     "placeholder": "Search bikes, phones, cars…",
-    "emptyTitle": "Find a product or group",
-    "emptyBody": "Search by brand or model, like Activa or iPhone."
+    "emptyTitle": "Find a product",
+    "emptyBody": "Search by brand or model, like Activa or iPhone. Small typos are fine.",
+    "recent": "Recent searches",
+    "clear": "Clear",
+    "clearText": "Clear search",
+    "removeRecent": "Remove {{term}}",
+    "noResultsTitle": "Nothing found for “{{query}}”",
+    "noResultsBody": "Try the brand name, or a shorter word."
   },
   "groups": {
     "title": "My Groups",
@@ -153,5 +160,35 @@
     "timelineExploring": "Just exploring",
     "save": "Save and continue",
     "skip": "Skip for now"
+  },
+  "catalog": {
+    "products": "Products",
+    "product": "Product",
+    "openCategory": "Open {{name}}",
+    "fromPrice": "From {{price}}",
+    "priceSoon": "Price coming soon",
+    "emptyCategoryTitle": "No products here yet",
+    "emptyCategoryBody": "We are adding products to this category. Check back soon.",
+    "offlineTitle": "You are offline",
+    "tryAgainBody": "Please try again in a moment.",
+    "noImage": "No photo yet",
+    "imageLabel": "{{name}}, photo {{index}} of {{total}}",
+    "variant": "Variant",
+    "priceIn": "Price in {{city}}",
+    "yourCity": "your city",
+    "exShowroom": "Ex-showroom",
+    "onRoad": "On-road",
+    "mrp": "MRP",
+    "priceNote": "Usual market price. Group prices from dealers are lower.",
+    "noCityPrice": "No price for your city yet.",
+    "specs": "Key specs",
+    "openGroupsIn": "Open groups in {{city}}",
+    "noGroupTitle": "No open group yet",
+    "noGroupBody": "Be the first in {{city}}. When enough people join, dealers bid and the lowest price wins.",
+    "startGroup": "Start a group",
+    "startGroupHint": "Saves your interest. Starting groups opens very soon.",
+    "interestSaved": "Saved. Starting groups opens very soon, and we will tell you when people near you want this too.",
+    "notFoundTitle": "Product not available",
+    "notFoundBody": "This product was removed or is not live yet."
   }
 }

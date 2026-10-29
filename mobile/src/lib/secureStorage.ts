@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   REFRESH_TOKEN: 'sm.auth.refreshToken',
   DEVICE_ID: 'sm.device.id',
   LANGUAGE: 'sm.settings.language',
+  RECENT_SEARCHES: 'sm.search.recent',
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

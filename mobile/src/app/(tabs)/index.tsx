@@ -1,12 +1,13 @@
 /**
- * Home tab. Day 3: greeting, the user's city, promise card, chosen interests (placeholder
- * until real sections arrive on Day 11) and how it works.
+ * Home tab: greeting and city, promise card, category grid (Day 4), chosen interests
+ * (placeholder until real group sections arrive on Day 11) and how it works.
  */
 import { MapPin, UsersRound } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
+import { CategoryGrid } from '@/components/features/CategoryGrid';
 import { EmptyState } from '@/components/features/EmptyState';
 import { HeroCard } from '@/components/features/HeroCard';
 import { HowItWorksSteps } from '@/components/features/HowItWorksSteps';
@@ -57,8 +58,13 @@ export default function HomeScreen() {
 
       <HeroCard />
 
+      <AppText variant="heading" className="mb-3 mt-8">
+        {t('home.browseCategories')}
+      </AppText>
+      <CategoryGrid />
+
       {user ? (
-        <View className="mt-6">
+        <View className="mt-8">
           <InterestsSummaryCard interests={user.interests} />
         </View>
       ) : null}

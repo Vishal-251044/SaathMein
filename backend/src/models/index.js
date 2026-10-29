@@ -14,4 +14,5 @@ module.exports = {
   Ledger: require('./ledger.model'),
   Session: require('./session.model'),
   DemandSignal: require('./demandSignal.model'),
+  PriceHistory: require('./priceHistory.model'),
 };

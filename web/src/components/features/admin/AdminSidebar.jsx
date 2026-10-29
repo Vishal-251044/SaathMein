@@ -31,7 +31,9 @@ export default function AdminSidebar({ role, onNavigate }) {
 
       <ul className="flex flex-col gap-1">
         {navItemsForRole(role).map(({ label, href, icon: Icon, availableOn }) => {
-          const isActive = href && pathname === href;
+          // Sub-pages (e.g. /admin/products/123) keep their section highlighted
+          const isActive =
+            href && (pathname === href || (href !== '/admin' && pathname.startsWith(`${href}/`)));
           const content = (
             <>
               <Icon className="size-5 shrink-0" strokeWidth={2} aria-hidden="true" />

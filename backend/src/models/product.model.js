@@ -1,7 +1,8 @@
 /**
  * Product model — a catalog item with variants, specs, images and per-city prices.
- * PRD §13 `products`, CAT-2. The embedding vector (Smart Match, Day 16) is stored here
- * but never returned by default.
+ * PRD §13 `products`, CAT-2. Prices are per city AND per variant (variantKey null = the
+ * product's base price). Every price change is also written to priceHistory (CAT-5).
+ * The embedding vector (Smart Match, Day 16) is stored here but never returned by default.
  */
 const { Schema, model } = require('mongoose');
 const { imageSchema, paiseValidator } = require('./shared.schemas');
@@ -18,6 +19,7 @@ const variantSchema = new Schema(
 const cityPriceSchema = new Schema(
   {
     cityId: { type: Schema.Types.ObjectId, ref: 'City', required: true },
+    variantKey: { type: String, trim: true, default: null }, // null = applies to the whole product
     mrpPaise: { type: Number, validate: paiseValidator },
     exShowroomPaise: { type: Number, validate: paiseValidator },
     onRoadPaise: { type: Number, validate: paiseValidator }, // vehicles: ex-showroom + RTO + insurance
@@ -40,11 +42,15 @@ const productSchema = new Schema(
     tags: [{ type: String, trim: true, lowercase: true }],
     embedding: { type: [Number], select: false },
     active: { type: Boolean, default: true },
+    // Set by imports with unverified prices; cleared when staff switch the product on
+    needsPriceReview: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
 
 productSchema.index({ slug: 1 }, { unique: true });
+productSchema.index({ active: 1, brand: 1, model: 1 });
+productSchema.index({ needsPriceReview: 1, updatedAt: -1 });
 productSchema.index({ categoryId: 1, active: 1 });
 // Text-index fallback for search when Atlas Search is unavailable (DIS-2)
 productSchema.index(

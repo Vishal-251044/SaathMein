@@ -44,6 +44,19 @@ const recordInterestSignals = async ({ user, categories, interests }) => {
 };
 
 /**
+ * Record one view / search / interest signal (fire and forget — never throws).
+ * @param {Object} signal - `{ userId, type, productId?, categoryId?, query?, cityId?, area? }`
+ * @returns {Promise<void>}
+ */
+const recordSignal = async (signal) => {
+  try {
+    await DemandSignal.create(signal);
+  } catch (err) {
+    log.error({ err: err.message, type: signal.type }, 'Could not record demand signal');
+  }
+};
+
+/**
  * Remove all signals of a user (account deletion).
  * @param {string} userId - User id
  * @returns {Promise<void>}
@@ -52,4 +65,4 @@ const deleteUserSignals = async (userId) => {
   await DemandSignal.deleteMany({ userId });
 };
 
-module.exports = { recordInterestSignals, deleteUserSignals };
+module.exports = { recordInterestSignals, recordSignal, deleteUserSignals };

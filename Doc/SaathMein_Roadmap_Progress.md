@@ -127,17 +127,29 @@ Notes:
 **Done when:** admin imports products with a CSV; a user searches "activa" with a typo and opens the product page with its Pune price.
 
 - [ ] Mobile: category grid on Home
-- [ ] Mobile: product page (image carousel, variants, specs, city price)
-- [ ] Mobile: "Start a group" CTA and open-groups section on product page
-- [ ] Mobile: search screen with 300 ms debounce and recent searches
-- [ ] Backend: `GET /categories`, `/products?q=`, `/products/:id`, `/cities`
-- [ ] Backend: Atlas Search index (brand, model, tags) with text-index fallback
-- [ ] Backend: priceHistory written on every price change
-- [ ] Web: Admin Catalog categories with rules editor
-- [ ] Web: Products CRUD with variants and city prices
-- [ ] Web: bulk CSV import with failed-row report
-- [ ] Data: import 300+ launch products (two-wheelers, mobiles, cars, ACs)
-- [ ] Data: indexes products.slug, products.categoryId
+- [x] Mobile: product page (image carousel, variants, specs, city price)
+- [x] Mobile: "Start a group" CTA and open-groups section on product page
+- [x] Mobile: search screen with 300 ms debounce and recent searches
+- [x] Backend: `GET /categories`, `/products?q=`, `/products/:id`, `/cities`
+- [x] Backend: Atlas Search index (brand, model, tags) with text-index fallback
+- [x] Backend: priceHistory written on every price change
+- [x] Web: Admin Catalog categories with rules editor
+- [x] Web: Products CRUD with variants and city prices
+- [x] Web: bulk CSV import with failed-row report
+- [x] Data: import 300+ launch products (two-wheelers, mobiles, cars, ACs)
+- [x] Data: indexes products.slug, products.categoryId
+
+Notes:
+- Built 29 Oct 2026. Backend: 127 tests pass (CSV parser, typo matching incl. "actva/acitva/activ → Activa", import validation + failed-row report, a dry run of the whole starter catalog, price history diffs, presenters, catalog permissions).
+- DECISION (Vishal, 29 Oct): starter catalog = 315 real models (88 two-wheelers incl. Activa 6G with 3 variants, 81 cars, 99 mobiles/laptops, 50 ACs/TVs/appliances) with APPROXIMATE Pune prices. Every product imports HIDDEN with "Needs price review". Staff check prices in Admin → Products (filter "Needs price review") and switch each product Live, which clears the flag.
+- Commands (after seeds): `npm run import:products` (starter file `src/scripts/data/launch-products.csv`, or pass your own CSV; `--dry-run` checks only) and `npm run search:indexes` (Atlas Search index `product_search`).
+- Search: Atlas Search fuzzy matching when the index exists; otherwise an in-memory typo-tolerant fallback (Damerau–Levenshtein over brand/model/tags, cached 60 s, fine to a few thousand products). The roadmap's "text-index fallback" is this fuzzy fallback, because a plain text index cannot handle typos.
+- Prices are per city AND per variant (`priceByCity.variantKey`, null = whole product). Headline price = on-road, else ex-showroom, else MRP. Every admin/CSV price change writes `priceHistory` (append-only); `GET /products/:id/price-history` is ready for Day 17 charts.
+- Product page "Start a group" records a demand signal (`POST /products/:id/interest`) and tells the user group creation opens soon — the real flow replaces it on Day 6. Logged-in views and searches are also recorded as demand signals.
+- Product images: signed Cloudinary uploads from Admin → Products (CSV can also carry https image URLs). Starter products have no images yet.
+- Admin catalog routes are Owner/Admin/Deal Manager only; the role check is scoped to /categories and /products so it cannot block other admin modules (tested).
+- PENDING (owner): run `npm run seed`, `npm run import:products`, `npm run search:indexes` once MongoDB Atlas is set; review prices before switching products live.
+- PENDING (Day 5): audit log for category/product/import changes.
 
 ### Day 5 — Dealer Login, Onboarding & Dashboard v1 (Fri 30 Oct)
 **Done when:** a dealer signs up and logs in, finishes KYC, gets a Razorpay Route linked account in test mode and is approved in admin; the approval appears in the audit log.

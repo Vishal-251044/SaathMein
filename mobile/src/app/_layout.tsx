@@ -7,10 +7,11 @@
  */
 import '../global.css';
 import '@/i18n';
+import '@/lib/nativewindInterop';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { type Href, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -36,6 +37,8 @@ export default function RootLayout() {
   const needsOnboarding = useAuthStore((state) =>
     Boolean(state.user && !state.user.onboardingCompletedAt),
   );
+  const hasCity = useAuthStore((state) => Boolean(state.user?.cityId));
+  const hasChosenLanguage = useSettingsStore((state) => state.hasChosenLanguage);
 
   useEffect(() => {
     useSettingsStore
@@ -59,22 +62,36 @@ export default function RootLayout() {
 
   const isSignedIn = authStatus === 'signedIn';
 
+  // Where a blocked route sends the user. Phones open the first allowed screen anyway,
+  // but on web every URL (e.g. "/") must resolve to a real screen.
+  const startRoute: Href = !isSignedIn
+    ? hasChosenLanguage
+      ? '/phone'
+      : '/language'
+    : needsOnboarding
+      ? hasCity
+        ? '/onboarding/interests'
+        : '/onboarding/city'
+      : '/';
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeRoot>
             <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Protected guard={isSignedIn && !needsOnboarding}>
+              <Stack.Protected guard={isSignedIn && !needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="edit-profile" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="edit-city" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="edit-interests" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="category/[id]" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="product/[id]" options={{ animation: 'slide_from_right' }} />
               </Stack.Protected>
-              <Stack.Protected guard={isSignedIn && needsOnboarding}>
+              <Stack.Protected guard={isSignedIn && needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="onboarding" />
               </Stack.Protected>
-              <Stack.Protected guard={!isSignedIn}>
+              <Stack.Protected guard={!isSignedIn} redirectTo={startRoute}>
                 <Stack.Screen name="(auth)" />
               </Stack.Protected>
             </Stack>

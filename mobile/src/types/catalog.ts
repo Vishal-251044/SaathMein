@@ -46,3 +46,48 @@ export interface LocationMatch {
   city: City | null;
   area: Area | null;
 }
+
+/** One price for the buyer's city (integer paise; pricePaise = on-road, else ex-showroom, else MRP). */
+export interface ProductPrice {
+  variantKey: string | null;
+  mrpPaise: number | null;
+  exShowroomPaise: number | null;
+  onRoadPaise: number | null;
+  pricePaise: number | null;
+  updatedAt: string;
+}
+
+/** Product in lists and search results. */
+export interface ProductCard {
+  id: string;
+  slug: string;
+  brand: string;
+  model: string;
+  name: string;
+  categoryId: string;
+  imageUrl: string | null;
+  fromPricePaise: number | null;
+}
+
+export interface ProductVariant {
+  key: string;
+  name: string;
+  attrs: Record<string, string>;
+}
+
+/** Product page data (GET /products/:id). */
+export interface ProductDetail extends ProductCard {
+  description: string | null;
+  tags: string[];
+  variants: ProductVariant[];
+  specs: Record<string, string>;
+  images: { url: string }[];
+  cityId: string | null;
+  prices: ProductPrice[];
+}
+
+/** One page of GET /products. */
+export interface ProductPage {
+  products: ProductCard[];
+  meta: { page: number; limit: number; hasNextPage: boolean; cityId: string | null };
+}

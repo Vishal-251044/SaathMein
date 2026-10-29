@@ -42,6 +42,21 @@ export const formatBps = (bps) => `${Number((bps / 100).toFixed(2))}%`;
 export const formatMemberCount = (count, target) => `${count} of ${target}`;
 
 /**
+ * URL-safe slug, identical to the backend's slugify ("H-Smart Edition" → "h-smart-edition").
+ * Used to predict variant keys before a product is saved.
+ * @param {string} text - Input
+ * @returns {string} Slug
+ */
+export const slugify = (text = '') =>
+  String(text)
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+/**
  * Parse a comma/space separated list of pincodes, keeping valid unique 6-digit codes.
  * @param {string} text - e.g. "411038, 411052 411038"
  * @returns {{ pincodes: string[], invalid: string[] }} Valid codes and rejected entries

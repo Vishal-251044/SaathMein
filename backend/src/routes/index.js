@@ -19,7 +19,7 @@ router.use('/health', healthRoutes);
 router.use('/auth', requireDatabase, authRoutes);
 router.use('/users', requireDatabase, userRoutes);
 router.use('/admin', requireDatabase, adminRoutes);
-router.use(['/categories', '/cities'], requireDatabase);
+router.use(['/categories', '/cities', '/products'], requireDatabase);
 router.use(catalogRoutes);
 
 module.exports = router;

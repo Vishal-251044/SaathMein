@@ -16,6 +16,7 @@ const demandSignalSchema = new Schema(
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
     productId: { type: Schema.Types.ObjectId, ref: 'Product' },
     brand: { type: String, trim: true, maxlength: 60 },
+    query: { type: String, trim: true, maxlength: 100 }, // search text (type "search")
     cityId: { type: Schema.Types.ObjectId, ref: 'City' },
     area: { type: String, trim: true },
     budgetMinPaise: Number,

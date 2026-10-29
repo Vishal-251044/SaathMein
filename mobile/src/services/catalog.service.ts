@@ -1,9 +1,16 @@
 /**
- * Catalog service — public categories and cities (no login needed).
+ * Catalog service — public categories, cities and products (browsing needs no login;
+ * when logged in, the API remembers views and searches for recommendations).
  */
-import type { CategoryGroup, City, LocationMatch } from '@/types/catalog';
+import type {
+  CategoryGroup,
+  City,
+  LocationMatch,
+  ProductDetail,
+  ProductPage,
+} from '@/types/catalog';
 
-import { api, unwrap } from './api';
+import { api, type ApiEnvelope, unwrap } from './api';
 
 /** @returns Active category tree */
 export async function getCategories(): Promise<CategoryGroup[]> {
@@ -28,4 +35,54 @@ export function matchLocation(location: {
   pincode?: string;
 }): Promise<LocationMatch> {
   return unwrap(api.get('/cities/match', { params: location }));
+}
+
+export interface ProductQuery {
+  q?: string;
+  categoryId?: string;
+  cityId?: string | null;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * List or search products (typo-tolerant search, DIS-2).
+ * @param query - Search text, category, buyer city and page
+ * @returns One page of products with `hasNextPage`
+ */
+export async function listProducts({
+  q,
+  categoryId,
+  cityId,
+  page = 1,
+  limit = 20,
+}: ProductQuery): Promise<ProductPage> {
+  const response = await api.get<ApiEnvelope<{ products: ProductPage['products'] }>>('/products', {
+    params: { q: q || undefined, categoryId, cityId: cityId || undefined, page, limit },
+  });
+  return { products: response.data.data.products, meta: response.data.meta as ProductPage['meta'] };
+}
+
+/**
+ * Product page data with prices for the buyer's city.
+ * @param productId - Product id
+ * @param cityId - Buyer's city (defaults to the launch city on the server)
+ * @returns Product details
+ */
+export async function getProduct(
+  productId: string,
+  cityId?: string | null,
+): Promise<ProductDetail> {
+  const data = await unwrap<{ product: ProductDetail }>(
+    api.get(`/products/${productId}`, { params: { cityId: cityId || undefined } }),
+  );
+  return data.product;
+}
+
+/**
+ * "I want this" — records demand for a product until group creation opens (Day 6).
+ * @param productId - Product id
+ */
+export async function registerProductInterest(productId: string): Promise<void> {
+  await api.post(`/products/${productId}/interest`);
 }

@@ -15,12 +15,14 @@ import {
   Settings,
   ShieldCheck,
   MapPin,
+  Shapes,
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: 'all' },
   { label: 'Cities', href: '/admin/cities', icon: MapPin, roles: ['admin', 'deal_manager'] },
-  { label: 'Catalog', icon: Package, availableOn: 'Day 4', roles: ['admin', 'deal_manager'] },
+  { label: 'Categories', href: '/admin/catalog', icon: Shapes, roles: ['admin', 'deal_manager'] },
+  { label: 'Products', href: '/admin/products', icon: Package, roles: ['admin', 'deal_manager'] },
   { label: 'Sellers', icon: Store, availableOn: 'Day 5', roles: ['admin', 'deal_manager'] },
   {
     label: 'Groups',
