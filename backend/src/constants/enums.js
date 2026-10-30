@@ -32,6 +32,10 @@ const MEMBER_STATUS = Object.freeze({
   ACCEPTED: 'accepted',
   PURCHASED: 'purchased',
   REFUNDED: 'refunded',
+  // Community groups with leader approval (GRP-6): asked to join / approved, not paid yet
+  PENDING_APPROVAL: 'pending_approval',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
 });
 
 /** Dealer bid status in a live auction. */

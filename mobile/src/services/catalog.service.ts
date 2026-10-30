@@ -94,11 +94,3 @@ export async function getProduct(
   );
   return data.product;
 }
-
-/**
- * "I want this" — records demand for a product until group creation opens (Day 6).
- * @param productId - Product id
- */
-export async function registerProductInterest(productId: string): Promise<void> {
-  await api.post(`/products/${productId}/interest`);
-}

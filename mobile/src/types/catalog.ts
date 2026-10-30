@@ -16,7 +16,12 @@ export interface Category {
   icon: string | null;
   parentId: string | null;
   featuredBrands: string[];
-  rules: { minSize?: number; maxSize?: number; tokenAmountPaise?: number };
+  rules: {
+    minSize?: number;
+    maxSize?: number;
+    tokenAmountPaise?: number;
+    deadlineDays?: { min: number; max: number };
+  };
 }
 
 /** Top-level category with its children (GET /categories). */

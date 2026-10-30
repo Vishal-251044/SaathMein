@@ -10,6 +10,7 @@ const adminAuthRoutes = require('./admin.auth.routes');
 const adminCitiesRoutes = require('./admin.cities.routes');
 const adminCatalogRoutes = require('./admin.catalog.routes');
 const adminSellersRoutes = require('./admin.sellers.routes');
+const adminGroupsRoutes = require('./admin.groups.routes');
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use(requireStaff(), auditAdminWrites);
 router.use('/cities', adminCitiesRoutes);
 router.use(adminCatalogRoutes); // /categories, /products
 router.use(adminSellersRoutes); // /sellers, /product-requests, /audit-logs
+router.use(adminGroupsRoutes); // /groups
 
 module.exports = router;

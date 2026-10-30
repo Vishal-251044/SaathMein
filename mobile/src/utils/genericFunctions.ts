@@ -68,3 +68,31 @@ export function formatIndianPhone(phone: string | null | undefined): string {
 export function cx(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ');
 }
+
+export interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  /** True when the time has passed. */
+  isOver: boolean;
+  /** Under 24 hours left (shown in the warning colour). */
+  isSoon: boolean;
+}
+
+/**
+ * Split the time until a deadline into days, hours and minutes.
+ * @param deadline - ISO date or Date
+ * @param now - Current time in ms (tests)
+ * @returns Parts of the remaining time
+ */
+export function getTimeLeft(deadline: string | Date, now = Date.now()): TimeLeft {
+  const ms = Math.max(0, new Date(deadline).getTime() - now);
+  const totalMinutes = Math.floor(ms / 60_000);
+  return {
+    days: Math.floor(totalMinutes / 1440),
+    hours: Math.floor((totalMinutes % 1440) / 60),
+    minutes: totalMinutes % 60,
+    isOver: ms === 0,
+    isSoon: ms > 0 && ms < 24 * 3_600_000,
+  };
+}

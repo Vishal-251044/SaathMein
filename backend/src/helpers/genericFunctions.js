@@ -2,6 +2,7 @@
  * Generic reusable helpers shared across services.
  * Check here before writing a new helper (CLAUDE.md §12).
  */
+const crypto = require('crypto');
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -106,8 +107,20 @@ const distanceKm = ([lng1, lat1], [lng2, lat2]) => {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a));
 };
 
+// No 0/O, 1/I/L: codes are read aloud and typed from WhatsApp messages
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+/**
+ * Random human-friendly code (group invite codes, deal codes).
+ * @param {number} [length=8] - Number of characters
+ * @returns {string} e.g. "K7M2QX9P"
+ */
+const generateCode = (length = 8) =>
+  Array.from({ length }, () => CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)]).join('');
+
 module.exports = {
   DEFAULT_PAGE_SIZE,
+  generateCode,
   parseDurationToMs,
   distanceKm,
   MAX_PAGE_SIZE,

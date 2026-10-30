@@ -19,4 +19,5 @@ module.exports = {
   SellerInvite: require('./sellerInvite.model'),
   AuditLog: require('./auditLog.model'),
   ProductRequest: require('./productRequest.model'),
+  Setting: require('./setting.model'),
 };

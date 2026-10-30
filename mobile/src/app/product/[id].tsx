@@ -1,11 +1,10 @@
 /**
  * Product page (CAT-2, DIS-4, TRU-1): images, variants with the user's city price, specs,
  * open groups in the city, verified dealers in the city and the "Start a group" call to action.
- * Until group creation exists (Day 6) the CTA records the user's interest (demand signal)
- * and says so — it never pretends a group was created.
+ * "Start a group" opens the create flow, which first offers similar open groups (GRP-2).
  */
-import { useLocalSearchParams } from 'expo-router';
-import { CheckCircle2, PackageX, UsersRound } from 'lucide-react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { PackageX, UsersRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
@@ -13,16 +12,16 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/features/EmptyState';
+import { GroupCard } from '@/components/features/GroupCard';
 import { PriceBlock } from '@/components/features/PriceBlock';
 import { ProductImageCarousel } from '@/components/features/ProductImageCarousel';
 import { VerifiedDealersSection } from '@/components/features/VerifiedDealersSection';
 import { StackHeader } from '@/components/layout/StackHeader';
 import { AppText } from '@/components/ui/AppText';
 import { Button } from '@/components/ui/Button';
-import { Notice } from '@/components/ui/Notice';
 import { useCategories, useCities } from '@/hooks/useCatalog';
-import { useProduct, useProductInterest } from '@/hooks/useProducts';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { useProductGroups } from '@/hooks/useGroups';
+import { useProduct } from '@/hooks/useProducts';
 import { ApiClientError } from '@/services/api';
 import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
@@ -44,13 +43,12 @@ function ProductSkeleton() {
  */
 export default function ProductScreen() {
   const { t, i18n } = useTranslation();
-  const { colors } = useThemeColors();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: product, isPending, isError, error, refetch, isFetching } = useProduct(id);
   const { data: cities } = useCities();
   const { data: groups } = useCategories();
-  const interest = useProductInterest();
+  const { data: openGroups } = useProductGroups(id);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
 
   const city = cities?.find((item) => item.id === product?.cityId);
@@ -145,11 +143,17 @@ export default function ProductScreen() {
 
               <View className="gap-3">
                 <AppText variant="heading">{t('catalog.openGroupsIn', { city: cityName })}</AppText>
-                <EmptyState
-                  icon={UsersRound}
-                  title={t('catalog.noGroupTitle')}
-                  body={t('catalog.noGroupBody', { city: cityName })}
-                />
+                {openGroups?.groups.length ? (
+                  openGroups.groups.map((group) => (
+                    <GroupCard key={group.id} group={group} hideProduct />
+                  ))
+                ) : (
+                  <EmptyState
+                    icon={UsersRound}
+                    title={t('catalog.noGroupTitle')}
+                    body={t('catalog.noGroupBody', { city: cityName })}
+                  />
+                )}
               </View>
 
               <VerifiedDealersSection categoryId={product.categoryId} cityName={cityName} />
@@ -162,30 +166,17 @@ export default function ProductScreen() {
             style={{ paddingBottom: Math.max(insets.bottom, 12) }}
           >
             <View className="w-full max-w-[640px] gap-2 self-center">
-              {interest.isSuccess ? (
-                <View
-                  className="flex-row items-center gap-2 rounded-button bg-savings-soft px-4 py-3"
-                  accessibilityLiveRegion="polite"
-                >
-                  <CheckCircle2 size={18} color={colors.savings} strokeWidth={2} />
-                  <AppText variant="caption" color="ink" className="flex-1">
-                    {t('catalog.interestSaved')}
-                  </AppText>
-                </View>
-              ) : (
-                <>
-                  {interest.error ? (
-                    <Notice message={t(getErrorMessageKey(interest.error))} />
-                  ) : null}
-                  <Button
-                    label={t('catalog.startGroup')}
-                    icon={UsersRound}
-                    loading={interest.isPending}
-                    onPress={() => interest.mutate(product.id)}
-                    accessibilityHint={t('catalog.startGroupHint')}
-                  />
-                </>
-              )}
+              <Button
+                label={t('catalog.startGroup')}
+                icon={UsersRound}
+                onPress={() =>
+                  router.push({
+                    pathname: '/group/create',
+                    params: { productId: product.id, ...(variantKey ? { variantKey } : {}) },
+                  })
+                }
+                accessibilityHint={t('catalog.startGroupHint')}
+              />
             </View>
           </View>
         </>

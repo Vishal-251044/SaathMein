@@ -33,8 +33,8 @@ export const ADMIN_NAV_ITEMS = [
   },
   {
     label: 'Groups',
+    href: '/admin/groups',
     icon: UsersRound,
-    availableOn: 'Day 6',
     roles: ['admin', 'deal_manager', 'support'],
   },
   { label: 'Auctions', icon: Gavel, availableOn: 'Day 9', roles: ['admin', 'deal_manager'] },

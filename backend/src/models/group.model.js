@@ -3,7 +3,7 @@
  * Buyer-led groups go to a live dealer auction when full; seller-led groups use
  * fixed discount tiers. PRD §13 `groups`, §10.3, §10.5.
  *
- * IMPORTANT: `status` may only be changed by services/groups/stateMachine.js (Day 6).
+ * IMPORTANT: `status` may only be changed by services/groups/stateMachine.js.
  */
 const { Schema, model } = require('mongoose');
 const { GROUP_STATUS, GROUP_TYPE, GROUP_VISIBILITY, values } = require('../constants/enums');
@@ -54,6 +54,7 @@ const groupSchema = new Schema(
       default: GROUP_VISIBILITY.PUBLIC,
     },
     inviteCode: { type: String, trim: true, uppercase: true }, // community groups and share links
+    requiresApproval: { type: Boolean, default: false }, // community: leader approves members (GRP-6)
 
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     variantKey: { type: String, trim: true }, // null = "any variant"
@@ -71,6 +72,8 @@ const groupSchema = new Schema(
 
     deadline: { type: Date, required: true },
     deadlineExtended: { type: Boolean, default: false }, // leader may extend once (GRP-5)
+    // Deadline passed at ≥70% of target: the leader chooses extend / start early until this time
+    leaderDecisionDueAt: Date,
     status: { type: String, enum: values(GROUP_STATUS), default: GROUP_STATUS.OPEN },
     statusHistory: [
       {
@@ -78,6 +81,8 @@ const groupSchema = new Schema(
         from: String,
         to: String,
         reason: String,
+        byType: { type: String, enum: ['system', 'user', 'staff'] }, // who caused it
+        by: { type: Schema.Types.ObjectId, ref: 'User' },
         at: { type: Date, default: Date.now },
       },
     ],
@@ -89,6 +94,25 @@ const groupSchema = new Schema(
   { timestamps: true },
 );
 
+// Status may only change through services/groups/stateMachine.js (CLAUDE.md §8): saves
+// and updates that touch `status` without the state machine flag are refused.
+groupSchema.pre('save', function guardStatusOnSave() {
+  if (!this.isNew && this.isModified('status')) {
+    throw new Error('Group status must be changed through the state machine');
+  }
+  if (this.isNew && this.status !== GROUP_STATUS.OPEN) {
+    throw new Error('New groups must start open');
+  }
+});
+groupSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function guardStatusOnUpdate() {
+  const update = this.getUpdate() || {};
+  const touchesStatus =
+    'status' in update || 'status' in (update.$set || {}) || 'status' in (update.$unset || {});
+  if (touchesStatus && !this.getOptions().stateMachine) {
+    throw new Error('Group status must be changed through the state machine');
+  }
+});
+
 // Indexes from PRD §13
 groupSchema.index({ cityId: 1, status: 1, deadline: 1 });
 groupSchema.index({ productId: 1, cityId: 1, status: 1 });
@@ -97,6 +121,8 @@ groupSchema.index(
   { inviteCode: 1 },
   { unique: true, partialFilterExpression: { inviteCode: { $type: 'string' } } },
 );
+// Deadline sweep: open groups whose deadline or leader decision window has passed
+groupSchema.index({ status: 1, leaderDecisionDueAt: 1 });
 // Auction close job looks up live auctions by end time
 groupSchema.index({ status: 1, 'auction.endsAt': 1 });
 

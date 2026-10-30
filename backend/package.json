@@ -10,6 +10,8 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
+    "worker": "node worker.js",
+    "dev:worker": "node --watch worker.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -23,6 +25,7 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.81.5",
     "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",

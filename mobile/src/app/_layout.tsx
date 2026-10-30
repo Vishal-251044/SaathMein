@@ -88,6 +88,9 @@ export default function RootLayout() {
                 <Stack.Screen name="category/[id]" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="product/[id]" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="request-product" options={{ animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="group/[id]" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="group/create" options={{ animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="g/[code]" options={{ animation: 'fade' }} />
               </Stack.Protected>
               <Stack.Protected guard={isSignedIn && needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="onboarding" />

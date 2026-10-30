@@ -2,14 +2,9 @@
  * Product hooks (TanStack Query): paginated lists/search and the product page.
  * Prices always come for the logged-in user's city.
  */
-import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
-import {
-  getProduct,
-  listPopularProducts,
-  listProducts,
-  registerProductInterest,
-} from '@/services/catalog.service';
+import { getProduct, listPopularProducts, listProducts } from '@/services/catalog.service';
 import { useAuthStore } from '@/stores/auth.store';
 
 const PAGE_SIZE = 20;
@@ -52,11 +47,6 @@ export function useProduct(productId: string | undefined) {
     queryFn: () => getProduct(productId as string, cityId),
     enabled: Boolean(productId),
   });
-}
-
-/** @returns Mutation that records "I want this" for a product */
-export function useProductInterest() {
-  return useMutation({ mutationFn: registerProductInterest });
 }
 
 /** @returns Query with the most wanted products in the user's city (Home rail) */

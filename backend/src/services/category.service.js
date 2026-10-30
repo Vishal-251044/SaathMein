@@ -23,6 +23,10 @@ const toPublicCategory = (category) => ({
     minSize: category.rules?.minSize,
     maxSize: category.rules?.maxSize,
     tokenAmountPaise: category.rules?.tokenAmountPaise,
+    // Group creation limits (GRP-1)
+    deadlineDays: category.rules?.deadlineDays
+      ? { min: category.rules.deadlineDays.min, max: category.rules.deadlineDays.max }
+      : undefined,
   },
 });
 

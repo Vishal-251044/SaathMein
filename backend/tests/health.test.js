@@ -1,16 +1,23 @@
 /**
  * Integration tests for GET /api/health, the 404 handler and the CORS whitelist.
+ * The app is loaded once; the database status is switched through a mock (reloading the
+ * whole app per test is slow when all suites run in parallel).
  */
+jest.mock('../src/config/db', () => ({
+  ...jest.requireActual('../src/config/db'),
+  getDBStatus: jest.fn(() => 'not_configured'),
+}));
+
 const request = require('supertest');
+const { getDBStatus } = require('../src/config/db');
+const app = require('../src/app');
+
+beforeEach(() => {
+  getDBStatus.mockReturnValue('not_configured');
+});
 
 describe('GET /api/health', () => {
-  afterEach(() => {
-    jest.resetModules();
-    jest.dontMock('../src/config/db');
-  });
-
   it('returns 503 "degraded" when the database is not configured', async () => {
-    const app = require('../src/app');
     const res = await request(app).get('/api/health');
 
     expect(res.status).toBe(503);
@@ -23,8 +30,7 @@ describe('GET /api/health', () => {
   });
 
   it('returns 200 with database "connected" when MongoDB is up', async () => {
-    jest.doMock('../src/config/db', () => ({ getDBStatus: () => 'connected' }));
-    const app = require('../src/app');
+    getDBStatus.mockReturnValue('connected');
     const res = await request(app).get('/api/health');
 
     expect(res.status).toBe(200);
@@ -38,8 +44,6 @@ describe('GET /api/health', () => {
 });
 
 describe('Error handling and security middleware', () => {
-  const app = require('../src/app');
-
   it('returns the standard 404 format for unknown routes', async () => {
     const res = await request(app).get('/api/does-not-exist');
 

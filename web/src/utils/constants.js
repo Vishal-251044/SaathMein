@@ -84,3 +84,17 @@ export const PAYOUT_STATUS_LABELS = Object.freeze({
   suspended: 'Suspended',
   failed: 'Setup failed',
 });
+
+/** Group status labels and badge tones (PRD §10.3). */
+export const GROUP_STATUS_META = Object.freeze({
+  open: { label: 'Open', tone: 'brand' },
+  full: { label: 'Full', tone: 'brand' },
+  auction_live: { label: 'Auction live', tone: 'warning' },
+  won: { label: 'Won', tone: 'brand' },
+  purchasing: { label: 'Purchasing', tone: 'brand' },
+  runner_up: { label: 'Runner-up offer', tone: 'warning' },
+  completed: { label: 'Completed', tone: 'muted' },
+  expired: { label: 'Expired', tone: 'muted' },
+  no_deal: { label: 'No deal', tone: 'danger' },
+  cancelled: { label: 'Cancelled', tone: 'danger' },
+});

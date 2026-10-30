@@ -183,18 +183,31 @@ Notes:
 ### Day 6 — Groups Core & Lifecycle State Machine (Sat 31 Oct)
 **Done when:** a user creates a group, a second user finds it in the list and on the product page, and the deadline job expires a test group correctly.
 
-- [ ] Mobile: create group flow (product / variant, target size, deadline, public or community)
-- [ ] Mobile: "Join a similar group instead?" step
-- [ ] Mobile: group page (people counter + progress bar, time left, members, status timeline)
-- [ ] Mobile: group cards; My Groups tab (joined, leading)
-- [ ] Backend: group state machine with guarded transitions (open → full → auction_live → won → purchasing → completed + runner_up, expired, no_deal, cancelled)
-- [ ] Backend: `POST /groups`, `GET /groups` (filters), `GET /groups/:id`, `GET /groups/similar`
-- [ ] Backend: community groups (invite code, join-by-code, leader approval)
-- [ ] Backend: BullMQ jobs (deadline check, auction close)
-- [ ] Data: indexes groups.{cityId, status, deadline}, groups.{productId, cityId, status}
-- [ ] Data: unique index groupMembers.{groupId, userId}
-- [ ] Tests: every state transition
-- [ ] Web: Admin Groups list (read-only)
+- [x] Mobile: create group flow (product / variant, target size, deadline, public or community)
+- [x] Mobile: "Join a similar group instead?" step
+- [x] Mobile: group page (people counter + progress bar, time left, members, status timeline)
+- [x] Mobile: group cards; My Groups tab (joined, leading)
+- [x] Backend: group state machine with guarded transitions (open → full → auction_live → won → purchasing → completed + runner_up, expired, no_deal, cancelled)
+- [x] Backend: `POST /groups`, `GET /groups` (filters), `GET /groups/:id`, `GET /groups/similar`
+- [x] Backend: community groups (invite code, join-by-code, leader approval)
+- [x] Backend: BullMQ jobs (deadline check, auction close)
+- [x] Data: indexes groups.{cityId, status, deadline}, groups.{productId, cityId, status}
+- [x] Data: unique index groupMembers.{groupId, userId}
+- [x] Tests: every state transition
+- [x] Web: Admin Groups list (read-only)
+
+Notes:
+- Built 30 Oct 2026. Backend: 328 tests pass (all 100 status pairs, every guard, optimistic lock, model refusing status writes outside the state machine, deadline sweep, auction close, group rules, routes and admin permissions). Web builds; mobile typecheck + lint pass.
+- DECISION (Vishal, 30 Oct — open question 5): an auction started early at ≥70% uses the SAME rules and ceiling; dealers see the real member count.
+- DECISION (Vishal): a membership always means a paid token (PAY-2). A new group shows "0 of N" — the leader takes their seat by paying the token on Day 7 ("pay to start" goes into the create flow then).
+- DECISION (Vishal): at the deadline with ≥70% (and at least 1 member) the leader has 48 h to extend once (+7 days, never beyond the category's max deadline from creation) or start the auction early; no answer → expired. Below 70% → expired. Values live in the new `settings` collection (`groups.earlyStartThresholdBps`, `leaderDecisionHours`, `extensionDays`, `maxOpenGroupsPerLeader` = 5), with defaults until the Settings page (Day 11).
+- State machine: `services/groups/stateMachine.js` is the only writer of `group.status` — the Group model now throws on any save/update touching status without it. Writes use the current status as an optimistic lock (exactly once); side effects (schedule auction close; refunds TODO Day 7) run after the change.
+- Jobs: new `worker.js` (`npm run worker`, needs `REDIS_URL`): minute sweep (deadlines + overdue auctions safety net) and one delayed auction-close job per end time (Redis lock + state-machine lock). Auction close today: lowest price wins, earliest wins a tie, runner-up = best other dealer, no bids → no_deal. Min-dealers extension, admin pause and deal codes stay on Days 9–10. BullMQ is only loaded when Redis is configured.
+- Community groups: every group has an 8-character invite code (no 0/O/1/I/L); community groups are hidden from search and 404 for people without the code; optional leader approval happens before payment (`pending_approval` → `approved`, then pay on Day 7). Leader can cancel only while nobody has paid.
+- Mobile: "Start a group" on the product page opens the create flow (replaces the Day 4 interest-only button); product page lists open groups; group page with people counter + Sunrise bar, time left, timeline, invite code + share sheet, leader decision card, join requests; My Groups (Joined / Leading) with "Have an invite code?"; `saathmein://g/<code>` opens a group. https share links and links opened before login come with sharing on Day 8.
+- Test fixes: health test no longer reloads the whole app twice (it timed out under parallel load); Jest timeout 20 s for bcrypt-heavy auth tests.
+- PENDING (owner): `REDIS_URL` (Upstash) in `backend/.env` and run `npm run worker` next to the API — without it deadlines are not processed.
+- Not verified end-to-end yet (needs MongoDB + Redis). To check "Done when": create a group with a 3-day deadline, open it from a second account via the product page or the list, then set its `deadline` in the past in Atlas and wait for the worker sweep (≤1 min) → status `expired`.
 
 ### Day 7 — Razorpay Payments, Refunds & Ledger (Sun 1 Nov · Power day)
 **Done when:** in Razorpay test mode, three users pay tokens and join; one leaves and is refunded; an expired group refunds everyone; the ledger matches Razorpay exactly.
@@ -428,3 +441,6 @@ Notes:
 | 27 Oct 2026 | Auction bids stored in `bids` + `auctionDealers` (PRD §13); no separate `offers` collection | Days 1, 9, 18 |
 | 27 Oct 2026 | Build started 27 Oct (planned 26 Oct) — schedule is one day behind | All |
 | 30 Oct 2026 | Dealer login = email + password; business phone is a contact only (dealer phone OTP deferred) — pending Vishal's OK | Days 5, 9 |
+| 30 Oct 2026 | Open question 5: early-start auction (≥70%) keeps the same rules and ceiling | Days 6, 9 |
+| 30 Oct 2026 | Membership = paid token; new groups start at 0 members, leader pays to take a seat | Days 6, 7 |
+| 30 Oct 2026 | Deadline at ≥70%: leader has 48 h to extend once (+7 days, capped at category max) or start early; else expired | Day 6 |
