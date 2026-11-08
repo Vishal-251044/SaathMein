@@ -19,3 +19,9 @@ process.env.FIREBASE_PRIVATE_KEY = '';
 process.env.CLOUDINARY_CLOUD_NAME = 'saathmein-test';
 process.env.CLOUDINARY_API_KEY = '123456789012345';
 process.env.CLOUDINARY_API_SECRET = 'test-cloudinary-secret';
+// Test-only Razorpay keys (no network calls are made; the SDK is mocked)
+process.env.RAZORPAY_KEY_ID = 'rzp_test_saathmein';
+process.env.RAZORPAY_KEY_SECRET = 'test-razorpay-key-secret';
+process.env.RAZORPAY_WEBHOOK_SECRET = 'test-razorpay-webhook-secret';
+// Cheap password hashing in tests (production enforces 12+)
+process.env.BCRYPT_ROUNDS = '4';

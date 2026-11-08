@@ -11,8 +11,12 @@ const refundSchema = new Schema(
   {
     razorpayRefundId: { type: String, trim: true },
     amountPaise: { type: Number, required: true, validate: paiseValidator },
+    // Back-out fee kept from the token with this refund (left after lock, PAY-3)
+    feePaise: { type: Number, default: 0, validate: paiseValidator },
     reason: { type: String, required: true, trim: true }, // left_open_group, expired, no_deal, ...
     status: { type: String, enum: ['pending', 'processed', 'failed'], default: 'pending' },
+    attempts: { type: Number, default: 0, min: 0 },
+    lastError: { type: String, trim: true },
     initiatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, // null = system
     createdAt: { type: Date, default: Date.now },
     processedAt: Date,
@@ -24,6 +28,7 @@ const transferSchema = new Schema(
   {
     razorpayTransferId: { type: String, trim: true },
     sellerId: { type: Schema.Types.ObjectId, ref: 'Seller' },
+    razorpayAccountId: { type: String, trim: true }, // dealer's linked account
     amountPaise: { type: Number, validate: paiseValidator }, // token minus commission
     commissionPaise: { type: Number, validate: paiseValidator },
     onHold: { type: Boolean, default: true },
@@ -34,6 +39,7 @@ const transferSchema = new Schema(
     },
     releasedAt: Date,
     reversedAt: Date,
+    lastError: { type: String, trim: true },
   },
   { _id: false },
 );
@@ -51,6 +57,10 @@ const paymentSchema = new Schema(
     razorpayTaxPaise: { type: Number, validate: paiseValidator },
     status: { type: String, enum: values(PAYMENT_STATUS), default: PAYMENT_STATUS.CREATED },
     failureReason: { type: String, trim: true },
+    // Seat held for this checkout; after this time the seat counts as free again
+    reservedUntil: Date,
+    // Paid but no seat was free (late payment): refunded in full
+    seatUnavailable: { type: Boolean, default: false },
     refunds: [refundSchema],
     transfer: { type: transferSchema, default: undefined },
     // Razorpay webhook event ids already processed (idempotency, PAY-2)
@@ -67,5 +77,9 @@ paymentSchema.index(
 );
 paymentSchema.index({ userId: 1, createdAt: -1 });
 paymentSchema.index({ groupId: 1, status: 1 });
+paymentSchema.index({ groupId: 1, userId: 1, status: 1 });
+paymentSchema.index({ 'refunds.razorpayRefundId': 1 });
+paymentSchema.index({ 'transfer.razorpayTransferId': 1 });
+paymentSchema.index({ 'refunds.status': 1 });
 
 module.exports = model('Payment', paymentSchema);

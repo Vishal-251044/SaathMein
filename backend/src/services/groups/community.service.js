@@ -19,13 +19,13 @@ const log = createLogger('CommunityGroups');
  * @param {string} code - Invite code
  * @param {string} userId - Buyer
  * @returns {Promise<{ group: Object, nextStep: 'view'|'pay_token'|'wait_for_approval'|'declined' }>}
- * @throws {ApiError} 404 INVALID_CODE
+ * @throws {ApiError} 404 INVITE_CODE_INVALID
  */
 const joinByCode = async (code, userId) => {
   const group = await Group.findOne({ inviteCode: code.toUpperCase() }).lean();
   if (!group) {
     throw ApiError.notFound('This invite code is not valid. Check it and try again.', {
-      code: 'INVALID_CODE',
+      code: 'INVITE_CODE_INVALID',
     });
   }
   const groupId = String(group._id);

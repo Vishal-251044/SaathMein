@@ -213,21 +213,36 @@ Notes:
 **Done when:** in Razorpay test mode, three users pay tokens and join; one leaves and is refunded; an expired group refunds everyone; the ledger matches Razorpay exactly.
 
 - [ ] Mobile: Razorpay React Native SDK in an EAS development build
-- [ ] Mobile: join flow (token summary, refund rules, pay by UPI / card)
-- [ ] Mobile: money timeline per group (paid, held, refunded, transferred) + receipts
-- [ ] Mobile: leave group with refund preview
-- [ ] Mobile: join waitlist when a group is full
-- [ ] Backend: `POST /payments/order`, `/payments/verify` (HMAC signature)
-- [ ] Backend: `/payments/webhook` for payment.captured, payment.failed, refund.*, transfer.*, settlement.processed (idempotent)
-- [ ] Backend: join = payment + member + count in one MongoDB transaction
-- [ ] Backend: refund service (leave open group, expired, no_deal, cancelled, back-out fee after lock)
-- [ ] Backend: ledger service (append-only)
-- [ ] Backend: Route transfer service (token minus commission, on hold, release / reverse)
-- [ ] Backend: waitlist (freed seat offered to next user for 2 h)
+- [x] Mobile: join flow (token summary, refund rules, pay by UPI / card)
+- [x] Mobile: money timeline per group (paid, held, refunded, transferred) + receipts
+- [x] Mobile: leave group with refund preview
+- [x] Mobile: join waitlist when a group is full
+- [x] Backend: `POST /payments/order`, `/payments/verify` (HMAC signature)
+- [x] Backend: `/payments/webhook` for payment.captured, payment.failed, refund.*, transfer.*, settlement.processed (idempotent)
+- [x] Backend: join = payment + member + count in one MongoDB transaction
+- [x] Backend: refund service (leave open group, expired, no_deal, cancelled, back-out fee after lock)
+- [x] Backend: ledger service (append-only)
+- [x] Backend: Route transfer service (token minus commission, on hold, release / reverse)
+- [x] Backend: waitlist (freed seat offered to next user for 2 h)
 - [ ] DevOps: webhook URL on a Render preview / public tunnel
-- [ ] Backend: daily reconciliation job vs Razorpay settlements
-- [ ] Tests: duplicate webhook, failed payment, every refund path
-- [ ] Backend: commission rules per category read from settings
+- [x] Backend: daily reconciliation job vs Razorpay settlements
+- [x] Tests: duplicate webhook, failed payment, every refund path
+- [x] Backend: commission rules per category read from settings
+
+Notes:
+- Built 8 Nov 2026. Backend: 400 tests pass (signatures, commission split, ledger balances for every flow, order rules, the join transaction incl. duplicates / last seat / late payment / amount mismatch, every refund path incl. back-out fee and fee-only, retries, webhook idempotency and redelivery, Route hold / release / reverse / failed transfer, reconciliation auto-fixes, raw-body webhook route). Mobile typecheck + lint pass.
+- DECISION (Vishal, 8 Nov — open question 1): the token is a PART-PAYMENT. The dealer gets token minus commission through Route (on hold until the purchase is confirmed); the buyer pays the winning price minus the token at the shop. Commission above the token is invoiced to the dealer.
+- DECISION (Vishal, 8 Nov — open question 3): the buyer convenience fee is charged at purchase (Day 10), ₹0 at launch. Today the token is the only charge; refunds always return the full token (minus the back-out fee only after lock).
+- Join flow: `POST /payments/order` (amount = the group's token snapshot; the seat is held 15 min = `settings.payments.seatReservationMinutes`) → Razorpay Checkout (UPI first) → `POST /payments/verify` (HMAC with the key secret; captures if only authorized). The ONE join path (`confirmCapturedPayment`) is used by verify, the webhook and reconciliation: payment paid + ledger `token_held` + seat (`memberCount` +1, guarded) + member, in one transaction; duplicates do nothing; the last seat moves the group to `full` (state machine); a payment that arrives after the last seat is taken (or with a wrong amount) is refunded in full.
+- Webhook: `POST /api/payments/webhook` reads the RAW body (signature over exact bytes, webhook secret), outside the general rate limit; event ids stored in `webhookEvents` (processed once; a failed one runs again on redelivery). Handled: payment.captured / authorized / failed, refund.processed / failed, transfer.processed / failed, settlement.processed.
+- Refunds: one refund per payment + reason, claimed in the database BEFORE calling Razorpay (never twice); queued in BullMQ (`refunds`, retried with backoff; the minute sweep re-queues failed ones up to 8 attempts); ledger `refund` (+ `fee`) written when Razorpay says processed. Paths: leave open (full), leave after lock (minus `group.backoutFeePaise`, snapshot at creation), expired / no_deal / cancelled (all members, via group effects), seat unavailable, amount mismatch. Leaving during `auction_live` is blocked; the 24 h exit window after a win comes on Day 10.
+- Ledger: added `transfer_reversal` and `commission_reversal` types (corrections stay new rows). Route transfer service (hold / release / reverse) is ready and tested; it is called from the auction win (Day 9) and purchase confirmation (Day 10).
+- Waitlist: free to join when full; a freed seat is offered to the next person for 2 h (`settings.payments.waitlistOfferHours`), only they can pay for it; expired offers go to the back of the line.
+- Reconciliation: nightly 02:30 IST (BullMQ scheduler) over the previous IST day; lost captures and lost refund.processed are fixed automatically through the normal paths; other differences are stored in `reconciliationReports` for the Payment monitor (Day 13); Razorpay fee/tax saved per payment.
+- Mobile: `react-native-razorpay` 3.0.0 (loaded lazily — in Expo Go the pay button explains that payments need the app build). Pay screen, money timeline with receipt, leave sheet with refund preview, waitlist / seat-offer actions, "Start group" now goes straight to paying the leader's token. Public key id comes from the server, so no new app env variable.
+- Fixes: invite-code errors now use `INVITE_CODE_INVALID` (it reused the OTP code); Day 6 group errors and payment errors now show translated messages instead of "something went wrong"; bcrypt cost is `BCRYPT_ROUNDS` (12, production refuses less; tests use 4 — the slow cost-12 hashing was timing out tests).
+- PENDING (owner): Razorpay test keys + webhook secret; create the webhook in the Razorpay dashboard (events above) pointing to a public URL — locally run a tunnel (e.g. `cloudflared tunnel --url http://localhost:5000`) and use `https://<tunnel>/api/payments/webhook`; `REDIS_URL` + `npm run worker`; build the EAS development build (`eas build --profile development --platform android`) — Razorpay Checkout does not run in Expo Go.
+- Not verified end-to-end yet. "Done when" check: in test mode, 3 users pay tokens and join; one leaves (refund); expire the group (set `deadline` in the past) → everyone refunded; then compare the `ledgers` collection with the Razorpay dashboard (and the nightly reconciliation report).
 
 ### Day 8 — Live Groups, Chat, Push & Sharing (Mon 2 Nov)
 **Done when:** two phones see the counter change instantly when one joins; chat works; a push arrives when the group fills; a WhatsApp link opens the group in the app.
@@ -444,3 +459,5 @@ Notes:
 | 30 Oct 2026 | Open question 5: early-start auction (≥70%) keeps the same rules and ceiling | Days 6, 9 |
 | 30 Oct 2026 | Membership = paid token; new groups start at 0 members, leader pays to take a seat | Days 6, 7 |
 | 30 Oct 2026 | Deadline at ≥70%: leader has 48 h to extend once (+7 days, capped at category max) or start early; else expired | Day 6 |
+| 8 Nov 2026 | Open question 1: token is a part-payment of the bill; dealer gets token minus commission via Route (on hold) | Days 7, 9, 10 |
+| 8 Nov 2026 | Open question 3: buyer convenience fee charged at purchase, ₹0 at launch | Days 7, 10 |

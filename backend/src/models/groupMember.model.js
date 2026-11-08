@@ -13,6 +13,8 @@ const groupMemberSchema = new Schema(
     paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
     dealCode: { type: String, trim: true, uppercase: true }, // issued when the auction is won
     waitlistPosition: { type: Number, min: 1 },
+    // A freed seat is offered to this waitlisted person until this time (2 h)
+    offerExpiresAt: Date,
     joinedAt: { type: Date, default: Date.now },
     leftAt: Date,
   },

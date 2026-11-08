@@ -12,6 +12,8 @@ const requestLogger = require('./middlewares/requestLogger.middleware');
 const { apiLimiter } = require('./middlewares/rateLimit.middleware');
 const { notFound, errorHandler } = require('./middlewares/error.middleware');
 const apiRoutes = require('./routes');
+const { requireDatabase } = require('./middlewares/database.middleware');
+const paymentController = require('./controllers/payment.controller');
 
 const app = express();
 
@@ -36,7 +38,16 @@ app.use(
   }),
 );
 
-// Small JSON limit by default. (The Razorpay webhook route will need the raw body — Day 7.)
+// Razorpay webhook: RAW body (the signature covers the exact bytes), before the JSON
+// parser and outside the general rate limit (Razorpay retries from few IPs). PAY-2.
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json', limit: '1mb' }),
+  requireDatabase,
+  paymentController.webhook,
+);
+
+// Small JSON limit for everything else
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 

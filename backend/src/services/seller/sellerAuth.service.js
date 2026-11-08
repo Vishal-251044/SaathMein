@@ -30,7 +30,7 @@ const emailService = require('../email.service');
 
 const log = createLogger('SellerAuth');
 
-const BCRYPT_ROUNDS = 12;
+const BCRYPT_ROUNDS = config.auth.bcryptRounds;
 const CODE_TTL_MS = 15 * 60 * 1000;
 const MAX_CODE_ATTEMPTS = 5;
 const RESEND_LIMIT = { limit: 5, windowMs: 60 * 60 * 1000 };

@@ -111,7 +111,25 @@
     "areaUnavailable": "Pick your area from the list.",
     "invalidCategory": "One of the chosen categories is no longer available. Please choose again.",
     "uploadsUnavailable": "Photo upload is not available right now.",
-    "uploadFailed": "The photo could not be uploaded. Please try again."
+    "uploadFailed": "The photo could not be uploaded. Please try again.",
+    "invalidGroupSize": "Choose a group size within the allowed range.",
+    "invalidDeadline": "Choose a deadline within the allowed range.",
+    "categoryInactive": "Groups are not open for this category yet.",
+    "tooManyGroups": "You already lead several open groups. Wait for one to finish.",
+    "groupChanged": "This group changed a moment ago. Pull down to refresh.",
+    "alreadyExtended": "The deadline can be extended only once.",
+    "extensionNotPossible": "This group cannot run longer. Start the auction instead.",
+    "groupHasMembers": "People have paid to join. Contact support to cancel.",
+    "inviteCodeInvalid": "This invite code is not valid. Check it and try again.",
+    "alreadyMember": "You are already in this group.",
+    "groupFull": "This group is full. Join the waitlist to get the next free seat.",
+    "groupClosed": "This group is no longer taking members.",
+    "seatsReserved": "All remaining seats are in checkout. Try again in a few minutes.",
+    "seatsAvailable": "Seats are still free. Join the group instead.",
+    "approvalRequired": "Wait for the group leader to approve you.",
+    "paymentsUnavailable": "Payments are not available right now. Please try again later.",
+    "paymentNotVerified": "We could not verify this payment. If money was taken, it will be refunded.",
+    "cannotLeave": "You cannot leave this group right now."
   },
   "language": {
     "title": "Choose your language",
@@ -272,8 +290,6 @@
     "seatsLeft_other": "{{count}} seats left",
     "deadlinePassed": "Deadline passed",
     "tokenLabel": "Refundable token",
-    "joinSoon": "Joining with a refundable token opens very soon.",
-    "leaderPaySoon": "Your group is live. You will take your seat by paying the refundable token (coming very soon). Share the code to bring people in.",
     "noteLabel": "Note from the leader",
     "inviteTitle": "Invite people",
     "inviteHint": "Share this code. Friends enter it in My Groups.",
@@ -301,7 +317,8 @@
     "decline": "Decline {{name}}",
     "cancelGroup": "Cancel this group",
     "cancelConfirmTitle": "Cancel this group?",
-    "cancelConfirmBody": "Nobody has paid yet. The group will close for everyone."
+    "cancelConfirmBody": "Nobody has paid yet. The group will close for everyone.",
+    "leaderPayNow": "Pay the refundable token to take your own seat. Then share the code to bring people in."
   },
   "createGroup": {
     "title": "Start a group",
@@ -330,7 +347,7 @@
     "notePlaceholder": "For example, colour preference or delivery area",
     "review": "Review",
     "edit": "Change details",
-    "tokenNote": "You take your seat by paying the refundable token. Payments open very soon.",
+    "tokenNote": "Next you pay the refundable token to take your seat in your own group.",
     "create": "Start group"
   },
   "joinCode": {
@@ -339,5 +356,83 @@
     "open": "Open group",
     "invalidTitle": "Invite not valid",
     "goToGroups": "Go to My Groups"
+  },
+  "pay": {
+    "title": "Join the group",
+    "forGroup": "You are joining",
+    "tokenLabel": "Refundable token",
+    "tokenA11y": "Token amount {{amount}}",
+    "seatOffer": "A seat was freed and is held for you. Pay now to take it.",
+    "rulesTitle": "What happens to your token",
+    "ruleOpen": "Leave any time while the group is open and get the full token back.",
+    "ruleLocked": "Once the group is full, seats lock. If you leave then, {{fee}} is kept and the rest comes back.",
+    "ruleLockedNoFee": "Once the group is full, seats lock. You can still leave and get the full token back.",
+    "ruleFailed": "If the group does not fill or no dealer deal happens, the full token comes back automatically.",
+    "rulePartPayment": "When you buy, the token counts towards your bill at the shop.",
+    "payButton": "Pay {{amount}} token",
+    "payHint": "Opens Razorpay to pay by UPI, card or net banking",
+    "secure": "Secure payment by Razorpay. Refunds go back to the same account.",
+    "cancelled": "Payment cancelled. Nothing was charged and your seat hold was released.",
+    "needsAppBuild": "Payments work in the SaathMein app build, not in Expo Go.",
+    "failed": "The payment did not go through. Nothing was charged. Please try again.",
+    "joinedTitle": "You are in the group",
+    "joinedBody": "Your {{amount}} token is safely held. We will tell you when dealers start bidding.",
+    "processingTitle": "Payment received",
+    "processingBody": "We are confirming it with your bank. Your seat appears in a minute.",
+    "seatGoneTitle": "The group filled up first",
+    "seatGoneBody": "The last seat was taken just before your payment. Your {{amount}} is being refunded in full.",
+    "goToGroup": "Go to the group"
+  },
+  "money": {
+    "title": "Your money",
+    "receipt": "Receipt",
+    "event": {
+      "paid": "Token paid",
+      "held": "Held safely by SaathMein",
+      "refund_started": "Refund started (5–7 working days)",
+      "refunded": "Refunded to you",
+      "fee_kept": "Back-out fee kept",
+      "sent_to_dealer": "Sent to the dealer towards your bill",
+      "released": "Released to the dealer after purchase",
+      "returned_from_dealer": "Returned from the dealer",
+      "failed": "Payment failed"
+    },
+    "reason": {
+      "left_open_group": "You left the group",
+      "left_after_lock": "You left after seats locked",
+      "group_expired": "Group did not fill in time",
+      "no_deal": "No dealer offer was accepted",
+      "group_cancelled": "Group was cancelled",
+      "seat_unavailable": "The last seat was taken before your payment",
+      "amount_mismatch": "Payment amount did not match"
+    },
+    "method": {
+      "upi": "UPI",
+      "card": "Card",
+      "netbanking": "Net banking",
+      "wallet": "Wallet"
+    }
+  },
+  "leave": {
+    "title": "Leave this group?",
+    "paid": "You paid",
+    "fee": "Back-out fee (seats locked)",
+    "refund": "You get back",
+    "feeExplain": "The group was already full, so the back-out fee is kept. The rest reaches your account in 5–7 working days.",
+    "refundTime": "The full token reaches your account in 5–7 working days.",
+    "locked": "Seats are locked while dealers bid. You can exit after the auction.",
+    "notMember": "You have not paid for a seat in this group.",
+    "confirm": "Leave and get refund",
+    "stay": "Stay in the group"
+  },
+  "join": {
+    "payToJoin": "Join for {{amount}} token",
+    "refundable": "Fully refundable while the group is open",
+    "leave": "Leave group",
+    "offerBody": "A seat is free for you. It is held for {{time}}.",
+    "joinWaitlist": "Join the waitlist",
+    "waitlistExplain": "Free. If someone leaves, the seat is offered to you for 2 hours.",
+    "waitlistPosition": "You are #{{position}} on the waitlist",
+    "leaveWaitlist": "Leave the waitlist"
   }
 }

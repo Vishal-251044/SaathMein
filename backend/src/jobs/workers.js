@@ -1,7 +1,10 @@
 /**
  * BullMQ workers (run by worker.js as a separate process, never inside the API):
- * - group-deadlines: the minute sweep (deadlines + overdue auction safety net).
+ * - group-deadlines: the minute sweep (deadlines, overdue auctions, expired waitlist seat
+ *   offers, failed refunds to retry).
  * - auction-close: closes one auction at its end time.
+ * - refunds: one Razorpay refund per job (retried with backoff).
+ * - reconciliation: nightly comparison with Razorpay.
  */
 const { Worker } = require('bullmq');
 const { getRedis } = require('../config/redis');
@@ -9,6 +12,9 @@ const { createLogger } = require('../utils/logger');
 const { QUEUE_NAMES, ensureDeadlineSweep } = require('./queues');
 const { processDeadlines } = require('../services/groups/deadline.service');
 const { closeAuction, closeOverdueAuctions } = require('../services/auction/auctionClose.service');
+const { expireSeatOffers } = require('../services/groups/membership.service');
+const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
+const { runReconciliation } = require('../services/payments/reconciliation.service');
 
 const log = createLogger('Workers');
 
@@ -17,9 +23,19 @@ const PROCESSORS = {
   [QUEUE_NAMES.DEADLINES]: async () => {
     const deadlines = await processDeadlines();
     const auctionsClosed = await closeOverdueAuctions();
-    return { ...deadlines, auctionsClosed };
+    const offersExpired = await expireSeatOffers();
+    const refundsRetried = await retryFailedRefunds();
+    return { ...deadlines, auctionsClosed, offersExpired, refundsRetried };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),
+  [QUEUE_NAMES.REFUNDS]: async (job) => {
+    const { paymentId, attempt: _attempt, ...refund } = job.data;
+    return refundPayment(paymentId, refund);
+  },
+  [QUEUE_NAMES.RECONCILIATION]: async (job) => {
+    const report = await runReconciliation(job.data?.day ? { day: job.data.day } : {});
+    return { day: report.day, status: report.status };
+  },
 };
 
 /**

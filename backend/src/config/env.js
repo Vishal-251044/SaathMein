@@ -42,6 +42,8 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(1),
   JWT_ACCESS_EXPIRES_IN: duration('15m'),
   JWT_REFRESH_EXPIRES_IN: duration('30d'),
+  // Password hashing cost. Production must keep 12+; tests use 4 so suites stay fast.
+  BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
 
   // Staff (admin console) tokens — separate secrets (ADL-4)
   STAFF_JWT_ACCESS_SECRET: z.string().min(1),
@@ -131,6 +133,9 @@ const isTwoFactorKeyValid = /^[0-9a-fA-F]{64}$/.test(env.TWO_FACTOR_ENCRYPTION_K
 if (isProduction && weakSecrets.length) {
   fail(`These secrets must be at least 32 random characters: ${weakSecrets.join(', ')}`);
 }
+if (isProduction && env.BCRYPT_ROUNDS < 12) {
+  fail('BCRYPT_ROUNDS must be 12 or more in production');
+}
 if (isProduction && !isTwoFactorKeyValid) {
   fail('TWO_FACTOR_ENCRYPTION_KEY must be 64 hex characters (32 bytes) in production');
 }
@@ -180,6 +185,7 @@ const config = Object.freeze({
     twoFactorKey,
     isTwoFactorKeyConfigured: isTwoFactorKeyValid,
     weakSecrets,
+    bcryptRounds: env.BCRYPT_ROUNDS,
   },
   firebase: {
     projectId: env.FIREBASE_PROJECT_ID,

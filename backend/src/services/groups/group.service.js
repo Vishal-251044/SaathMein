@@ -133,6 +133,7 @@ const createGroup = async (userId, input) => {
         targetSize: input.targetSize,
         maxSize: input.targetSize,
         tokenAmountPaise: rules.tokenAmountPaise, // snapshot: later rule edits do not change it
+        backoutFeePaise: Math.min(rules.backoutFeePaise ?? 0, rules.tokenAmountPaise),
         deadline: new Date(now + input.deadlineDays * DAY_MS),
         statusHistory: [{ to: GROUP_STATUS.OPEN, reason: 'created', byType: 'user', by: userId }],
       });

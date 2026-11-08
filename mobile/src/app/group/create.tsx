@@ -3,7 +3,7 @@
  * instead?") so demand is not split, then variant, group size, deadline, public or
  * community, note — then a review step. Sizes and deadline limits come from the
  * category rules; the token amount is set by the server.
- * The leader takes their own seat by paying the token (Day 7).
+ * After creating, the leader goes straight to paying the token to take their own seat.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowRight, Lock, Minus, Plus, UsersRound } from 'lucide-react-native';
@@ -126,7 +126,11 @@ export default function CreateGroupScreen() {
         ...(note.trim() ? { note: note.trim() } : {}),
       },
       {
-        onSuccess: (group) => router.replace({ pathname: '/group/[id]', params: { id: group.id } }),
+        onSuccess: (group) => {
+          // Group page underneath, pay screen on top (back returns to the group)
+          router.replace({ pathname: '/group/[id]', params: { id: group.id } });
+          router.push({ pathname: '/pay/[groupId]', params: { groupId: group.id } });
+        },
       },
     );
   };

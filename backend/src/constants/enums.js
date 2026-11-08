@@ -67,6 +67,10 @@ const LEDGER_TYPE = Object.freeze({
   TRANSFER: 'transfer',
   HOLD_RELEASE: 'hold_release',
   COMMISSION: 'commission',
+  // A Route transfer taken back from the dealer (member exited / dealer backed out, PAY-4)
+  TRANSFER_REVERSAL: 'transfer_reversal',
+  // Commission given back when its transfer is reversed
+  COMMISSION_REVERSAL: 'commission_reversal',
   FEE: 'fee',
   WALLET: 'wallet',
 });

@@ -9,6 +9,7 @@
  */
 const bcrypt = require('bcrypt');
 const User = require('../../models/user.model');
+const config = require('../../config/env');
 const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const { ACCOUNT_STATUS, TOKEN_AUDIENCE } = require('../../constants/enums');
@@ -26,7 +27,7 @@ const {
 
 const log = createLogger('StaffAuthService');
 
-const BCRYPT_ROUNDS = 12;
+const BCRYPT_ROUNDS = config.auth.bcryptRounds;
 // Compared against when the email does not exist, so response time does not reveal accounts.
 // Generated once on first use (a real hash with the same cost as staff passwords).
 let dummyHashPromise = null;

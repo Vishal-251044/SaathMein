@@ -8,6 +8,10 @@
  * - leaderDecisionHours: how long the leader has to choose (48 h), then the group expires.
  * - extensionDays: one extension adds 7 days (never past the category's maximum deadline).
  * - maxOpenGroupsPerLeader: anti-spam limit on open groups one person leads.
+ *
+ * payments (Day 7):
+ * - seatReservationMinutes: a seat is held while the buyer is in checkout.
+ * - waitlistOfferHours: a freed seat is offered to the next waitlisted person this long.
  */
 const Setting = require('../models/setting.model');
 const { createLogger } = require('../utils/logger');
@@ -21,6 +25,10 @@ const DEFAULTS = Object.freeze({
     leaderDecisionHours: 48,
     extensionDays: 7,
     maxOpenGroupsPerLeader: 5,
+  }),
+  payments: Object.freeze({
+    seatReservationMinutes: 15,
+    waitlistOfferHours: 2,
   }),
 });
 
@@ -50,7 +58,16 @@ const getSettings = async (key) => {
 /** @returns {Promise<typeof DEFAULTS.groups>} Group lifecycle settings */
 const getGroupSettings = () => getSettings('groups');
 
+/** @returns {Promise<typeof DEFAULTS.payments>} Checkout and waitlist settings */
+const getPaymentSettings = () => getSettings('payments');
+
 /** Forget cached values (after an admin edit, and in tests). */
 const clearSettingsCache = () => cache.clear();
 
-module.exports = { DEFAULTS, getSettings, getGroupSettings, clearSettingsCache };
+module.exports = {
+  DEFAULTS,
+  getSettings,
+  getGroupSettings,
+  getPaymentSettings,
+  clearSettingsCache,
+};

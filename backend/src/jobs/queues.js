@@ -4,6 +4,8 @@
  *   extend / start-early window — GRP-5, GRP-8).
  * - auction-close: one delayed job per auction end time; closing runs exactly once
  *   (job id per end time + lock + state machine optimistic lock — CLAUDE.md §8).
+ * - refunds: one job per refund (retried with backoff until Razorpay accepts it, PAY-3).
+ * - reconciliation: nightly comparison with Razorpay (PAY-7), 02:30 IST.
  * Without REDIS_URL, scheduling is skipped with a warning (the sweep still catches
  * auctions whose end time passed once Redis is back).
  */
@@ -15,6 +17,8 @@ const log = createLogger('Queues');
 const QUEUE_NAMES = Object.freeze({
   DEADLINES: 'group-deadlines',
   AUCTION_CLOSE: 'auction-close',
+  REFUNDS: 'refunds',
+  RECONCILIATION: 'reconciliation',
 });
 
 const DEADLINE_SWEEP_EVERY_MS = 60 * 1000;
@@ -78,16 +82,39 @@ const scheduleAuctionClose = async (group) => {
 };
 
 /**
- * Register the repeating deadline sweep (idempotent; called by the worker on start).
+ * Queue one refund. The job id (payment + reason + attempt) makes the same refund queue
+ * only once; a retry after failure uses the next attempt number.
+ * @param {{ paymentId: string, reason: string, amountPaise?: number, feePaise?: number, attempt?: number }} refund
+ * @returns {Promise<boolean>} false when Redis is not configured (caller refunds inline)
+ */
+const enqueueRefund = async (refund) => {
+  const queue = getQueue(QUEUE_NAMES.REFUNDS);
+  if (!queue) return false;
+  await queue.add('refund', refund, {
+    jobId: `refund-${refund.paymentId}-${refund.reason}-${refund.attempt || 1}`,
+    attempts: 8,
+    backoff: { type: 'exponential', delay: 30_000 },
+  });
+  return true;
+};
+
+/**
+ * Register the repeating jobs (idempotent; called by the worker on start):
+ * the minute deadline sweep and the nightly reconciliation at 02:30 IST.
  * @returns {Promise<void>}
  */
 const ensureDeadlineSweep = async () => {
-  const queue = getQueue(QUEUE_NAMES.DEADLINES);
-  if (!queue) return;
-  await queue.upsertJobScheduler(
+  const deadlines = getQueue(QUEUE_NAMES.DEADLINES);
+  if (!deadlines) return;
+  await deadlines.upsertJobScheduler(
     'deadline-sweep',
     { every: DEADLINE_SWEEP_EVERY_MS },
     { name: 'sweep', data: {} },
+  );
+  await getQueue(QUEUE_NAMES.RECONCILIATION).upsertJobScheduler(
+    'nightly-reconciliation',
+    { pattern: '30 2 * * *', tz: 'Asia/Kolkata' },
+    { name: 'reconcile', data: {} },
   );
 };
 
@@ -101,6 +128,7 @@ module.exports = {
   QUEUE_NAMES,
   getQueue,
   scheduleAuctionClose,
+  enqueueRefund,
   ensureDeadlineSweep,
   closeQueues,
 };

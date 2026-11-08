@@ -70,7 +70,15 @@ export interface GroupDetail extends GroupCard {
   inviteCode: string | null;
   leader: { firstName: string | null } | null;
   members: GroupMemberPreview[];
-  myMembership: { status: MembershipStatus; joinedAt: string } | null;
+  myMembership: {
+    status: MembershipStatus;
+    joinedAt: string;
+    waitlistPosition: number | null;
+    /** A freed seat is held for me until then (pay to take it). */
+    seatOfferExpiresAt: string | null;
+  } | null;
+  /** Kept from the token if I leave after seats lock. */
+  backoutFeePaise: number;
   statusHistory: GroupStatusEntry[];
   auction: { startsAt: string; endsAt: string; dealerCount: number } | null;
   leaderDecision: { dueAt: string; canExtend: boolean; canStartEarly: boolean } | null;

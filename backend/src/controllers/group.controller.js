@@ -5,6 +5,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { sendSuccess } = require('../utils/ApiResponse');
 const groupService = require('../services/groups/group.service');
 const communityService = require('../services/groups/community.service');
+const membershipService = require('../services/groups/membership.service');
 
 /** POST /api/groups */
 const createGroup = asyncHandler(async (req, res) => {
@@ -85,7 +86,51 @@ const decideRequest = asyncHandler(async (req, res) => {
   });
 });
 
+/** GET /api/groups/:groupId/leave-preview — what leaving would refund */
+const leavePreview = asyncHandler(async (req, res) => {
+  const terms = await membershipService.leavePreview(req.params.groupId, req.auth.userId);
+  return sendSuccess(res, { message: 'Refund preview', data: { terms } });
+});
+
+/** POST /api/groups/:groupId/leave — leave and get the token back (PAY-3) */
+const leaveGroup = asyncHandler(async (req, res) => {
+  const terms = await membershipService.leaveGroup(req.params.groupId, req.auth.userId);
+  const group = await groupService.getGroup(req.params.groupId, { userId: req.auth.userId });
+  return sendSuccess(res, {
+    message: 'You left the group. Your refund is on its way.',
+    data: { terms, group },
+  });
+});
+
+/** POST /api/groups/:groupId/waitlist — join the waitlist of a full group */
+const joinWaitlist = asyncHandler(async (req, res) => {
+  const { position } = await membershipService.joinWaitlist(
+    req.params.groupId,
+    req.auth.userId,
+    req.body || {},
+  );
+  const group = await groupService.getGroup(req.params.groupId, {
+    userId: req.auth.userId,
+    code: req.body?.code,
+  });
+  return sendSuccess(res, {
+    statusCode: 201,
+    message: 'You are on the waitlist',
+    data: { position, group },
+  });
+});
+
+/** DELETE /api/groups/:groupId/waitlist */
+const leaveWaitlist = asyncHandler(async (req, res) => {
+  await membershipService.leaveWaitlist(req.params.groupId, req.auth.userId);
+  return sendSuccess(res, { message: 'You left the waitlist' });
+});
+
 module.exports = {
+  leavePreview,
+  leaveGroup,
+  joinWaitlist,
+  leaveWaitlist,
   createGroup,
   listGroups,
   similarGroups,

@@ -20,4 +20,7 @@ module.exports = {
   AuditLog: require('./auditLog.model'),
   ProductRequest: require('./productRequest.model'),
   Setting: require('./setting.model'),
+  WebhookEvent: require('./webhookEvent.model'),
+  Settlement: require('./settlement.model'),
+  ReconciliationReport: require('./reconciliationReport.model'),
 };

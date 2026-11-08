@@ -70,7 +70,16 @@ const toGroupDetail = (
         avatarUrl: member.userId.avatar?.url || null,
         isLeader: str(member.userId._id) === str(group.leaderId),
       })),
-    myMembership: membership ? { status: membership.status, joinedAt: membership.joinedAt } : null,
+    myMembership: membership
+      ? {
+          status: membership.status,
+          joinedAt: membership.joinedAt,
+          waitlistPosition: membership.waitlistPosition ?? null,
+          // A freed seat is held for this buyer until then (pay to take it)
+          seatOfferExpiresAt: membership.offerExpiresAt ?? null,
+        }
+      : null,
+    backoutFeePaise: group.backoutFeePaise ?? 0,
     statusHistory: (group.statusHistory || []).map((entry) => ({
       from: entry.from || null,
       to: entry.to,

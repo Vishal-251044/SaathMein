@@ -1,8 +1,9 @@
 /**
  * Group page (GRP-3): product, people counter, time left, members (first names only),
  * status timeline, share code, and the leader's tools (extend / start early, join
- * requests, cancel an empty group). Joining with a token arrives on Day 7, chat and live
- * socket updates on Day 8, the live auction card on Day 9.
+ * requests, cancel an empty group), joining with the token / waitlist / leaving with a
+ * refund (Day 7) and my money timeline. Chat and live socket updates on Day 8, the live
+ * auction card on Day 9.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -24,8 +25,10 @@ import { PressableScale } from '@/components/animations/PressableScale';
 import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { GroupStatusTimeline } from '@/components/features/GroupStatusTimeline';
+import { JoinGroupBar } from '@/components/features/JoinGroupBar';
 import { JoinRequestsCard } from '@/components/features/JoinRequestsCard';
 import { LeaderDecisionCard } from '@/components/features/LeaderDecisionCard';
+import { MoneyTimeline } from '@/components/features/MoneyTimeline';
 import { PeopleCounter } from '@/components/features/PeopleCounter';
 import { StackHeader } from '@/components/layout/StackHeader';
 import { AppText } from '@/components/ui/AppText';
@@ -187,14 +190,20 @@ export default function GroupScreen() {
               <JoinRequestsCard groupId={group.id} />
             ) : null}
 
-            {group.status === 'open' && !group.isLeader && !group.myMembership ? (
-              <Notice tone="info" message={t('group.joinSoon')} />
-            ) : null}
             {group.myMembership?.status === 'pending_approval' ? (
               <Notice tone="info" message={t('group.awaitingApprovalBody')} />
             ) : null}
-            {group.isLeader && group.memberCount === 0 && group.status === 'open' ? (
-              <Notice tone="info" message={t('group.leaderPaySoon')} />
+            {group.isLeader && !group.myMembership && group.status === 'open' ? (
+              <Notice tone="info" message={t('group.leaderPayNow')} />
+            ) : null}
+
+            <JoinGroupBar group={group} code={code} />
+
+            {group.myMembership &&
+            !['pending_approval', 'approved', 'rejected', 'waitlisted'].includes(
+              group.myMembership.status,
+            ) ? (
+              <MoneyTimeline groupId={group.id} />
             ) : null}
 
             {group.note ? (

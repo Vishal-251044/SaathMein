@@ -68,6 +68,8 @@ const groupSchema = new Schema(
     maxSize: { type: Number, min: 2 },
     memberCount: { type: Number, default: 0, min: 0 },
     tokenAmountPaise: { type: Number, required: true, validate: paiseValidator }, // snapshot at creation
+    // Kept from the token when a member leaves after seats lock (snapshot at creation, PAY-3)
+    backoutFeePaise: { type: Number, default: 0, validate: paiseValidator },
     tiers: [tierSchema],
 
     deadline: { type: Date, required: true },
