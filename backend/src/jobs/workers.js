@@ -10,7 +10,8 @@ const { Worker } = require('bullmq');
 const { getRedis } = require('../config/redis');
 const { createLogger } = require('../utils/logger');
 const { QUEUE_NAMES, ensureDeadlineSweep } = require('./queues');
-const { processDeadlines } = require('../services/groups/deadline.service');
+const { processDeadlines, sendDeadlineReminders } = require('../services/groups/deadline.service');
+const { sendDeferredPushes } = require('../services/notifications/notification.service');
 const { closeAuction, closeOverdueAuctions } = require('../services/auction/auctionClose.service');
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
@@ -25,7 +26,9 @@ const PROCESSORS = {
     const auctionsClosed = await closeOverdueAuctions();
     const offersExpired = await expireSeatOffers();
     const refundsRetried = await retryFailedRefunds();
-    return { ...deadlines, auctionsClosed, offersExpired, refundsRetried };
+    const reminders = await sendDeadlineReminders();
+    const pushesSent = await sendDeferredPushes();
+    return { ...deadlines, auctionsClosed, offersExpired, refundsRetried, reminders, pushesSent };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),
   [QUEUE_NAMES.REFUNDS]: async (job) => {

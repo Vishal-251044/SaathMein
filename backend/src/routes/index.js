@@ -12,6 +12,7 @@ const sellerRoutes = require('./seller.routes');
 const marketplaceRoutes = require('./marketplace.routes');
 const groupRoutes = require('./group.routes');
 const paymentRoutes = require('./payment.routes');
+const notificationRoutes = require('./notification.routes');
 const adminRoutes = require('./admin');
 
 const router = Router();
@@ -26,6 +27,7 @@ router.use('/admin', requireDatabase, adminRoutes);
 router.use('/seller', requireDatabase, sellerRoutes);
 router.use('/groups', requireDatabase, groupRoutes);
 router.use('/payments', requireDatabase, paymentRoutes);
+router.use('/notifications', requireDatabase, notificationRoutes);
 router.use(
   ['/categories', '/cities', '/products', '/sellers', '/product-requests'],
   requireDatabase,

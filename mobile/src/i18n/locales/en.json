@@ -129,7 +129,12 @@
     "approvalRequired": "Wait for the group leader to approve you.",
     "paymentsUnavailable": "Payments are not available right now. Please try again later.",
     "paymentNotVerified": "We could not verify this payment. If money was taken, it will be refunded.",
-    "cannotLeave": "You cannot leave this group right now."
+    "cannotLeave": "You cannot leave this group right now.",
+    "chatMembersOnly": "Only group members can use the chat.",
+    "chatTooFast": "You are sending messages too fast. Please wait a moment.",
+    "pollLeaderOnly": "Only the group leader can start a poll.",
+    "tooManyPinned": "You can pin up to 3 messages. Unpin one first.",
+    "pollClosed": "This poll is closed."
   },
   "language": {
     "title": "Choose your language",
@@ -295,7 +300,7 @@
     "inviteHint": "Share this code. Friends enter it in My Groups.",
     "codeA11y": "Invite code {{code}}",
     "share": "Share invite",
-    "shareMessage": "Join my SaathMein group for {{name}}. We buy together and save together. Invite code: {{code}}",
+    "shareMessage": "Join my SaathMein group for {{name}}. {{count}} of {{target}} have joined: when the group fills up, dealers compete and the lowest price wins for all of us. {{link}} (invite code {{code}})",
     "membersTitle": "Members",
     "leaderTag": "leader",
     "someone": "Someone",
@@ -318,7 +323,8 @@
     "cancelGroup": "Cancel this group",
     "cancelConfirmTitle": "Cancel this group?",
     "cancelConfirmBody": "Nobody has paid yet. The group will close for everyone.",
-    "leaderPayNow": "Pay the refundable token to take your own seat. Then share the code to bring people in."
+    "leaderPayNow": "Pay the refundable token to take your own seat. Then share the code to bring people in.",
+    "memberJoined": "{{name}} joined"
   },
   "createGroup": {
     "title": "Start a group",
@@ -434,5 +440,42 @@
     "waitlistExplain": "Free. If someone leaves, the seat is offered to you for 2 hours.",
     "waitlistPosition": "You are #{{position}} on the waitlist",
     "leaveWaitlist": "Leave the waitlist"
+  },
+  "chat": {
+    "open": "Open group chat",
+    "title": "Group chat",
+    "placeholder": "Message the group",
+    "send": "Send",
+    "addPhoto": "Add a photo",
+    "photo": "Photo",
+    "newPoll": "New poll",
+    "pollQuestion": "Question",
+    "pollOption": "Option {{number}}",
+    "removeOption": "Remove option {{number}}",
+    "addOption": "Add an option",
+    "sendPoll": "Send poll",
+    "pin": "Pin message",
+    "unpin": "Unpin message",
+    "report": "Report message",
+    "actionsTitle": "Message",
+    "longPressHint": "Long press for more options",
+    "hidden": "This message is hidden after reports. Our team will review it.",
+    "voteA11y": "{{option}}, {{count}} votes",
+    "votes_one": "{{count}} vote",
+    "votes_other": "{{count}} votes",
+    "reconnecting": "Reconnecting… messages may be delayed.",
+    "membersOnlyTitle": "Chat is for members",
+    "membersOnlyBody": "Join the group to talk with the other buyers.",
+    "emptyTitle": "Say hello",
+    "emptyBody": "Talk with people buying the same product. Be kind: abuse is filtered and can be reported."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread_one": "{{count}} unread",
+    "unread_other": "{{count}} unread",
+    "markAll": "Mark all as read",
+    "emptyTitle": "No notifications yet",
+    "emptyBody": "Updates about your groups, refunds and dealer bids appear here.",
+    "bellUnread": "Notifications, {{count}} unread"
   }
 }

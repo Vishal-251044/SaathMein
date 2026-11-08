@@ -80,6 +80,17 @@ const envSchema = z.object({
   // Public URL of the dealer dashboard (links in emails, e.g. team invites)
   SELLER_WEB_URL: z.string().default('http://localhost:3000/seller'),
 
+  // Public base for share links (<base>/g/<code>) and Android App Links (Day 8)
+  APP_LINK_BASE_URL: z.string().default('http://localhost:5000'),
+  ANDROID_PACKAGE_NAME: z.string().default('com.saathmein.app'),
+  // SHA-256 fingerprints of the app signing keys (Play Console → App integrity), comma separated
+  ANDROID_SHA256_CERT_FINGERPRINTS: z.string().default(''),
+  PLAY_STORE_URL: z
+    .string()
+    .default('https://play.google.com/store/apps/details?id=com.saathmein.app'),
+  // Optional: Expo push "enhanced security" access token (expo.dev → Access tokens)
+  EXPO_ACCESS_TOKEN: z.string().default(''),
+
   // Owner account — read only by `npm run create-owner` (ADL-3)
   OWNER_EMAIL: z.string().default(''),
   OWNER_PASSWORD: z.string().default(''),
@@ -224,6 +235,17 @@ const config = Object.freeze({
     isConfigured: env.RESEND_API_KEY.startsWith('re_'),
   },
   sellerWebUrl: env.SELLER_WEB_URL.replace(/\/+$/, ''),
+  appLinks: {
+    baseUrl: env.APP_LINK_BASE_URL.replace(/\/+$/, ''),
+    androidPackage: env.ANDROID_PACKAGE_NAME,
+    sha256Fingerprints: env.ANDROID_SHA256_CERT_FINGERPRINTS.split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+    playStoreUrl: env.PLAY_STORE_URL,
+  },
+  expo: {
+    accessToken: env.EXPO_ACCESS_TOKEN.startsWith('your_') ? '' : env.EXPO_ACCESS_TOKEN,
+  },
   owner: {
     email: env.OWNER_EMAIL,
     password: env.OWNER_PASSWORD,

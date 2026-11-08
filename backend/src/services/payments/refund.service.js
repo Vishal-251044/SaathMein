@@ -16,7 +16,14 @@ const { withTransaction } = require('../../utils/transaction');
 const { enqueueRefund } = require('../../jobs/queues');
 const razorpay = require('./razorpay.service');
 const { recordLedger } = require('./ledger.service');
-const { LEDGER_TYPE, MEMBER_STATUS, PAYMENT_STATUS } = require('../../constants/enums');
+const { notifyUsers } = require('../notifications/notification.service');
+const { formatINR } = require('../../utils/money');
+const {
+  LEDGER_TYPE,
+  MEMBER_STATUS,
+  NOTIFICATION_TYPE,
+  PAYMENT_STATUS,
+} = require('../../constants/enums');
 
 const log = createLogger('RefundService');
 const MAX_ATTEMPTS = 8;
@@ -99,14 +106,14 @@ const claimRefund = async (paymentId, { reason, amountPaise, feePaise, initiated
  * @param {Date} [processedAt] - When Razorpay processed it
  * @returns {Promise<boolean>} true when this call recorded it
  */
-const markRefundProcessed = (razorpayRefundId, processedAt = new Date()) =>
-  withTransaction(async (session) => {
+const markRefundProcessed = async (razorpayRefundId, processedAt = new Date()) => {
+  const done = await withTransaction(async (session) => {
     const payment = await Payment.findOneAndUpdate(
       { refunds: { $elemMatch: { razorpayRefundId, status: { $ne: 'processed' } } } },
       { $set: { 'refunds.$.status': 'processed', 'refunds.$.processedAt': processedAt } },
       { new: true, session },
     );
-    if (!payment) return false;
+    if (!payment) return null;
     const refund = payment.refunds.find((item) => item.razorpayRefundId === razorpayRefundId);
     payment.status = statusAfterRefunds(payment);
     await payment.save({ session });
@@ -135,8 +142,20 @@ const markRefundProcessed = (razorpayRefundId, processedAt = new Date()) =>
       { paymentId: String(payment._id), razorpayRefundId, amountPaise: refund.amountPaise },
       'Refund processed',
     );
-    return true;
+    return { userId: payment.userId, groupId: payment.groupId, amountPaise: refund.amountPaise };
   });
+  if (!done) return false;
+
+  // After commit: tell the buyer (LIV-3 "refund done")
+  if (done.amountPaise > 0) {
+    await notifyUsers([done.userId], NOTIFICATION_TYPE.REFUND_DONE, {
+      amount: formatINR(done.amountPaise),
+      groupId: done.groupId,
+      url: `/group/${done.groupId}`,
+    });
+  }
+  return true;
+};
 
 /**
  * Mark a refund failed (refund.failed webhook) so the retry sweep picks it up.

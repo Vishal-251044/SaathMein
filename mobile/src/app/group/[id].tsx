@@ -2,8 +2,8 @@
  * Group page (GRP-3): product, people counter, time left, members (first names only),
  * status timeline, share code, and the leader's tools (extend / start early, join
  * requests, cancel an empty group), joining with the token / waitlist / leaving with a
- * refund (Day 7) and my money timeline. Chat and live socket updates on Day 8, the live
- * auction card on Day 9.
+ * refund (Day 7) and my money timeline, live updates over Socket.io with a polling
+ * fallback, chat entry and WhatsApp sharing (Day 8). The live auction card comes on Day 9.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -12,12 +12,13 @@ import {
   Crown,
   Lock,
   PackageX,
+  MessagesSquare,
   Share2,
   UsersRound,
   XCircle,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, RefreshControl, ScrollView, Share, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -26,6 +27,7 @@ import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { GroupStatusTimeline } from '@/components/features/GroupStatusTimeline';
 import { JoinGroupBar } from '@/components/features/JoinGroupBar';
+import { NewMemberToast } from '@/components/features/NewMemberToast';
 import { JoinRequestsCard } from '@/components/features/JoinRequestsCard';
 import { LeaderDecisionCard } from '@/components/features/LeaderDecisionCard';
 import { MoneyTimeline } from '@/components/features/MoneyTimeline';
@@ -35,6 +37,8 @@ import { AppText } from '@/components/ui/AppText';
 import { Button } from '@/components/ui/Button';
 import { Notice } from '@/components/ui/Notice';
 import { useCancelGroup, useGroup } from '@/hooks/useGroups';
+import { useGroupSocket } from '@/hooks/useGroupSocket';
+import { shareToWhatsApp } from '@/lib/share';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimeLeft } from '@/hooks/useTimeLeft';
 import { ApiClientError } from '@/services/api';
@@ -61,17 +65,37 @@ export default function GroupScreen() {
   const { colors } = useThemeColors();
   const insets = useSafeAreaInsets();
   const { id, code } = useLocalSearchParams<{ id: string; code?: string }>();
-  const { data: group, isPending, isError, error, refetch, isRefetching } = useGroup(id, code);
+  // Live counter, members and status over the socket; polling only while it is down
+  const { connected, lastJoined } = useGroupSocket(id, code);
+  const {
+    data: group,
+    isPending,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+  } = useGroup(id, code, {
+    live: connected,
+  });
   const cancel = useCancelGroup();
   const timeLeft = useTimeLeft(group?.deadline);
   const isNotFound = error instanceof ApiClientError && error.status === 404;
+  const canChat =
+    Boolean(group?.isLeader) ||
+    ['active', 'accepted', 'purchased'].includes(group?.myMembership?.status ?? '');
 
-  /** Share the invite code with the system share sheet (deep links arrive on Day 8). */
+  /** WhatsApp first, with the https link that opens the app (LIV-4). */
   const share = () => {
     if (!group?.inviteCode) return;
-    Share.share({
-      message: t('group.shareMessage', { name: group.product.name, code: group.inviteCode }),
-    }).catch(() => {});
+    shareToWhatsApp(
+      t('group.shareMessage', {
+        name: group.product.name,
+        count: group.memberCount,
+        target: group.targetSize,
+        link: group.shareUrl ?? '',
+        code: group.inviteCode,
+      }),
+    ).catch(() => {});
   };
 
   const confirmCancel = () => {
@@ -89,6 +113,7 @@ export default function GroupScreen() {
   return (
     <View className="flex-1 bg-bg">
       <StackHeader title={t('group.title')} />
+      <NewMemberToast member={lastJoined} />
 
       {isPending ? <GroupSkeleton /> : null}
 
@@ -198,6 +223,17 @@ export default function GroupScreen() {
             ) : null}
 
             <JoinGroupBar group={group} code={code} />
+
+            {canChat ? (
+              <Button
+                label={t('chat.open')}
+                icon={MessagesSquare}
+                variant="secondary"
+                onPress={() =>
+                  router.push({ pathname: '/group/chat/[id]', params: { id: group.id } })
+                }
+              />
+            ) : null}
 
             {group.myMembership &&
             !['pending_approval', 'approved', 'rejected', 'waitlisted'].includes(

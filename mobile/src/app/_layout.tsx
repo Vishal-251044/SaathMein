@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppEffects } from '@/components/layout/AppEffects';
 import { ThemeRoot } from '@/components/layout/ThemeRoot';
 import { queryClient } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/auth.store';
@@ -79,6 +80,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeRoot>
+            <AppEffects isInApp={isSignedIn && !needsOnboarding} />
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Protected guard={isSignedIn && !needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="(tabs)" />
@@ -92,6 +94,8 @@ export default function RootLayout() {
                 <Stack.Screen name="group/create" options={{ animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="g/[code]" options={{ animation: 'fade' }} />
                 <Stack.Screen name="pay/[groupId]" options={{ animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="group/chat/[id]" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
               </Stack.Protected>
               <Stack.Protected guard={isSignedIn && needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="onboarding" />

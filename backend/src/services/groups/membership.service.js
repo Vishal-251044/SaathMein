@@ -13,10 +13,13 @@ const { createLogger } = require('../../utils/logger');
 const { withTransaction } = require('../../utils/transaction');
 const { getPaymentSettings } = require('../settings.service');
 const { queueRefund, REFUND_REASON } = require('../payments/refund.service');
+const { isQuietHours, quietHoursEnd } = require('../notifications/notification.service');
+const { publishGroupCount, notifyAboutGroup } = require('./groupLive');
 const {
   GROUP_STATUS,
   GROUP_VISIBILITY,
   MEMBER_STATUS,
+  NOTIFICATION_TYPE,
   PAYMENT_STATUS,
 } = require('../../constants/enums');
 
@@ -189,6 +192,7 @@ const leaveGroup = async (groupId, userId) => {
     amountPaise: terms.refundPaise,
     feePaise: terms.feePaise,
   });
+  await publishGroupCount(groupId);
   if (group.status === GROUP_STATUS.FULL) await offerNextSeat(groupId);
   log.info(
     { groupId, userId, refundPaise: terms.refundPaise, feePaise: terms.feePaise },
@@ -269,16 +273,18 @@ const offerNextSeat = async (groupId, now = new Date()) => {
     offerExpiresAt: { $gt: now },
   });
   const { waitlistOfferHours } = await getPaymentSettings();
+  // Offers made at night run from 08:00, so nobody loses a seat while asleep
+  const offerStart = isQuietHours(now) ? quietHoursEnd(now) : now;
   let offered = 0;
   for (let i = liveOffers; i < free; i += 1) {
     const next = await GroupMember.findOneAndUpdate(
       { groupId, status: MEMBER_STATUS.WAITLISTED, offerExpiresAt: { $exists: false } },
-      { $set: { offerExpiresAt: new Date(now.getTime() + waitlistOfferHours * HOUR_MS) } },
+      { $set: { offerExpiresAt: new Date(offerStart.getTime() + waitlistOfferHours * HOUR_MS) } },
       { sort: { waitlistPosition: 1 }, new: true },
     );
     if (!next) break;
     offered += 1;
-    // TODO(Day 8): push notification "A seat is free for you for 2 hours"
+    await notifyAboutGroup(next.userId, groupId, NOTIFICATION_TYPE.SEAT_OFFER);
     log.info(
       { groupId: String(groupId), userId: String(next.userId) },
       'Seat offered from waitlist',

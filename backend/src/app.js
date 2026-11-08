@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require('./middlewares/error.middleware');
 const apiRoutes = require('./routes');
 const { requireDatabase } = require('./middlewares/database.middleware');
 const paymentController = require('./controllers/payment.controller');
+const deepLinkController = require('./controllers/deepLink.controller');
 
 const app = express();
 
@@ -50,6 +51,10 @@ app.post(
 // Small JSON limit for everything else
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
+
+// Share links and Android App Links verification (outside /api, public)
+app.get('/.well-known/assetlinks.json', deepLinkController.assetLinks);
+app.get('/g/:code', apiLimiter, deepLinkController.groupLink);
 
 app.use('/api', apiLimiter, apiRoutes);
 

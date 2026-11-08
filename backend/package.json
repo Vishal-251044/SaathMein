@@ -24,6 +24,7 @@
     "import:products": "node src/scripts/import-products.js"
   },
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.81.5",
     "cloudinary": "^2.11.0",
@@ -40,6 +41,7 @@
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",
     "razorpay": "^2.9.8",
+    "socket.io": "^4.8.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {

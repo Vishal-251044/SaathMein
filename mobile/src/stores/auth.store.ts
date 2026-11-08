@@ -9,6 +9,8 @@
 import { create } from 'zustand';
 
 import { setAccessToken, setRefreshHandler } from '@/lib/authSession';
+import { unregisterPush } from '@/lib/notifications';
+import { disconnectSocket } from '@/lib/socket';
 import { signOutOfFirebase } from '@/lib/phoneAuth';
 import { getItem, removeItem, setItem, STORAGE_KEYS } from '@/lib/secureStorage';
 import { ApiClientError } from '@/services/api';
@@ -129,6 +131,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     logout: async () => {
+      // Stop push to this phone and close the live connection first (needs the session)
+      await unregisterPush().catch(() => {});
+      disconnectSocket();
       const refreshToken = await getItem(STORAGE_KEYS.REFRESH_TOKEN);
       if (refreshToken) {
         // Best effort: the phone signs out even if the server cannot be reached

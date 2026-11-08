@@ -22,6 +22,20 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     );
   }
 
+  // Android App Links: https://<host>/g/<code> opens the app (verified by the backend's
+  // /.well-known/assetlinks.json on that host). Host from EXPO_PUBLIC_APP_LINK_HOST.
+  const appLinkHost = process.env.EXPO_PUBLIC_APP_LINK_HOST;
+  const appLinkFilters = appLinkHost
+    ? [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [{ scheme: 'https', host: appLinkHost, pathPrefix: '/g/' }],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+      ]
+    : [];
+
   return {
     ...config,
     name: config.name ?? 'SaathMein',
@@ -29,7 +43,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       ...(hasFirebaseConfig ? { googleServicesFile } : {}),
+      intentFilters: [...(config.android?.intentFilters ?? []), ...appLinkFilters],
     },
-    plugins: [...(config.plugins ?? []), ...(hasFirebaseConfig ? FIREBASE_PLUGINS : [])],
+    plugins: [
+      ...(config.plugins ?? []),
+      // Push notifications (Expo + FCM); icon colour = Sunrise primary
+      ['expo-notifications', { color: '#FF5A3C' }],
+      ...(hasFirebaseConfig ? FIREBASE_PLUGINS : []),
+    ],
   };
 };

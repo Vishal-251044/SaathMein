@@ -68,6 +68,8 @@ export interface GroupDetail extends GroupCard {
   requiresApproval: boolean;
   /** Only for the leader and members (for sharing). */
   inviteCode: string | null;
+  /** https share link (opens the app through Android App Links). */
+  shareUrl: string | null;
   leader: { firstName: string | null } | null;
   members: GroupMemberPreview[];
   myMembership: {

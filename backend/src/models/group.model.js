@@ -76,6 +76,8 @@ const groupSchema = new Schema(
     deadlineExtended: { type: Boolean, default: false }, // leader may extend once (GRP-5)
     // Deadline passed at ≥70% of target: the leader chooses extend / start early until this time
     leaderDecisionDueAt: Date,
+    // "Deadline in 24 h" reminder already sent (notification sweep)
+    deadlineReminderSentAt: Date,
     status: { type: String, enum: values(GROUP_STATUS), default: GROUP_STATUS.OPEN },
     statusHistory: [
       {

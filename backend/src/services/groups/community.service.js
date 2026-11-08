@@ -5,11 +5,13 @@
  */
 const Group = require('../../models/group.model');
 const GroupMember = require('../../models/groupMember.model');
+const User = require('../../models/user.model');
 const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const { firstNameOnly } = require('../../helpers/genericFunctions');
 const { getGroup } = require('./group.service');
-const { GROUP_STATUS, MEMBER_STATUS } = require('../../constants/enums');
+const { notifyAboutGroup } = require('./groupLive');
+const { GROUP_STATUS, MEMBER_STATUS, NOTIFICATION_TYPE } = require('../../constants/enums');
 
 const log = createLogger('CommunityGroups');
 
@@ -53,7 +55,10 @@ const joinByCode = async (code, userId) => {
         { upsert: true },
       );
       nextStep = 'wait_for_approval';
-      // TODO(Day 8): notify the leader of the request
+      const requester = await User.findById(userId).select('name').lean();
+      await notifyAboutGroup(group.leaderId, group, NOTIFICATION_TYPE.JOIN_REQUEST, {
+        firstName: firstNameOnly(requester?.name) || 'Someone',
+      });
       log.info({ groupId, userId }, 'Join request filed');
     } else {
       nextStep = 'pay_token'; // payment arrives on Day 7
@@ -110,7 +115,7 @@ const decideJoinRequest = async (groupId, leaderId, userId, approve) => {
     { $set: { status: approve ? MEMBER_STATUS.APPROVED : MEMBER_STATUS.REJECTED } },
   );
   if (!result.matchedCount) throw ApiError.notFound('Request not found');
-  // TODO(Day 8): notify the person
+  await notifyAboutGroup(userId, groupId, NOTIFICATION_TYPE.REQUEST_DECIDED, { approved: approve });
   log.info({ groupId, userId, approve }, 'Join request decided');
   return listJoinRequests(groupId, leaderId);
 };

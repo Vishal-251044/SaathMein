@@ -77,6 +77,18 @@ const userSchema = new Schema(
     walletBalancePaise: { type: Number, default: 0, validate: paiseValidator },
     trustScore: { type: Number, min: 0, max: 100, default: 50 },
     deviceIds: [{ type: String, trim: true }],
+    // Expo push tokens of this user's phones (Day 8); removed when Expo says DeviceNotRegistered
+    pushTokens: {
+      type: [
+        {
+          _id: false,
+          token: { type: String, required: true, trim: true },
+          platform: { type: String, enum: ['android', 'ios'], default: 'android' },
+          updatedAt: { type: Date, default: Date.now },
+        },
+      ],
+      select: false,
+    },
     lastLoginAt: Date,
     // Set when the user saves or skips interest onboarding (ACC-3)
     onboardingCompletedAt: Date,

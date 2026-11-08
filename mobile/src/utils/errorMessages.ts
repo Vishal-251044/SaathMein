@@ -48,6 +48,14 @@ const ERROR_KEYS: Record<string, string> = {
   RAZORPAY_ERROR: 'errors.paymentsUnavailable',
   INVALID_SIGNATURE: 'errors.paymentNotVerified',
   CANNOT_LEAVE: 'errors.cannotLeave',
+  // Chat (Day 8)
+  CHAT_MEMBERS_ONLY: 'errors.chatMembersOnly',
+  CHAT_RATE_LIMIT: 'errors.chatTooFast',
+  POLL_LEADER_ONLY: 'errors.pollLeaderOnly',
+  EMPTY_MESSAGE: 'errors.validation',
+  TOO_MANY_PINNED: 'errors.tooManyPinned',
+  OWN_MESSAGE: 'errors.validation',
+  POLL_CLOSED: 'errors.pollClosed',
   // Firebase phone auth (PhoneAuthError.code)
   INVALID_CODE: 'errors.invalidCode',
   CODE_EXPIRED: 'errors.codeExpired',

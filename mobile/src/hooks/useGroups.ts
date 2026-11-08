@@ -1,8 +1,7 @@
 /**
  * Group hooks (TanStack Query): lists, similar groups, the group page, My Groups and the
  * leader's actions. Mutations put the returned group in the cache and refresh lists.
- * Live updates over Socket.io (with polling fallback) arrive on Day 8; until then the
- * group page refetches every 30 s while open.
+ * Live updates come over Socket.io (useGroupSocket); while it is down the group page polls.
  */
 import {
   type QueryClient,
@@ -15,8 +14,10 @@ import {
 import * as groupService from '@/services/group.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { GroupDetail } from '@/types/group';
+import { LIVE_FALLBACK_POLL_MS } from '@/utils/constants';
 
-const GROUP_REFRESH_MS = 30_000;
+// While live over the socket, only a slow safety refresh; while the socket is down, poll
+const LIVE_SAFETY_REFRESH_MS = 60_000;
 
 /** Put a group in the cache and mark every list stale. */
 function cacheGroup(queryClient: QueryClient, group: GroupDetail) {
@@ -54,15 +55,22 @@ export function useMyGroups(role: 'joined' | 'leading') {
   });
 }
 
-/** @param groupId - Group @param code - Invite code (community) @returns Group page query */
-export function useGroup(groupId: string | undefined, code?: string) {
+/**
+ * @param groupId - Group
+ * @param code - Invite code (community)
+ * @param options.live - true while useGroupSocket is connected
+ * @returns Group page query
+ */
+export function useGroup(groupId: string | undefined, code?: string, { live = false } = {}) {
   return useQuery({
     queryKey: ['group', groupId],
     queryFn: () => groupService.getGroup(groupId as string, code),
     enabled: Boolean(groupId),
     refetchInterval: (query) =>
       query.state.data && ['open', 'full', 'auction_live'].includes(query.state.data.status)
-        ? GROUP_REFRESH_MS
+        ? live
+          ? LIVE_SAFETY_REFRESH_MS
+          : LIVE_FALLBACK_POLL_MS
         : false,
   });
 }

@@ -23,4 +23,6 @@ module.exports = {
   WebhookEvent: require('./webhookEvent.model'),
   Settlement: require('./settlement.model'),
   ReconciliationReport: require('./reconciliationReport.model'),
+  Message: require('./message.model'),
+  Notification: require('./notification.model'),
 };

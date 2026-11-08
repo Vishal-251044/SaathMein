@@ -20,6 +20,7 @@ const IMAGE_FORMATS = 'jpg,jpeg,png,webp,heic';
 const UPLOAD_KINDS = {
   avatar: { folder: 'saathmein/avatars', transformation: 'c_limit,w_512,h_512,q_auto:good' },
   product: { folder: 'saathmein/products', transformation: 'c_limit,w_1600,h_1600,q_auto:good' },
+  chat: { folder: 'saathmein/chat', transformation: 'c_limit,w_1280,h_1280,q_auto:good' },
 };
 
 /**
@@ -142,6 +143,26 @@ const verifyProductImageUpload = (productId, upload) => {
   return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
 };
 
+/* ------------------------------- Chat images ------------------------------- */
+
+/** @param {string} groupId @returns {string} Public id prefix for one group's chat images */
+const chatImagePrefix = (groupId) => `${UPLOAD_KINDS.chat.folder}/${groupId}/`;
+
+/** @param {string} groupId @returns Signed params for one chat image (LIV-5) */
+const createChatImageUploadParams = (groupId) =>
+  createSignedUpload(`${chatImagePrefix(groupId)}${randomToken(9)}`, 'chat');
+
+/**
+ * Verify a chat image upload belongs to this group and was signed by us.
+ * @param {string} groupId - Group chat
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ * @returns {{ publicId: string, url: string }}
+ */
+const verifyChatImageUpload = (groupId, upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(chatImagePrefix(groupId)));
+  return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
+};
+
 /* ------------------------------ KYC documents ------------------------------ */
 
 const KYC_FOLDER = 'saathmein/kyc';
@@ -219,6 +240,8 @@ module.exports = {
   verifyAvatarUpload,
   createProductImageUploadParams,
   verifyProductImageUpload,
+  createChatImageUploadParams,
+  verifyChatImageUpload,
   createKycUploadParams,
   verifyKycUpload,
   kycDocumentUrl,

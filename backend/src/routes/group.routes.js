@@ -10,6 +10,7 @@ const { createRateLimiter } = require('../middlewares/rateLimit.middleware');
 const controller = require('../controllers/group.controller');
 const schemas = require('../validators/group.validator');
 const { waitlistSchema } = require('../validators/payment.validator');
+const chatRoutes = require('./chat.routes');
 
 const router = Router();
 
@@ -88,5 +89,8 @@ router.delete(
   validate({ params: schemas.groupIdParams }),
   controller.leaveWaitlist,
 );
+
+// Group chat (LIV-5)
+router.use('/:groupId/messages', chatRoutes);
 
 module.exports = router;

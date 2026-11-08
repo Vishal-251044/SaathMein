@@ -140,9 +140,36 @@ const PRICE_SOURCE = Object.freeze({ OFFER: 'offer', TIER: 'tier', ADMIN: 'admin
  * @param {Object} enumObject - One of the frozen enums above
  * @returns {string[]} Enum values
  */
+/** Socket.io events (PRD §12.3, LIV-1). Server → app unless noted. */
+const SOCKET_EVENTS = Object.freeze({
+  JOIN_GROUP: 'group:join', // app → server
+  LEAVE_GROUP: 'group:leave', // app → server
+  GROUP_COUNT: 'group:count',
+  GROUP_MEMBER: 'group:member',
+  GROUP_STATUS: 'group:status',
+  CHAT_MESSAGE: 'chat:message',
+  CHAT_UPDATE: 'chat:update',
+  NOTIFICATION: 'notification:new',
+});
+
+/** Notification types (push + in-app, PRD §10.7). */
+const NOTIFICATION_TYPE = Object.freeze({
+  GROUP_FULL: 'group_full',
+  DEADLINE_SOON: 'deadline_soon',
+  LEADER_DECISION: 'leader_decision',
+  GROUP_ENDED: 'group_ended',
+  AUCTION_STARTED: 'auction_started',
+  REFUND_DONE: 'refund_done',
+  SEAT_OFFER: 'seat_offer',
+  JOIN_REQUEST: 'join_request',
+  REQUEST_DECIDED: 'request_decided',
+});
+
 const values = (enumObject) => Object.values(enumObject);
 
 module.exports = {
+  SOCKET_EVENTS,
+  NOTIFICATION_TYPE,
   GROUP_STATUS,
   GROUP_TYPE,
   GROUP_VISIBILITY,

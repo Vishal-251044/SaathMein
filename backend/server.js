@@ -1,7 +1,7 @@
 /**
  * SaathMein API entry point.
  * Loads config, connects MongoDB and Redis, starts the HTTP server and handles
- * graceful shutdown. (Socket.io attaches to this server on Day 8.)
+ * graceful shutdown. Socket.io (live groups, chat, notifications) shares the HTTP server.
  */
 const http = require('http');
 const config = require('./src/config/env');
@@ -9,6 +9,7 @@ const app = require('./src/app');
 const { connectDB, disconnectDB } = require('./src/config/db');
 const { connectRedis, disconnectRedis } = require('./src/config/redis');
 const { createLogger } = require('./src/utils/logger');
+const { initSockets } = require('./src/sockets/gateway');
 
 // Register all models before any connection or query
 require('./src/models');
@@ -24,6 +25,7 @@ const server = http.createServer(app);
 const start = () => {
   connectDB();
   connectRedis();
+  initSockets(server).catch((err) => log.error({ err: err.message }, 'Socket.io failed to start'));
 
   server.listen(config.port, () => {
     log.info(`SaathMein API listening on http://localhost:${config.port} (${config.env})`);

@@ -247,18 +247,29 @@ Notes:
 ### Day 8 — Live Groups, Chat, Push & Sharing (Mon 2 Nov)
 **Done when:** two phones see the counter change instantly when one joins; chat works; a push arrives when the group fills; a WhatsApp link opens the group in the app.
 
-- [ ] Mobile: socket client (live counter, status changes, new-member animation)
-- [ ] Mobile: group chat (text, images, polls for leader, pin, report)
-- [ ] Mobile: push notifications (Expo Notifications + FCM) and notification centre
-- [ ] Mobile: share to WhatsApp with deep link (expo-linking, Android App Links)
-- [ ] Backend: Socket.io gateway (JWT auth, room per group, Redis adapter)
-- [ ] Backend: chat messages API with rate limits and profanity filter
-- [ ] Backend: notification service (push + in-app, quiet hours 10 pm – 8 am)
-- [ ] Backend: deep-link route `/g/:code` → app or Play Store
+- [x] Mobile: socket client (live counter, status changes, new-member animation)
+- [x] Mobile: group chat (text, images, polls for leader, pin, report)
+- [x] Mobile: push notifications (Expo Notifications + FCM) and notification centre
+- [x] Mobile: share to WhatsApp with deep link (expo-linking, Android App Links)
+- [x] Backend: Socket.io gateway (JWT auth, room per group, Redis adapter)
+- [x] Backend: chat messages API with rate limits and profanity filter
+- [x] Backend: notification service (push + in-app, quiet hours 10 pm – 8 am)
+- [x] Backend: deep-link route `/g/:code` → app or Play Store
 - [ ] FCM credentials in Expo
-- [ ] assetlinks.json for App Links on the domain
+- [x] assetlinks.json for App Links on the domain
 - [ ] Play Console: create the app; start internal testing
 - [ ] Play Console: start closed testing (12+ testers for 14 days if personal account)
+
+Notes:
+- Built 8 Nov 2026. Backend: 432 tests pass (socket auth + room access, share page + assetlinks, notifications: quiet hours / language / deferred push / dead tokens / token moves, chat: members only, profanity, polls, pins, reports, live effects incl. 24 h reminder once and night-time seat offers). Web builds; mobile typecheck + lint pass.
+- Sockets: Socket.io on the API server (`group:<id>` and `user:<id>` rooms), app access token in the handshake, Redis adapter when `REDIS_URL` is set. The worker has no socket server: it publishes on Redis (`saathmein:socket-emit`) and each API instance re-emits to its own clients. Events: `group:count`, `group:member`, `group:status`, `chat:message`, `chat:update`, `notification:new`. The app polls every 15 s while the socket is down (60 s safety refresh while live).
+- Chat: members + leader only (winning dealer joins on Day 9); 10 messages/min per person; abusive words masked (built-in English + Hindi/Marathi list, no extra library); photos via signed Cloudinary uploads (resized to 1280 px on the phone); polls by the leader (one vote per member); up to 3 pinned; hidden after 3 reports (Support review queue on Day 12).
+- Notifications: saved for the in-app centre (90-day TTL) in the user's language (en/hi/mr templates on the server), sent live, pushed through the Expo push service (no SDK). Quiet hours 22:00–08:00 IST: pushes wait until 08:00 (minute sweep). Sent today: group full, deadline in 24 h, leader decision, group ended (refund), auction started, refund done, waitlist seat offer, join request + decision. New lowest price / won / price validity arrive with Days 9–10.
+- DECISION (Claude, small): a waitlist seat freed during quiet hours is held until 10:00 IST (2 h from 08:00), so nobody loses a seat while asleep.
+- Sharing: group page shares to WhatsApp (falls back to the share sheet) with `https://<domain>/g/<code>`. The web app proxies `/g/*` and `/.well-known/assetlinks.json` to the backend (Next.js rewrites), so the public domain works for links. Android App Links: `autoVerify` filter for `EXPO_PUBLIC_APP_LINK_HOST`; links opened while signed out are kept and opened after login (`+native-intent`).
+- Fix: chat photos no longer use the square 512 px avatar picker.
+- PENDING (owner): `eas init` (adds the EAS project id needed for push tokens); upload the FCM V1 service-account key to Expo (expo.dev → Credentials) — then FCM task can be ticked; Play Console app + internal testing; copy the app signing SHA-256 (Play Console → App integrity) into `ANDROID_SHA256_CERT_FINGERPRINTS`; set `APP_LINK_BASE_URL` (backend) and `EXPO_PUBLIC_APP_LINK_HOST` / `EXPO_PUBLIC_SOCKET_URL` (mobile) to real values; new development build (expo-notifications + App Links are native changes).
+- Not verified end-to-end yet. "Done when" check: two phones on one group — pay from one, the counter changes on the other within a second; chat both ways; fill the group → "Your group is full" push; send the WhatsApp link to a phone with the app → opens the group.
 
 ### Day 9 — Dealer Live Auction: Lowest Price Wins (Tue 3 Nov)
 **Done when:** a full group of 5 test buyers gets live bids from 3 test dealers; each bid must beat the lowest; a last-minute bid extends the timer; at close the lowest dealer wins automatically and all 5 members get deal codes for that dealer.

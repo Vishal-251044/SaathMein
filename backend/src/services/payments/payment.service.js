@@ -22,6 +22,7 @@ const { getPaymentSettings } = require('../settings.service');
 const { assertCanJoin } = require('../groups/membership.service');
 const { transition } = require('../groups/stateMachine');
 const { runGroupEffects } = require('../groups/groupEffects');
+const { publishNewMember } = require('../groups/groupLive');
 const razorpay = require('./razorpay.service');
 const { recordLedger } = require('./ledger.service');
 const { queueRefund, REFUND_REASON } = require('./refund.service');
@@ -245,6 +246,8 @@ const confirmCapturedPayment = async (paymentOrId, entity, { source = 'webhook' 
     return { outcome: 'joined' };
   });
 
+  // Live counter + new-member animation for everyone watching (LIV-1)
+  if (result.outcome === 'joined') await publishNewMember(groupId, payment.userId);
   if (result.full) await runGroupEffects(result.full, GROUP_STATUS.OPEN);
   if (result.outcome === 'seat_unavailable' || result.outcome === 'mismatch') {
     await queueRefund(payment._id, {

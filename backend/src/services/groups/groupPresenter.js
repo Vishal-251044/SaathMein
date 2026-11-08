@@ -3,6 +3,7 @@
  * Privacy (PRD §14): members appear by first name and avatar only; no phone numbers.
  * The invite code is shown only to people who may share it (leader and members).
  */
+const config = require('../../config/env');
 const { toProductCard } = require('../catalog/productPresenter');
 const { firstNameOnly } = require('../../helpers/genericFunctions');
 const { earlyStartMinimum } = require('./stateMachine');
@@ -62,6 +63,9 @@ const toGroupDetail = (
     note: group.note || null,
     requiresApproval: Boolean(group.requiresApproval),
     inviteCode: canShare ? group.inviteCode : null,
+    // https share link (opens the app via App Links, or the landing page)
+    shareUrl:
+      canShare && group.inviteCode ? `${config.appLinks.baseUrl}/g/${group.inviteCode}` : null,
     leader: leader ? { firstName: firstNameOnly(leader.name) || null } : null,
     members: members
       .filter((member) => member.userId)

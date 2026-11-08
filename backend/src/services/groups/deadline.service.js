@@ -6,12 +6,14 @@
  * - otherwise it expires (tokens refunded — Day 7).
  * If the leader does not choose in time, the group expires.
  * Seller-led deals at expiry depend on open question 4 and arrive on Day 9.
+ * Also sends the "24 hours left" reminder once per group (LIV-3).
  */
 const Group = require('../../models/group.model');
 const { createLogger } = require('../../utils/logger');
 const { getGroupSettings } = require('../settings.service');
 const { transition, earlyStartMinimum } = require('./stateMachine');
-const { GROUP_STATUS, GROUP_TYPE } = require('../../constants/enums');
+const { notifyAboutGroup, notifyGroupMembers } = require('./groupLive');
+const { GROUP_STATUS, GROUP_TYPE, NOTIFICATION_TYPE } = require('../../constants/enums');
 
 const log = createLogger('GroupDeadlines');
 const BATCH = 200;
@@ -66,7 +68,7 @@ const processDeadlines = async (now = new Date()) => {
       );
       if (result.modifiedCount) {
         awaitingLeader += 1;
-        // TODO(Day 8): push + in-app notification to the leader
+        await notifyAboutGroup(group.leaderId, group, NOTIFICATION_TYPE.LEADER_DECISION);
         log.info(
           { groupId: String(group._id), members: group.memberCount },
           'Leader decision window opened',
@@ -90,4 +92,31 @@ const processDeadlines = async (now = new Date()) => {
   return { expired, awaitingLeader };
 };
 
-module.exports = { processDeadlines };
+/**
+ * "24 hours left" reminder for open groups, once per group.
+ * @param {Date} [now] - Current time
+ * @returns {Promise<number>} Groups reminded
+ */
+const sendDeadlineReminders = async (now = new Date()) => {
+  const soon = await Group.find({
+    status: GROUP_STATUS.OPEN,
+    deadline: { $gt: now, $lte: new Date(now.getTime() + 24 * HOUR_MS) },
+    deadlineReminderSentAt: { $exists: false },
+  })
+    .limit(BATCH)
+    .lean();
+  let reminded = 0;
+  for (const group of soon) {
+    // Claim first so two sweeps never remind twice
+    const claimed = await Group.updateOne(
+      { _id: group._id, deadlineReminderSentAt: { $exists: false } },
+      { $set: { deadlineReminderSentAt: now } },
+    );
+    if (!claimed.modifiedCount) continue;
+    await notifyGroupMembers(group, NOTIFICATION_TYPE.DEADLINE_SOON);
+    reminded += 1;
+  }
+  return reminded;
+};
+
+module.exports = { processDeadlines, sendDeadlineReminders };

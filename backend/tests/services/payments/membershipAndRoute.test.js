@@ -145,7 +145,7 @@ describe('leaveGroup', () => {
       amountPaise: 90_100,
       feePaise: 9_900,
     });
-    expect(Group.findById).toHaveBeenCalledTimes(2); // offerNextSeat reloads the group
+    expect(Group.findById).toHaveBeenCalledTimes(3); // load, live counter, offerNextSeat
   });
 
   it('does not refund when the group changed meanwhile (auction started)', async () => {

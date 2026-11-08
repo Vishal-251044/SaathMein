@@ -3,9 +3,10 @@
  * product rail (Day 5), chosen interests (placeholder until real group sections arrive on
  * Day 11) and how it works.
  */
-import { MapPin, UsersRound } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Bell, MapPin, UsersRound } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { CategoryGrid } from '@/components/features/CategoryGrid';
@@ -18,6 +19,7 @@ import { Screen } from '@/components/layout/Screen';
 import { AppText } from '@/components/ui/AppText';
 import { LogoMark } from '@/components/ui/LogoMark';
 import { useCities } from '@/hooks/useCatalog';
+import { useUnreadCount } from '@/hooks/useNotifications';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuthStore } from '@/stores/auth.store';
 import { enterFade } from '@/utils/animations';
@@ -30,6 +32,7 @@ export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const { colors } = useThemeColors();
   const user = useAuthStore((state) => state.user);
+  const unread = useUnreadCount(true);
   const { data: cities } = useCities();
 
   const city = cities?.find((item) => item.id === user?.cityId);
@@ -56,6 +59,23 @@ export default function HomeScreen() {
             <AppText variant="caption">{t('home.subtitle')}</AppText>
           )}
         </View>
+        <Pressable
+          onPress={() => router.push('/notifications')}
+          accessibilityRole="button"
+          accessibilityLabel={
+            unread ? t('notifications.bellUnread', { count: unread }) : t('notifications.title')
+          }
+          className="h-12 w-12 items-center justify-center rounded-full bg-bg-band"
+        >
+          <Bell size={22} color={colors.ink} strokeWidth={2} />
+          {unread ? (
+            <View className="absolute right-1.5 top-1.5 min-w-[18px] items-center rounded-full bg-primary px-1">
+              <AppText variant="label" color="white">
+                {unread > 9 ? '9+' : unread}
+              </AppText>
+            </View>
+          ) : null}
+        </Pressable>
       </Animated.View>
 
       <HeroCard />
