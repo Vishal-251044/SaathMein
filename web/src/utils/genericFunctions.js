@@ -67,3 +67,35 @@ export const parsePincodes = (text = '') => {
   const invalid = entries.filter((entry) => !/^[1-9]\d{5}$/.test(entry));
   return { pincodes, invalid };
 };
+
+/**
+ * Countdown text from seconds: "2d 4h" over a day, "3:05:09" over an hour, else "04:59".
+ * @param {number|null} seconds - Seconds left
+ * @returns {string}
+ */
+export const formatCountdown = (seconds) => {
+  if (seconds == null) return '';
+  const pad = (value) => String(value).padStart(2, '0');
+  const days = Math.floor(seconds / 86_400);
+  const hours = Math.floor((seconds % 86_400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}:${pad(minutes)}:${pad(secs)}`;
+  return `${pad(minutes)}:${pad(secs)}`;
+};
+
+/**
+ * Short Indian date-time, e.g. "8 Nov, 4:30 pm".
+ * @param {string|Date|null} value
+ * @returns {string}
+ */
+export const formatDateTime = (value) =>
+  value
+    ? new Date(value).toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : '';

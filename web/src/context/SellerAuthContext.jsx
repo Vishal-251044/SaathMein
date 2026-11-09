@@ -9,6 +9,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useQueryClient } from '@tanstack/react-query';
 import { logout as logoutRequest, refreshSession } from '@/services/sellerAuth.service';
 import sellerSession from '@/lib/sellerSession';
+import { closeSellerSocket } from '@/lib/sellerSocket';
 import { SELLER_TOKEN_REFRESH_MS } from '@/utils/constants';
 
 const SellerAuthContext = createContext(null);
@@ -32,6 +33,7 @@ export function SellerAuthProvider({ children }) {
   /** Forget the session locally and drop cached dealer data. */
   const clearSession = useCallback(() => {
     sellerSession.setAccessToken(null);
+    closeSellerSocket();
     queryClient.removeQueries({ queryKey: ['seller'] });
     setState({ status: 'signedOut', user: null });
   }, [queryClient]);

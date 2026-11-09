@@ -91,7 +91,8 @@ const initSockets = async (httpServer) => {
     const { userId } = socket.data;
     socket.join(rooms.user(userId));
     // Dealer team members also get their business room (rank updates, outbid)
-    SellerStaff.findOne({ userId, status: 'active' })
+    // (kept as a promise: an auction join sent right after connecting waits for it)
+    const sellerReady = SellerStaff.findOne({ userId, status: 'active' })
       .select('sellerId')
       .lean()
       .then((membership) => {
@@ -104,6 +105,7 @@ const initSockets = async (httpServer) => {
     // Dealer web: watch an auction the dealer joined (anonymous lowest price, timer)
     socket.on(SOCKET_EVENTS.AUCTION_JOIN, async ({ groupId } = {}, ack = () => {}) => {
       try {
+        await sellerReady;
         if (!socket.data.sellerId || !/^[a-f0-9]{24}$/.test(String(groupId))) {
           return ack({ ok: false, error: 'NOT_FOUND' });
         }

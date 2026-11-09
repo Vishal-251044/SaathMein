@@ -11,6 +11,21 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000
 /** Request timeout for API calls, in milliseconds. */
 export const API_TIMEOUT_MS = 15000;
 
+/** Socket.io server for live auctions (from web/.env.local, no /api suffix). */
+export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+
+/** Live events the dealer dashboard listens to (match backend constants/enums.js). */
+export const SOCKET_EVENTS = Object.freeze({
+  AUCTION_JOIN: 'auction:join',
+  AUCTION_LOWEST: 'auction:lowest',
+  AUCTION_EXTENDED: 'auction:extended',
+  AUCTION_WON: 'auction:won',
+  AUCTION_RANK: 'auction:rank',
+});
+
+/** Poll the auction this often while the live connection is down (fallback). */
+export const AUCTION_POLL_MS = 10_000;
+
 /** Admin console signs out after this long without activity (ADL-4; the API enforces it too). */
 export const ADMIN_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -29,6 +44,10 @@ export const ROUTES = Object.freeze({
   SELLER_KYC: '/seller/kyc',
   SELLER_PROFILE: '/seller/profile',
   SELLER_TEAM: '/seller/team',
+  SELLER_AUCTIONS: '/seller/auctions',
+  SELLER_WON: '/seller/won',
+  SELLER_DEALS: '/seller/deals',
+  SELLER_DEAL_NEW: '/seller/deals/new',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
 });
