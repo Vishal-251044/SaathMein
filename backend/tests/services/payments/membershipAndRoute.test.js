@@ -6,6 +6,10 @@
  * - transfers: token minus commission on hold, release, reversal, failed transfer
  *   corrected with reversal entries; refunded tokens are never transferred.
  */
+jest.mock('../../../src/services/purchases/purchase.service', () => ({
+  getMyPurchase: jest.fn(async () => null),
+  cancelMemberPurchase: jest.fn(async () => {}),
+}));
 jest.mock('../../../src/models/group.model', () => ({ findById: jest.fn(), updateOne: jest.fn() }));
 jest.mock('../../../src/models/groupMember.model', () => ({
   findOne: jest.fn(),

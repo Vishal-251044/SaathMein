@@ -21,7 +21,7 @@ const {
 } = require('../../helpers/genericFunctions');
 const { transition } = require('../groups/stateMachine');
 const { notifyGroupMembers } = require('../groups/groupLive');
-const { getAuctionSettings } = require('../settings.service');
+const { getAuctionSettings, getPurchaseSettings } = require('../settings.service');
 const { emitToGroup } = require('../../sockets/emitter');
 const { ineligibilityReason } = require('../auction/eligibility');
 const { issueDealCodes } = require('../auction/dealCode.service');
@@ -238,13 +238,17 @@ const onDealMemberJoined = async (group) => {
  * @returns {Promise<Object>} Updated group
  */
 const closeSellerDeal = async (group, reason) => {
-  const settings = await getAuctionSettings();
+  const [settings, purchaseSettings] = await Promise.all([
+    getAuctionSettings(),
+    getPurchaseSettings(),
+  ]);
   const { pricePaise } = dealStatus(group, group.memberCount);
   const updated = await transition(group, GROUP_STATUS.WON, {
     reason,
     set: {
       winningPricePaise: pricePaise,
       exitWindowEndsAt: new Date(Date.now() + settings.exitWindowHours * HOUR_MS),
+      priceValidUntil: new Date(Date.now() + purchaseSettings.sellerDealValidityDays * DAY_MS),
     },
   });
   await issueDealCodes(group._id);

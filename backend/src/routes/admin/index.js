@@ -11,6 +11,7 @@ const adminCitiesRoutes = require('./admin.cities.routes');
 const adminCatalogRoutes = require('./admin.catalog.routes');
 const adminSellersRoutes = require('./admin.sellers.routes');
 const adminGroupsRoutes = require('./admin.groups.routes');
+const adminCommissionsRoutes = require('./admin.commissions.routes');
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/cities', adminCitiesRoutes);
 router.use(adminCatalogRoutes); // /categories, /products
 router.use(adminSellersRoutes); // /sellers, /product-requests, /audit-logs
 router.use(adminGroupsRoutes); // /groups
+router.use(adminCommissionsRoutes); // /commissions, /commission-invoices
 
 module.exports = router;

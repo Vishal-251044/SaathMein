@@ -204,11 +204,11 @@ const verifyKycUpload = (sellerId, upload) => {
 };
 
 /**
- * Short-lived link for staff to view a private KYC document (expires in 10 minutes).
+ * Short-lived link to view a private file: KYC document or purchase invoice (10 minutes).
  * @param {{ publicId: string, format?: string }} doc - Stored document
  * @returns {string|null} Signed URL, or null when Cloudinary is not configured
  */
-const kycDocumentUrl = ({ publicId, format }) => {
+const privateFileUrl = ({ publicId, format }) => {
   const cloudinary = getCloudinary();
   if (!cloudinary) return null;
   return cloudinary.utils.private_download_url(publicId, format || 'jpg', {
@@ -216,6 +216,43 @@ const kycDocumentUrl = ({ publicId, format }) => {
     resource_type: 'image',
     expires_at: Math.round(Date.now() / 1000) + KYC_PREVIEW_TTL_SECONDS,
   });
+};
+
+/* ---------------------------- Purchase invoices ---------------------------- */
+
+const INVOICE_FOLDER = 'saathmein/invoices';
+
+/** @param {string} purchaseId @returns {string} Public id prefix for one purchase's invoice */
+const invoicePrefix = (purchaseId) => `${INVOICE_FOLDER}/${purchaseId}/`;
+
+/**
+ * Signed params for the buyer's PRIVATE invoice photo or PDF (PUR-2). Like KYC files, it
+ * opens only through a short-lived signed URL.
+ * @param {string} purchaseId - Purchase
+ * @returns {{ uploadUrl: string, fields: Object }}
+ */
+const createInvoiceUploadParams = (purchaseId) => {
+  const cloudinary = requireCloudinary();
+  const params = {
+    timestamp: Math.round(Date.now() / 1000),
+    public_id: `${invoicePrefix(purchaseId)}${randomToken(9)}`,
+    type: 'authenticated',
+    allowed_formats: KYC_FORMATS,
+  };
+  const signature = cloudinary.utils.api_sign_request(params, config.cloudinary.apiSecret);
+  return {
+    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/image/upload`,
+    fields: { ...params, api_key: config.cloudinary.apiKey, signature },
+  };
+};
+
+/**
+ * Verify an invoice upload belongs to this purchase and was signed by us.
+ * @param {string} purchaseId - Purchase
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ */
+const verifyInvoiceUpload = (purchaseId, upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(invoicePrefix(purchaseId)));
 };
 
 /**
@@ -244,6 +281,9 @@ module.exports = {
   verifyChatImageUpload,
   createKycUploadParams,
   verifyKycUpload,
-  kycDocumentUrl,
+  kycDocumentUrl: privateFileUrl,
+  privateFileUrl,
+  createInvoiceUploadParams,
+  verifyInvoiceUpload,
   deleteImage,
 };

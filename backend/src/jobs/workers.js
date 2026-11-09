@@ -15,6 +15,8 @@ const { sendDeferredPushes } = require('../services/notifications/notification.s
 const { closeAuction, closeOverdueAuctions } = require('../services/auction/auctionClose.service');
 const { processAuctionTimeouts } = require('../services/auction/winner.service');
 const { retryMissingHolds } = require('../services/auction/settlement.service');
+const { processPurchaseTimers } = require('../services/purchases/purchase.service');
+const { generateMonthlyInvoices } = require('../services/payments/commission.service');
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
 const { runReconciliation } = require('../services/payments/reconciliation.service');
@@ -32,6 +34,7 @@ const PROCESSORS = {
     const pushesSent = await sendDeferredPushes();
     const auctionTimeouts = await processAuctionTimeouts();
     const holdsCreated = await retryMissingHolds();
+    const purchases = await processPurchaseTimers();
     return {
       ...deadlines,
       auctionsClosed,
@@ -41,6 +44,7 @@ const PROCESSORS = {
       pushesSent,
       auctionTimeouts,
       holdsCreated,
+      purchases,
     };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),
@@ -52,6 +56,8 @@ const PROCESSORS = {
     const report = await runReconciliation(job.data?.day ? { day: job.data.day } : {});
     return { day: report.day, status: report.status };
   },
+  // Previous IST month by default; Finance can also run a month from the console
+  [QUEUE_NAMES.COMMISSION_INVOICES]: async (job) => generateMonthlyInvoices(job.data?.month),
 };
 
 /**

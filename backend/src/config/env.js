@@ -46,6 +46,8 @@ const envSchema = z.object({
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
 
   // Staff (admin console) tokens — separate secrets (ADL-4)
+  // Signs deal-code QR payloads (PUR-1)
+  DEAL_CODE_SECRET: z.string().min(1).default('your_deal_code_signing_secret_here'),
   STAFF_JWT_ACCESS_SECRET: z.string().min(1),
   STAFF_JWT_REFRESH_SECRET: z.string().min(1),
   STAFF_JWT_ACCESS_EXPIRES_IN: duration('15m'),
@@ -137,6 +139,7 @@ const SECRET_KEYS = [
   'JWT_REFRESH_SECRET',
   'STAFF_JWT_ACCESS_SECRET',
   'STAFF_JWT_REFRESH_SECRET',
+  'DEAL_CODE_SECRET',
 ];
 const weakSecrets = SECRET_KEYS.filter((key) => !isStrongSecret(env[key]));
 const isTwoFactorKeyValid = /^[0-9a-fA-F]{64}$/.test(env.TWO_FACTOR_ENCRYPTION_KEY);
@@ -234,6 +237,7 @@ const config = Object.freeze({
     from: env.EMAIL_FROM,
     isConfigured: env.RESEND_API_KEY.startsWith('re_'),
   },
+  dealCodeSecret: env.DEAL_CODE_SECRET,
   sellerWebUrl: env.SELLER_WEB_URL.replace(/\/+$/, ''),
   appLinks: {
     baseUrl: env.APP_LINK_BASE_URL.replace(/\/+$/, ''),

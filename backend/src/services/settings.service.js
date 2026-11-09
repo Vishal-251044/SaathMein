@@ -52,6 +52,22 @@ const DEFAULTS = Object.freeze({
     seatReservationMinutes: 15,
     waitlistOfferHours: 2,
   }),
+  // Day 10: purchase completion (PUR-1 to PUR-4)
+  purchases: Object.freeze({
+    invoiceObjectionHours: 48, // invoice completes the purchase unless the dealer objects in time
+    expiryReminderHours: 48, // "your price ends soon" before the deal code expires
+    sellerDealValidityDays: 15, // seller-led deals: how long the won price is valid
+  }),
+  // Day 10: monthly commission invoices (GST). Legal values are placeholders until set in admin.
+  billing: Object.freeze({
+    legalName: 'SaathMein (legal name not set)',
+    gstin: '', // SaathMein GSTIN — set in admin settings before live invoices
+    address: '',
+    stateCode: '27', // Maharashtra (first two digits of the GSTIN)
+    sacCode: '', // confirm with the CA
+    gstRateBps: 1800, // 18% GST on commission, added on top (confirm with the CA)
+    invoicePrefix: 'SM',
+  }),
 });
 
 const cache = new Map();
@@ -86,6 +102,12 @@ const getAuctionSettings = () => getSettings('auctions');
 /** @returns {Promise<typeof DEFAULTS.payments>} Checkout and waitlist settings */
 const getPaymentSettings = () => getSettings('payments');
 
+/** @returns {Promise<typeof DEFAULTS.purchases>} Purchase completion settings */
+const getPurchaseSettings = () => getSettings('purchases');
+
+/** @returns {Promise<typeof DEFAULTS.billing>} Commission invoice (GST) settings */
+const getBillingSettings = () => getSettings('billing');
+
 /** Forget cached values (after an admin edit, and in tests). */
 const clearSettingsCache = () => cache.clear();
 
@@ -93,6 +115,8 @@ module.exports = {
   DEFAULTS,
   getSettings,
   getGroupSettings,
+  getPurchaseSettings,
+  getBillingSettings,
   getPaymentSettings,
   getAuctionSettings,
   clearSettingsCache,

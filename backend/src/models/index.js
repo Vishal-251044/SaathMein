@@ -26,4 +26,9 @@ module.exports = {
   Message: require('./message.model'),
   Notification: require('./notification.model'),
   AuctionDealer: require('./auctionDealer.model'),
+  Purchase: require('./purchase.model'),
+  Review: require('./review.model'),
+  Commission: require('./commission.model'),
+  CommissionInvoice: require('./commissionInvoice.model'),
+  Counter: require('./counter.model'),
 };

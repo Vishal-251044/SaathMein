@@ -14,6 +14,7 @@ const groupRoutes = require('./group.routes');
 const paymentRoutes = require('./payment.routes');
 const notificationRoutes = require('./notification.routes');
 const adminRoutes = require('./admin');
+const { purchaseRouter, reviewRouter } = require('./purchase.routes');
 
 const router = Router();
 
@@ -28,6 +29,8 @@ router.use('/seller', requireDatabase, sellerRoutes);
 router.use('/groups', requireDatabase, groupRoutes);
 router.use('/payments', requireDatabase, paymentRoutes);
 router.use('/notifications', requireDatabase, notificationRoutes);
+router.use('/purchases', requireDatabase, purchaseRouter);
+router.use('/reviews', requireDatabase, reviewRouter);
 router.use(
   ['/categories', '/cities', '/products', '/sellers', '/product-requests'],
   requireDatabase,

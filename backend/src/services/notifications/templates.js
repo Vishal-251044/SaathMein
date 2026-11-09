@@ -6,6 +6,63 @@ const { NOTIFICATION_TYPE: T } = require('../../constants/enums');
 
 /** @type {Record<string, Record<string, (data: Object) => { title: string, body: string }>>} */
 const TEMPLATES = {
+  // Day 10: purchases (PUR-1 to PUR-4)
+  [T.DEAL_CODE_EXPIRING]: {
+    en: (d) => ({
+      title: 'Your price ends soon',
+      body: `${d.productName}: your deal code works until ${d.date}. Visit the dealer before then.`,
+    }),
+    hi: (d) => ({
+      title: 'आपकी कीमत जल्द खत्म होगी',
+      body: `${d.productName}: आपका डील कोड ${d.date} तक चलेगा। उससे पहले डीलर के पास जाएँ।`,
+    }),
+    mr: (d) => ({
+      title: 'तुमची किंमत लवकरच संपेल',
+      body: `${d.productName}: तुमचा डील कोड ${d.date} पर्यंत चालेल. त्याआधी डीलरकडे जा.`,
+    }),
+  },
+  [T.DEAL_CODE_EXPIRED]: {
+    en: (d) => ({
+      title: 'Your deal code expired',
+      body: `${d.productName}: the dealer's price ended before you bought. Your token is being refunded minus the back-out fee.`,
+    }),
+    hi: (d) => ({
+      title: 'आपका डील कोड खत्म हो गया',
+      body: `${d.productName}: खरीदने से पहले डीलर की कीमत की अवधि खत्म हो गई। बैक-आउट फीस काटकर आपका टोकन वापस किया जा रहा है।`,
+    }),
+    mr: (d) => ({
+      title: 'तुमचा डील कोड संपला',
+      body: `${d.productName}: खरेदीपूर्वी डीलरच्या किमतीची मुदत संपली. बॅक-आउट फी वजा करून तुमचे टोकन परत केले जात आहे.`,
+    }),
+  },
+  [T.PURCHASE_COMPLETED]: {
+    en: (d) => ({
+      title: `You saved ${d.saved}`,
+      body: `${d.productName}: purchase complete. Rate the dealer and share your saving.`,
+    }),
+    hi: (d) => ({
+      title: `आपने ${d.saved} बचाए`,
+      body: `${d.productName}: खरीद पूरी हुई। डीलर को रेटिंग दें और अपनी बचत शेयर करें।`,
+    }),
+    mr: (d) => ({
+      title: `तुम्ही ${d.saved} वाचवले`,
+      body: `${d.productName}: खरेदी पूर्ण झाली. डीलरला रेटिंग द्या आणि तुमची बचत शेअर करा.`,
+    }),
+  },
+  [T.DEALER_INVOICE_UPLOADED]: {
+    en: (d) => ({
+      title: 'A buyer uploaded an invoice',
+      body: `${d.productName}: the purchase completes in ${d.hours} hours unless you object on the Purchases page.`,
+    }),
+    hi: (d) => ({
+      title: 'एक खरीदार ने बिल अपलोड किया',
+      body: `${d.productName}: अगर आप Purchases पेज पर आपत्ति नहीं करते, तो ${d.hours} घंटे में खरीद पूरी हो जाएगी।`,
+    }),
+    mr: (d) => ({
+      title: 'एका खरेदीदाराने बिल अपलोड केले',
+      body: `${d.productName}: तुम्ही Purchases पेजवर आक्षेप घेतला नाही, तर ${d.hours} तासांत खरेदी पूर्ण होईल.`,
+    }),
+  },
   [T.GROUP_FULL]: {
     en: (d) => ({
       title: 'Your group is full',

@@ -71,6 +71,21 @@ const notifyDealer = async (sellerId, type, data, email) => {
 };
 
 /**
+ * Until when the won price is valid: the dealer's chosen validity (7–15 days, stored on
+ * the bid as validTill − createdAt), counted from the win (PUR-1).
+ * @param {Object} bid - Winning bid (lean)
+ * @param {Date} now
+ * @returns {Date}
+ */
+const priceValidUntilFor = (bid, now) => {
+  const validityMs =
+    bid.validTill && bid.createdAt
+      ? new Date(bid.validTill).getTime() - new Date(bid.createdAt).getTime()
+      : 7 * DAY_MS;
+  return new Date(now.getTime() + Math.max(validityMs, DAY_MS));
+};
+
+/**
  * Declare the winner of a live auction.
  * @param {Object} group - Group in auction_live
  * @param {Object} winnerBid - Lowest bid (lean)
@@ -89,6 +104,7 @@ const declareWinner = async (group, winnerBid, runnerUpBid, { reason, actor } = 
       sellerId: winnerBid.sellerId,
       winningPricePaise: winnerBid.pricePerUnitPaise,
       exitWindowEndsAt: new Date(now.getTime() + settings.exitWindowHours * HOUR_MS),
+      priceValidUntil: priceValidUntilFor(winnerBid, now),
       'auction.winnerBidId': winnerBid._id,
       'auction.runnerUpBidId': runnerUpBid?._id,
       'auction.lowestBidId': winnerBid._id,
@@ -289,6 +305,7 @@ const respondToRunnerUpOffer = async (groupId, { sellerId, userId }, accept) => 
       sellerId,
       winningPricePaise: bid.pricePerUnitPaise,
       exitWindowEndsAt: new Date(Date.now() + settings.exitWindowHours * HOUR_MS),
+      priceValidUntil: priceValidUntilFor(bid, new Date()),
       'auction.winnerBidId': bid._id,
       'auction.lowestBidId': bid._id,
       'auction.lowestPricePaise': bid.pricePerUnitPaise,

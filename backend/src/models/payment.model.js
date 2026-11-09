@@ -77,6 +77,7 @@ paymentSchema.index(
 );
 paymentSchema.index({ userId: 1, createdAt: -1 });
 paymentSchema.index({ groupId: 1, status: 1 });
+paymentSchema.index({ 'transfer.sellerId': 1, updatedAt: -1 }); // dealer payouts (Day 10)
 paymentSchema.index({ groupId: 1, userId: 1, status: 1 });
 paymentSchema.index({ 'refunds.razorpayRefundId': 1 });
 paymentSchema.index({ 'transfer.razorpayTransferId': 1 });

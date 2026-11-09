@@ -228,6 +228,11 @@ const leaveGroup = async (groupId, userId) => {
     amountPaise: terms.refundPaise,
     feePaise: terms.feePaise,
   });
+  if (group.status !== GROUP_STATUS.OPEN && group.status !== GROUP_STATUS.FULL) {
+    // Exit window after a win: the deal code stops working (loaded here: avoids a cycle)
+    const { cancelMemberPurchase } = require('../purchases/purchase.service');
+    await cancelMemberPurchase(membership._id);
+  }
   await publishGroupCount(groupId);
   // Freed seats go to the waitlist (after a win: at the same price, PRD §10.5)
   if (group.status !== GROUP_STATUS.OPEN) await offerNextSeat(groupId);

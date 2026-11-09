@@ -4,6 +4,10 @@
  * leader extend once / capped; start early; cancel only when nobody paid; community
  * groups hidden from people without the code.
  */
+jest.mock('../../../src/services/purchases/purchase.service', () => ({
+  getMyPurchase: jest.fn(async () => null),
+  cancelMemberPurchase: jest.fn(async () => {}),
+}));
 jest.mock('../../../src/services/groups/groupEffects', () => ({ runGroupEffects: jest.fn() }));
 jest.mock('../../../src/services/demandSignal.service', () => ({ recordSignal: jest.fn() }));
 jest.mock('../../../src/services/settings.service', () => ({

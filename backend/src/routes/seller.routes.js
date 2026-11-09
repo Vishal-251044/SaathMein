@@ -13,6 +13,8 @@ const controller = require('../controllers/seller.controller');
 const schemas = require('../validators/seller.validator');
 const auctionSchemas = require('../validators/auction.validator');
 const auctionController = require('../controllers/sellerAuction.controller');
+const purchaseSchemas = require('../validators/purchase.validator');
+const purchaseController = require('../controllers/sellerPurchase.controller');
 
 const router = Router();
 
@@ -84,6 +86,42 @@ router.post(
 );
 router.get('/deals', validate(auctionSchemas.listDealsSchema), auctionController.listDeals);
 router.post('/deals', validate(auctionSchemas.createDealSchema), auctionController.createDeal);
+
+// Purchases (PUR-2, scan or type deal codes), payouts and commission invoices — team members
+const codeLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  message: 'Too many deal-code attempts. Please wait a few minutes.',
+});
+router.post(
+  '/purchases/lookup',
+  codeLimiter,
+  validate(purchaseSchemas.dealCodeInputSchema),
+  purchaseController.lookup,
+);
+router.post(
+  '/purchases/confirm',
+  codeLimiter,
+  validate(purchaseSchemas.dealCodeInputSchema),
+  purchaseController.confirm,
+);
+router.get('/purchases', validate(purchaseSchemas.sellerPurchasesSchema), purchaseController.list);
+router.post(
+  '/purchases/:purchaseId/object',
+  validate(purchaseSchemas.objectInvoiceSchema),
+  purchaseController.object,
+);
+router.get(
+  '/purchases/:purchaseId/invoice-url',
+  validate({ params: purchaseSchemas.purchaseIdParams }),
+  purchaseController.invoiceUrl,
+);
+router.get('/payouts', validate(purchaseSchemas.payoutsSchema), purchaseController.payouts);
+router.get(
+  '/commission-invoices/:invoiceId',
+  validate(purchaseSchemas.invoiceIdParams),
+  purchaseController.commissionInvoice,
+);
 
 // Owner only
 // Backing out of a won group carries penalties, so only the owner may do it

@@ -50,6 +50,7 @@ const toGroupCard = (group, { viewerId } = {}) => {
  * @param {{ earlyStartThresholdBps: number }} context.settings - Group settings
  * @param {Object|null} [context.auction] - Buyer auction view (getBuyerAuction), Day 9
  * @param {Object|null} [context.deal] - Seller-led deal view (tiers, price now, dealer)
+ * @param {Object|null} [context.myPurchase] - Viewer's purchase (deal-code ticket), Day 10
  * @returns {Object}
  */
 const toGroupDetail = (
@@ -62,6 +63,7 @@ const toGroupDetail = (
     settings,
     auction = null,
     deal = null,
+    myPurchase = null,
   },
 ) => {
   const card = toGroupCard(group, { viewerId });
@@ -104,6 +106,8 @@ const toGroupDetail = (
     })),
     auction,
     deal,
+    // Deal-code ticket, invoice, review and saving (PUR-1 to PUR-4)
+    myPurchase,
     winningPricePaise: group.winningPricePaise ?? null,
     // Members may still leave (refund minus back-out fee) until then (PRD §10.5)
     exitWindowEndsAt: group.exitWindowEndsAt ?? null,

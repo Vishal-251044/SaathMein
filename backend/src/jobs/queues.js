@@ -19,6 +19,7 @@ const QUEUE_NAMES = Object.freeze({
   AUCTION_CLOSE: 'auction-close',
   REFUNDS: 'refunds',
   RECONCILIATION: 'reconciliation',
+  COMMISSION_INVOICES: 'commission-invoices',
 });
 
 const DEADLINE_SWEEP_EVERY_MS = 60 * 1000;
@@ -100,7 +101,8 @@ const enqueueRefund = async (refund) => {
 
 /**
  * Register the repeating jobs (idempotent; called by the worker on start):
- * the minute deadline sweep and the nightly reconciliation at 02:30 IST.
+ * the minute deadline sweep, the nightly reconciliation at 02:30 IST and the monthly
+ * commission invoices at 03:00 IST on the 1st (F17).
  * @returns {Promise<void>}
  */
 const ensureDeadlineSweep = async () => {
@@ -115,6 +117,11 @@ const ensureDeadlineSweep = async () => {
     'nightly-reconciliation',
     { pattern: '30 2 * * *', tz: 'Asia/Kolkata' },
     { name: 'reconcile', data: {} },
+  );
+  await getQueue(QUEUE_NAMES.COMMISSION_INVOICES).upsertJobScheduler(
+    'monthly-commission-invoices',
+    { pattern: '0 3 1 * *', tz: 'Asia/Kolkata' },
+    { name: 'invoice', data: {} },
   );
 };
 

@@ -178,11 +178,31 @@ const NOTIFICATION_TYPE = Object.freeze({
   DEALER_OUTBID: 'dealer_outbid',
   DEALER_RESULT: 'dealer_result',
   RUNNER_UP_OFFER: 'runner_up_offer',
+  // Day 10: purchases
+  DEAL_CODE_EXPIRING: 'deal_code_expiring',
+  PURCHASE_COMPLETED: 'purchase_completed',
+  DEAL_CODE_EXPIRED: 'deal_code_expired',
+  DEALER_INVOICE_UPLOADED: 'dealer_invoice_uploaded',
 });
+
+/** One member's purchase from the winning dealer (PUR-1 to PUR-4). */
+const PURCHASE_STATUS = Object.freeze({
+  PENDING: 'pending', // deal code issued, not bought yet
+  INVOICE_UPLOADED: 'invoice_uploaded', // buyer uploaded the invoice; completes after 48 h without objection
+  OBJECTED: 'objected', // dealer objected to the invoice (dispute, Day 12)
+  COMPLETED: 'completed',
+  EXPIRED: 'expired', // price validity ended without a purchase (refund minus back-out fee)
+  CANCELLED: 'cancelled', // member left in the exit window, or the dealer backed out
+});
+
+/** Commission invoice status (monthly, GST). */
+const COMMISSION_INVOICE_STATUS = Object.freeze({ ISSUED: 'issued', PAID: 'paid' });
 
 const values = (enumObject) => Object.values(enumObject);
 
 module.exports = {
+  PURCHASE_STATUS,
+  COMMISSION_INVOICE_STATUS,
   SOCKET_EVENTS,
   NOTIFICATION_TYPE,
   GROUP_STATUS,

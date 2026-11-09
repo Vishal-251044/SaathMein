@@ -82,6 +82,8 @@ const groupSchema = new Schema(
     tiers: [tierSchema],
     // Seller-led deals: price per unit before tier discounts (AUC-9)
     basePricePaise: { type: Number, validate: paiseValidator },
+    // After a win: deal codes are valid until this time (dealer's price validity, PUR-1)
+    priceValidUntil: Date,
     // After a win: members may leave (refund minus back-out fee) until this time
     exitWindowEndsAt: Date,
     winningPricePaise: { type: Number, validate: paiseValidator },

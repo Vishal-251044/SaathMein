@@ -195,9 +195,11 @@ const getGroup = async (groupId, viewer = {}) => {
     User.findById(group.leaderId).select('name').lean(),
     getGroupSettings(),
   ]);
-  const [auction, deal] = await Promise.all([
+  const { getMyPurchase } = require('../purchases/purchase.service');
+  const [auction, deal, myPurchase] = await Promise.all([
     getBuyerAuctionLazy(group, viewer),
     group.type === GROUP_TYPE.SELLER_LED ? sellerDealView(group) : null,
+    getMyPurchase(group, viewer.userId),
   ]);
   return toGroupDetail(group, {
     viewerId: viewer.userId,
@@ -207,6 +209,7 @@ const getGroup = async (groupId, viewer = {}) => {
     settings,
     auction,
     deal,
+    myPurchase,
   });
 };
 
