@@ -18,6 +18,9 @@ let io = null;
 const rooms = {
   group: (groupId) => `group:${groupId}`,
   user: (userId) => `user:${userId}`,
+  // Dealers: one room per dealer business (rank updates) and one per auction they watch
+  seller: (sellerId) => `seller:${sellerId}`,
+  auction: (groupId) => `auction:${groupId}`,
 };
 
 /** @param {import('socket.io').Server|null} server - Set by the gateway in the API process */
@@ -26,8 +29,8 @@ const setIo = (server) => {
 };
 
 /**
- * Emit to one room.
- * @param {string} room - Room name
+ * Emit to one room (or several: a socket in more than one gets it once).
+ * @param {string|string[]} room - Room name(s)
  * @param {string} event - SOCKET_EVENTS value
  * @param {Object} payload - JSON payload
  */
@@ -51,6 +54,21 @@ const emitToRoom = (room, event, payload) => {
 /** @param {string} groupId @param {string} event @param {Object} payload */
 const emitToGroup = (groupId, event, payload) =>
   emitToRoom(rooms.group(groupId), event, { groupId: String(groupId), ...payload });
+
+/**
+ * Auction events go to buyers (group room) and dealers watching (auction room). Payloads
+ * never contain dealer names (AUC-6).
+ * @param {string} groupId @param {string} event @param {Object} payload
+ */
+const emitToAuction = (groupId, event, payload) =>
+  emitToRoom([rooms.group(groupId), rooms.auction(groupId)], event, {
+    groupId: String(groupId),
+    ...payload,
+  });
+
+/** @param {string} sellerId @param {string} event @param {Object} payload */
+const emitToSeller = (sellerId, event, payload) =>
+  emitToRoom(rooms.seller(sellerId), event, payload);
 
 /** @param {string} userId @param {string} event @param {Object} payload */
 const emitToUser = (userId, event, payload) => emitToRoom(rooms.user(userId), event, payload);
@@ -83,5 +101,7 @@ module.exports = {
   emitToRoom,
   emitToGroup,
   emitToUser,
+  emitToAuction,
+  emitToSeller,
   subscribeToWorkerEmits,
 };

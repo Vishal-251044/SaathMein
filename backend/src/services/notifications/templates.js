@@ -138,6 +138,130 @@ const TEMPLATES = {
         ? { title: 'तुम्हाला मंजुरी मिळाली', body: `${d.productName}: जागा घेण्यासाठी टोकन भरा.` }
         : { title: 'विनंती नाकारली', body: `${d.productName}: ग्रुप लीडरने तुमची विनंती नाकारली.` },
   },
+
+  /* ---------------------------- Live auction (Day 9) ---------------------------- */
+
+  [T.NEW_LOWEST_PRICE]: {
+    en: (d) => ({
+      title: `New lowest price: ${d.price}`,
+      body: `${d.productName}: dealers are competing. You save ${d.saved} so far.`,
+    }),
+    hi: (d) => ({
+      title: `नई सबसे कम कीमत: ${d.price}`,
+      body: `${d.productName}: डीलर मुकाबला कर रहे हैं। अब तक ${d.saved} की बचत।`,
+    }),
+    mr: (d) => ({
+      title: `नवी सर्वात कमी किंमत: ${d.price}`,
+      body: `${d.productName}: डीलर स्पर्धा करत आहेत. आतापर्यंत ${d.saved} ची बचत.`,
+    }),
+  },
+  [T.AUCTION_WON]: {
+    en: (d) => ({
+      title: `Winning price: ${d.price}`,
+      body: `${d.productName}: ${d.dealerName} won. Your deal code is ready. You can still exit within 24 hours.`,
+    }),
+    hi: (d) => ({
+      title: `जीतने वाली कीमत: ${d.price}`,
+      body: `${d.productName}: ${d.dealerName} जीते। आपका डील कोड तैयार है। 24 घंटे में अभी भी निकल सकते हैं।`,
+    }),
+    mr: (d) => ({
+      title: `जिंकलेली किंमत: ${d.price}`,
+      body: `${d.productName}: ${d.dealerName} जिंकले. तुमचा डील कोड तयार आहे. 24 तासांत अजूनही बाहेर पडू शकता.`,
+    }),
+  },
+  [T.SINGLE_BID_DECISION]: {
+    en: (d) => ({
+      title: 'Only one dealer bid',
+      body: `${d.productName}: one dealer offered ${d.price}. Accept it or cancel with full refunds within 24 hours.`,
+    }),
+    hi: (d) => ({
+      title: 'सिर्फ एक डीलर ने बोली लगाई',
+      body: `${d.productName}: एक डीलर ने ${d.price} दिया। 24 घंटे में स्वीकार करें या पूरे रिफ़ंड के साथ रद्द करें।`,
+    }),
+    mr: (d) => ({
+      title: 'फक्त एका डीलरने बोली लावली',
+      body: `${d.productName}: एका डीलरने ${d.price} दिले. 24 तासांत स्वीकारा किंवा पूर्ण रिफंडसह रद्द करा.`,
+    }),
+  },
+  [T.TIER_UNLOCKED]: {
+    en: (d) => ({
+      title: `Price dropped to ${d.price}`,
+      body: `${d.productName}: ${d.memberCount} joined, a new discount tier is unlocked for everyone.`,
+    }),
+    hi: (d) => ({
+      title: `कीमत घटकर ${d.price}`,
+      body: `${d.productName}: ${d.memberCount} जुड़े, सबके लिए नया डिस्काउंट स्तर खुला।`,
+    }),
+    mr: (d) => ({
+      title: `किंमत कमी होऊन ${d.price}`,
+      body: `${d.productName}: ${d.memberCount} सामील, सर्वांसाठी नवा सवलत स्तर खुला.`,
+    }),
+  },
+  [T.DEALER_AUCTION_OPEN]: {
+    en: (d) => ({
+      title: 'New group auction',
+      body: `${d.memberCount} buyers want ${d.productName}. Join and bid.`,
+    }),
+    hi: (d) => ({
+      title: 'नई ग्रुप नीलामी',
+      body: `${d.memberCount} खरीदार ${d.productName} चाहते हैं। जुड़ें और बोली लगाएं।`,
+    }),
+    mr: (d) => ({
+      title: 'नवा ग्रुप लिलाव',
+      body: `${d.memberCount} खरेदीदारांना ${d.productName} हवा आहे. सामील व्हा आणि बोली लावा.`,
+    }),
+  },
+  [T.DEALER_OUTBID]: {
+    en: (d) => ({
+      title: 'You have been outbid',
+      body: `${d.productName}: the lowest price is now ${d.price}.`,
+    }),
+    hi: (d) => ({
+      title: 'आपसे कम बोली लगी',
+      body: `${d.productName}: अब सबसे कम कीमत ${d.price} है।`,
+    }),
+    mr: (d) => ({
+      title: 'तुमच्यापेक्षा कमी बोली लागली',
+      body: `${d.productName}: आता सर्वात कमी किंमत ${d.price} आहे.`,
+    }),
+  },
+  [T.DEALER_RESULT]: {
+    en: (d) =>
+      d.won
+        ? {
+            title: 'You won the group',
+            body: `${d.productName}: ${d.memberCount} buyers at ${d.price}.`,
+          }
+        : { title: 'Auction closed', body: `${d.productName} closed at ${d.price}.` },
+    hi: (d) =>
+      d.won
+        ? {
+            title: 'आप ग्रुप जीत गए',
+            body: `${d.productName}: ${d.price} पर ${d.memberCount} खरीदार।`,
+          }
+        : { title: 'नीलामी बंद', body: `${d.productName} ${d.price} पर बंद हुई।` },
+    mr: (d) =>
+      d.won
+        ? {
+            title: 'तुम्ही ग्रुप जिंकला',
+            body: `${d.productName}: ${d.price} ला ${d.memberCount} खरेदीदार.`,
+          }
+        : { title: 'लिलाव बंद', body: `${d.productName} ${d.price} ला बंद झाला.` },
+  },
+  [T.RUNNER_UP_OFFER]: {
+    en: (d) => ({
+      title: 'The group is offered to you',
+      body: `${d.productName}: the winner backed out. Take it at your price ${d.price}.`,
+    }),
+    hi: (d) => ({
+      title: 'ग्रुप आपको दिया जा रहा है',
+      body: `${d.productName}: विजेता पीछे हट गया। अपनी कीमत ${d.price} पर लें।`,
+    }),
+    mr: (d) => ({
+      title: 'ग्रुप तुम्हाला दिला जात आहे',
+      body: `${d.productName}: विजेता मागे हटला. तुमच्या ${d.price} किमतीत घ्या.`,
+    }),
+  },
 };
 
 /**

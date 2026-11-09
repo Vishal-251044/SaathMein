@@ -25,4 +25,5 @@ module.exports = {
   ReconciliationReport: require('./reconciliationReport.model'),
   Message: require('./message.model'),
   Notification: require('./notification.model'),
+  AuctionDealer: require('./auctionDealer.model'),
 };

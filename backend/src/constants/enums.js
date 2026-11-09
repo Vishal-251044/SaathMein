@@ -150,6 +150,13 @@ const SOCKET_EVENTS = Object.freeze({
   CHAT_MESSAGE: 'chat:message',
   CHAT_UPDATE: 'chat:update',
   NOTIFICATION: 'notification:new',
+  // Live auction (AUC-6)
+  AUCTION_JOIN: 'auction:join', // dealer web → server
+  AUCTION_LOWEST: 'auction:lowest',
+  AUCTION_EXTENDED: 'auction:extended',
+  AUCTION_WON: 'auction:won',
+  AUCTION_RANK: 'auction:rank', // to one dealer: my rank
+  DEAL_TIER: 'deal:tier', // seller-led tier unlocked
 });
 
 /** Notification types (push + in-app, PRD §10.7). */
@@ -163,6 +170,14 @@ const NOTIFICATION_TYPE = Object.freeze({
   SEAT_OFFER: 'seat_offer',
   JOIN_REQUEST: 'join_request',
   REQUEST_DECIDED: 'request_decided',
+  NEW_LOWEST_PRICE: 'new_lowest_price',
+  AUCTION_WON: 'auction_won',
+  SINGLE_BID_DECISION: 'single_bid_decision',
+  TIER_UNLOCKED: 'tier_unlocked',
+  DEALER_AUCTION_OPEN: 'dealer_auction_open',
+  DEALER_OUTBID: 'dealer_outbid',
+  DEALER_RESULT: 'dealer_result',
+  RUNNER_UP_OFFER: 'runner_up_offer',
 });
 
 const values = (enumObject) => Object.values(enumObject);

@@ -5,7 +5,8 @@
  * two processes (a job and a user) can never both move the same group.
  *
  * open → full → auction_live → won → purchasing → completed
- *               (seller-led: full → won)          purchasing → runner_up → purchasing
+ *               (seller-led: full → won, or open → won at the deadline from tier 1 up)
+ *               won / purchasing → runner_up (winner backed out) → purchasing
  * Failure endings: expired, no_deal, cancelled (tokens refunded — Day 7).
  */
 const Group = require('../../models/group.model');
@@ -18,10 +19,10 @@ const log = createLogger('GroupStateMachine');
 
 /** Allowed next statuses for each status. Terminal statuses allow nothing. */
 const TRANSITIONS = Object.freeze({
-  [S.OPEN]: [S.FULL, S.AUCTION_LIVE, S.EXPIRED, S.CANCELLED],
+  [S.OPEN]: [S.FULL, S.AUCTION_LIVE, S.WON, S.EXPIRED, S.CANCELLED],
   [S.FULL]: [S.AUCTION_LIVE, S.WON, S.CANCELLED],
   [S.AUCTION_LIVE]: [S.WON, S.NO_DEAL, S.CANCELLED],
-  [S.WON]: [S.PURCHASING, S.CANCELLED],
+  [S.WON]: [S.PURCHASING, S.RUNNER_UP, S.CANCELLED],
   [S.PURCHASING]: [S.COMPLETED, S.RUNNER_UP, S.CANCELLED],
   [S.RUNNER_UP]: [S.PURCHASING, S.NO_DEAL, S.CANCELLED],
   [S.COMPLETED]: [],
@@ -65,6 +66,18 @@ const GUARDS = {
 
   [`${S.FULL}>${S.AUCTION_LIVE}`]: (group) =>
     group.type === GROUP_TYPE.BUYER_LED ? null : 'Only buyer-led groups have an auction',
+
+  // Seller-led deal at its deadline with at least the first tier reached (AUC-9)
+  [`${S.OPEN}>${S.WON}`]: (group) => {
+    if (group.type !== GROUP_TYPE.SELLER_LED) return 'Buyer-led groups are won through the auction';
+    const firstTier = group.tiers?.[0]?.size;
+    return firstTier && group.memberCount >= firstTier
+      ? null
+      : 'The first tier has not been reached';
+  },
+
+  [`${S.WON}>${S.RUNNER_UP}`]: (group, ctx) =>
+    ctx.runnerUpBidId || group.auction?.runnerUpBidId ? null : 'There is no runner-up offer',
 
   [`${S.FULL}>${S.WON}`]: (group) =>
     group.type === GROUP_TYPE.SELLER_LED ? null : 'Buyer-led groups are won through the auction',

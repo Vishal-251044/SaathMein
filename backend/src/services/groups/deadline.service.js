@@ -5,7 +5,8 @@
  *   the leader gets 48 h (leaderDecisionHours) to extend once or start the auction early;
  * - otherwise it expires (tokens refunded — Day 7).
  * If the leader does not choose in time, the group expires.
- * Seller-led deals at expiry depend on open question 4 and arrive on Day 9.
+ * Seller-led deals at the deadline: won at the tier reached, or expired with full refunds
+ * when the first tier was missed (open question 4, decided 8 Nov 2026).
  * Also sends the "24 hours left" reminder once per group (LIV-3).
  */
 const Group = require('../../models/group.model');
@@ -13,6 +14,7 @@ const { createLogger } = require('../../utils/logger');
 const { getGroupSettings } = require('../settings.service');
 const { transition, earlyStartMinimum } = require('./stateMachine');
 const { notifyAboutGroup, notifyGroupMembers } = require('./groupLive');
+const { closeSellerDeal } = require('../deals/deal.service');
 const { GROUP_STATUS, GROUP_TYPE, NOTIFICATION_TYPE } = require('../../constants/enums');
 
 const log = createLogger('GroupDeadlines');
@@ -79,7 +81,26 @@ const processDeadlines = async (now = new Date()) => {
     }
   }
 
-  // 2. Leader did not choose in time
+  // 2. Seller-led deals at their deadline
+  const deals = await Group.find({
+    status: GROUP_STATUS.OPEN,
+    type: GROUP_TYPE.SELLER_LED,
+    deadline: { $lte: now },
+  }).limit(BATCH);
+  for (const deal of deals) {
+    const firstTier = deal.tiers?.[0]?.size;
+    try {
+      if (firstTier && deal.memberCount >= firstTier) {
+        await closeSellerDeal(deal, 'deadline_tier_reached');
+      } else if (await expireGroup(deal, 'deadline_first_tier_missed', now)) {
+        expired += 1;
+      }
+    } catch (err) {
+      if (err.code !== 'GROUP_CHANGED') throw err;
+    }
+  }
+
+  // 3. Leader did not choose in time
   const undecided = await Group.find({
     status: GROUP_STATUS.OPEN,
     leaderDecisionDueAt: { $lte: now },

@@ -39,6 +39,19 @@ router.post(
 );
 
 router.get('/:groupId', optionalAuth, validate(schemas.getGroupSchema), controller.getGroup);
+// Live auction (AUC-9) and the leader's single-dealer decision
+router.get(
+  '/:groupId/auction',
+  optionalAuth,
+  validate(schemas.getGroupSchema),
+  controller.getGroupAuction,
+);
+router.post(
+  '/:groupId/auction/decision',
+  requireAuth,
+  validate(schemas.singleBidDecisionSchema),
+  controller.decideSingleBid,
+);
 router.post(
   '/:groupId/extend',
   requireAuth,

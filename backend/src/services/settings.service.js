@@ -9,6 +9,17 @@
  * - extensionDays: one extension adds 7 days (never past the category's maximum deadline).
  * - maxOpenGroupsPerLeader: anti-spam limit on open groups one person leads.
  *
+ * auctions (Day 9, PRD §10.5; decided by Vishal 8 Nov 2026):
+ * - minRating / minReviewsForRating: dealers rated below 3.5 cannot bid, but verified
+ *   dealers with fewer than 3 reviews (unrated) can (open question 2).
+ * - minDealerExtensionHours: fewer than 2 dealers → extend once by 24 h.
+ * - singleBidDecisionHours: one dealer → the leader has 24 h to accept, else cancel + refund.
+ * - exitWindowHours: members may leave after a win (refund minus back-out fee).
+ * - runnerUpOfferHours: the runner-up dealer has this long to take the group.
+ * - priceAlertMinutes: at most one "new lowest price" push per group in this time.
+ * - bidCooldownSeconds: one bid per dealer per few seconds.
+ * - backOutSuspensionDays: a winner who backs out cannot bid for this long (PRD §10.5).
+ *
  * payments (Day 7):
  * - seatReservationMinutes: a seat is held while the buyer is in checkout.
  * - waitlistOfferHours: a freed seat is offered to the next waitlisted person this long.
@@ -25,6 +36,17 @@ const DEFAULTS = Object.freeze({
     leaderDecisionHours: 48,
     extensionDays: 7,
     maxOpenGroupsPerLeader: 5,
+  }),
+  auctions: Object.freeze({
+    minRating: 3.5,
+    minReviewsForRating: 3,
+    minDealerExtensionHours: 24,
+    singleBidDecisionHours: 24,
+    exitWindowHours: 24,
+    runnerUpOfferHours: 24,
+    priceAlertMinutes: 30,
+    bidCooldownSeconds: 3,
+    backOutSuspensionDays: 30, // winner backs out → no auctions for 30 days
   }),
   payments: Object.freeze({
     seatReservationMinutes: 15,
@@ -58,6 +80,9 @@ const getSettings = async (key) => {
 /** @returns {Promise<typeof DEFAULTS.groups>} Group lifecycle settings */
 const getGroupSettings = () => getSettings('groups');
 
+/** @returns {Promise<typeof DEFAULTS.auctions>} Live auction rules */
+const getAuctionSettings = () => getSettings('auctions');
+
 /** @returns {Promise<typeof DEFAULTS.payments>} Checkout and waitlist settings */
 const getPaymentSettings = () => getSettings('payments');
 
@@ -69,5 +94,6 @@ module.exports = {
   getSettings,
   getGroupSettings,
   getPaymentSettings,
+  getAuctionSettings,
   clearSettingsCache,
 };

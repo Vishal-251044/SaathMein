@@ -34,10 +34,10 @@ const group = (overrides = {}) => ({
 });
 
 const EXPECTED_EDGES = {
-  open: ['full', 'auction_live', 'expired', 'cancelled'],
+  open: ['full', 'auction_live', 'won', 'expired', 'cancelled'],
   full: ['auction_live', 'won', 'cancelled'],
   auction_live: ['won', 'no_deal', 'cancelled'],
-  won: ['purchasing', 'cancelled'],
+  won: ['purchasing', 'runner_up', 'cancelled'],
   purchasing: ['completed', 'runner_up', 'cancelled'],
   runner_up: ['purchasing', 'no_deal', 'cancelled'],
   completed: [],
@@ -95,6 +95,18 @@ describe('guards', () => {
       S.AUCTION_LIVE,
       ctx,
     );
+  });
+
+  it('open → won only for seller-led deals that reached their first tier', () => {
+    const deal = { type: GROUP_TYPE.SELLER_LED, tiers: [{ size: 5 }, { size: 10 }] };
+    blocked(group({ ...deal, memberCount: 4 }), S.WON);
+    passes(group({ ...deal, memberCount: 5 }), S.WON);
+    blocked(group({ memberCount: 10 }), S.WON); // buyer-led
+  });
+
+  it('won → runner_up needs a runner-up bid (winner backed out)', () => {
+    blocked(group({ status: S.WON }), S.RUNNER_UP);
+    passes(group({ status: S.WON, auction: { runnerUpBidId: 'b2' } }), S.RUNNER_UP);
   });
 
   it('full → auction_live is buyer-led only; full → won is seller-led only', () => {

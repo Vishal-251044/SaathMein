@@ -48,11 +48,21 @@ const toGroupCard = (group, { viewerId } = {}) => {
  * @param {Object[]} [context.members] - Active members with `userId` populated (name, avatar)
  * @param {{ name: string }|null} [context.leader] - Leader user (name)
  * @param {{ earlyStartThresholdBps: number }} context.settings - Group settings
+ * @param {Object|null} [context.auction] - Buyer auction view (getBuyerAuction), Day 9
+ * @param {Object|null} [context.deal] - Seller-led deal view (tiers, price now, dealer)
  * @returns {Object}
  */
 const toGroupDetail = (
   group,
-  { viewerId, membership = null, members = [], leader = null, settings },
+  {
+    viewerId,
+    membership = null,
+    members = [],
+    leader = null,
+    settings,
+    auction = null,
+    deal = null,
+  },
 ) => {
   const card = toGroupCard(group, { viewerId });
   const canShare =
@@ -81,6 +91,8 @@ const toGroupDetail = (
           waitlistPosition: membership.waitlistPosition ?? null,
           // A freed seat is held for this buyer until then (pay to take it)
           seatOfferExpiresAt: membership.offerExpiresAt ?? null,
+          // Shown at the showroom after the group is won (only to this member)
+          dealCode: membership.status === 'active' ? membership.dealCode || null : null,
         }
       : null,
     backoutFeePaise: group.backoutFeePaise ?? 0,
@@ -90,13 +102,11 @@ const toGroupDetail = (
       reason: entry.reason || null,
       at: entry.at,
     })),
-    auction: group.auction?.startsAt
-      ? {
-          startsAt: group.auction.startsAt,
-          endsAt: group.auction.endsAt,
-          dealerCount: group.auction.dealerCount || 0,
-        }
-      : null,
+    auction,
+    deal,
+    winningPricePaise: group.winningPricePaise ?? null,
+    // Members may still leave (refund minus back-out fee) until then (PRD §10.5)
+    exitWindowEndsAt: group.exitWindowEndsAt ?? null,
     // Deadline passed at ≥70%: what the leader may do now (GRP-5)
     leaderDecision:
       awaitingDecision && card.isLeader

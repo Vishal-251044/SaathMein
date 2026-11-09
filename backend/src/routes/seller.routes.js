@@ -11,6 +11,8 @@ const { requireXhrHeader } = require('../middlewares/staffAuth.middleware');
 const { createRateLimiter } = require('../middlewares/rateLimit.middleware');
 const controller = require('../controllers/seller.controller');
 const schemas = require('../validators/seller.validator');
+const auctionSchemas = require('../validators/auction.validator');
+const auctionController = require('../controllers/sellerAuction.controller');
 
 const router = Router();
 
@@ -54,7 +56,43 @@ router.get('/me', controller.getMe);
 router.get('/team', controller.getTeam);
 router.post('/product-requests', validate(schemas.productRequestSchema), controller.requestProduct);
 
+// Live auctions (AUC-1 to AUC-8) and seller-led deals (AUC-9) — any team member
+router.get(
+  '/auctions',
+  validate(auctionSchemas.listAuctionsSchema),
+  auctionController.listAuctions,
+);
+router.get(
+  '/auctions/:groupId',
+  validate(auctionSchemas.auctionParamsSchema),
+  auctionController.getAuction,
+);
+router.post(
+  '/auctions/:groupId/join',
+  validate(auctionSchemas.joinAuctionSchema),
+  auctionController.joinAuction,
+);
+router.post(
+  '/auctions/:groupId/bids',
+  validate(auctionSchemas.placeBidSchema),
+  auctionController.placeBid,
+);
+router.post(
+  '/auctions/:groupId/runner-up',
+  validate(auctionSchemas.runnerUpSchema),
+  auctionController.respondRunnerUp,
+);
+router.get('/deals', validate(auctionSchemas.listDealsSchema), auctionController.listDeals);
+router.post('/deals', validate(auctionSchemas.createDealSchema), auctionController.createDeal);
+
 // Owner only
+// Backing out of a won group carries penalties, so only the owner may do it
+router.post(
+  '/auctions/:groupId/back-out',
+  requireSellerOwner,
+  validate(auctionSchemas.backOutSchema),
+  auctionController.backOut,
+);
 router.patch(
   '/profile',
   requireSellerOwner,

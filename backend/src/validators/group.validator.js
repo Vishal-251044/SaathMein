@@ -78,7 +78,13 @@ const adminListGroupsSchema = {
   }),
 };
 
+const singleBidDecisionSchema = {
+  params: groupIdParams,
+  body: z.object({ accept: z.boolean() }).strict(),
+};
+
 module.exports = {
+  singleBidDecisionSchema,
   groupIdParams,
   createGroupSchema,
   listGroupsSchema,

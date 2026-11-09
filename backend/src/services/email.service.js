@@ -165,7 +165,88 @@ const sendKycReviewNeeded = ({ to, businessName, adminUrl }) =>
     }),
   });
 
+/**
+ * New auction a dealer can bid in (AUC-1).
+ * @param {{ to: string|string[], productName: string, cityName: string, groupSize: number, endsAt: Date, url: string }} params
+ */
+const sendAuctionOpen = ({ to, productName, cityName, groupSize, endsAt, url }) =>
+  sendEmail({
+    to,
+    subject: `New group auction: ${groupSize} x ${productName} in ${cityName}`,
+    text: `${groupSize} buyers in ${cityName} want ${productName}. Bid before ${endsAt.toUTCString()}: ${url}`,
+    html: layout(
+      [
+        `${groupSize} confirmed buyers in ${cityName} want ${productName}.`,
+        'Join the live auction and give your best all-inclusive price. The lowest price wins the whole group.',
+        `Bidding ends ${endsAt.toUTCString()} (extended if someone bids in the last minutes).`,
+      ],
+      { label: 'Open the auction', url },
+    ),
+  });
+
+/**
+ * A dealer was outbid (AUC-6).
+ * @param {{ to: string|string[], productName: string, lowestPrice: string, url: string }} params
+ */
+const sendOutbid = ({ to, productName, lowestPrice, url }) =>
+  sendEmail({
+    to,
+    subject: `You have been outbid: ${productName}`,
+    text: `Another dealer offered ${lowestPrice}. Bid lower to lead again: ${url}`,
+    html: layout(
+      [`Another dealer offered ${lowestPrice} for ${productName}.`, 'Bid lower to lead again.'],
+      { label: 'Bid again', url },
+    ),
+  });
+
+/**
+ * Auction result for a dealer.
+ * @param {{ to: string|string[], productName: string, won: boolean, price: string, members: number, url: string }} params
+ */
+const sendAuctionResult = ({ to, productName, won, price, members, url }) =>
+  sendEmail({
+    to,
+    subject: won ? `You won: ${members} x ${productName}` : `Auction closed: ${productName}`,
+    text: won
+      ? `Your price ${price} won. ${members} buyers will come to buy at this price with their deal codes: ${url}`
+      : `The auction for ${productName} closed at ${price}. Thank you for bidding.`,
+    html: layout(
+      won
+        ? [
+            `Your price ${price} won the group for ${productName}.`,
+            `${members} buyers will visit with their deal codes. Please honour the price and delivery date you committed to.`,
+          ]
+        : [
+            `The auction for ${productName} closed at ${price}.`,
+            'Thank you for bidding. More groups are coming.',
+          ],
+      { label: won ? 'See the group' : 'See live auctions', url },
+    ),
+  });
+
+/**
+ * The runner-up gets the group because the winner backed out (PRD §10.5).
+ * @param {{ to: string|string[], productName: string, price: string, hours: number, url: string }} params
+ */
+const sendRunnerUpOffer = ({ to, productName, price, hours, url }) =>
+  sendEmail({
+    to,
+    subject: `The group is offered to you: ${productName}`,
+    text: `The winning dealer backed out. Take the group at your last price ${price} within ${hours} hours: ${url}`,
+    html: layout(
+      [
+        `The winning dealer backed out of the ${productName} group.`,
+        `You can take the whole group at your last price, ${price}. Answer within ${hours} hours.`,
+      ],
+      { label: 'Accept or decline', url },
+    ),
+  });
+
 module.exports = {
+  sendAuctionOpen,
+  sendOutbid,
+  sendAuctionResult,
+  sendRunnerUpOffer,
   sendEmail,
   escapeHtml,
   sendEmailVerificationCode,

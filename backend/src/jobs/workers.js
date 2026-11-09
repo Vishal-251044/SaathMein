@@ -13,6 +13,7 @@ const { QUEUE_NAMES, ensureDeadlineSweep } = require('./queues');
 const { processDeadlines, sendDeadlineReminders } = require('../services/groups/deadline.service');
 const { sendDeferredPushes } = require('../services/notifications/notification.service');
 const { closeAuction, closeOverdueAuctions } = require('../services/auction/auctionClose.service');
+const { processAuctionTimeouts } = require('../services/auction/winner.service');
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
 const { runReconciliation } = require('../services/payments/reconciliation.service');
@@ -28,7 +29,16 @@ const PROCESSORS = {
     const refundsRetried = await retryFailedRefunds();
     const reminders = await sendDeadlineReminders();
     const pushesSent = await sendDeferredPushes();
-    return { ...deadlines, auctionsClosed, offersExpired, refundsRetried, reminders, pushesSent };
+    const auctionTimeouts = await processAuctionTimeouts();
+    return {
+      ...deadlines,
+      auctionsClosed,
+      offersExpired,
+      refundsRetried,
+      reminders,
+      pushesSent,
+      auctionTimeouts,
+    };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),
   [QUEUE_NAMES.REFUNDS]: async (job) => {

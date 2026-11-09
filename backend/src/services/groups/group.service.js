@@ -11,6 +11,7 @@ const GroupMember = require('../../models/groupMember.model');
 const Product = require('../../models/product.model');
 const Category = require('../../models/category.model');
 const User = require('../../models/user.model');
+const Seller = require('../../models/seller.model');
 const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const {
@@ -22,6 +23,7 @@ const { recordSignal } = require('../demandSignal.service');
 const { getGroupSettings } = require('../settings.service');
 const { transition, earlyStartMinimum } = require('./stateMachine');
 const { toGroupCard, toGroupDetail } = require('./groupPresenter');
+const { toPublicSeller } = require('../seller/sellerPresenter');
 const {
   GROUP_STATUS,
   GROUP_TYPE,
@@ -193,7 +195,83 @@ const getGroup = async (groupId, viewer = {}) => {
     User.findById(group.leaderId).select('name').lean(),
     getGroupSettings(),
   ]);
-  return toGroupDetail(group, { viewerId: viewer.userId, membership, members, leader, settings });
+  const [auction, deal] = await Promise.all([
+    getBuyerAuctionLazy(group, viewer),
+    group.type === GROUP_TYPE.SELLER_LED ? sellerDealView(group) : null,
+  ]);
+  return toGroupDetail(group, {
+    viewerId: viewer.userId,
+    membership,
+    members,
+    leader,
+    settings,
+    auction,
+    deal,
+  });
+};
+
+/**
+ * Live auction for the group page (AUC-9): falling price, price history, winner,
+ * single-dealer decision. Same visibility rules as the group page.
+ * @param {string} groupId - Group id
+ * @param {{ userId?: string, code?: string }} viewer
+ * @returns {Promise<Object>}
+ * @throws {ApiError} 404 not visible or no auction
+ */
+const getGroupAuction = async (groupId, viewer = {}) => {
+  const group = await Group.findById(groupId).lean();
+  if (!group) throw ApiError.notFound('Group not found');
+  const membership = viewer.userId
+    ? await GroupMember.findOne({ groupId, userId: viewer.userId }).lean()
+    : null;
+  if (!canView(group, viewer, membership)) throw ApiError.notFound('Group not found');
+  const auction = await getBuyerAuctionLazy(group, viewer);
+  if (!auction) throw ApiError.notFound('This group has no auction yet');
+  return auction;
+};
+
+/**
+ * Leader accepts or declines the only dealer's price (decided 8 Nov 2026).
+ * @param {string} groupId - Group id
+ * @param {string} userId - Leader
+ * @param {boolean} accept - true = buy at that price, false = cancel with full refunds
+ * @returns {Promise<Object>} Group page
+ */
+const decideSingleBid = async (groupId, userId, accept) => {
+  const auctionService = require('../auction/auction.service');
+  await auctionService.decideSingleBid(groupId, userId, accept);
+  return getGroup(groupId, { userId });
+};
+
+/** Buyer auction view (loaded lazily: the auction services import the state machine). */
+const getBuyerAuctionLazy = (group, viewer) => {
+  const { getBuyerAuction } = require('../auction/auction.service');
+  return getBuyerAuction(group, viewer);
+};
+
+/**
+ * Seller-led deal for the group page (AUC-9): tiers, price now, "X more to unlock", dealer.
+ * @param {Object} group - Lean seller-led group
+ * @returns {Promise<Object>}
+ */
+const sellerDealView = async (group) => {
+  const { dealStatus } = require('../deals/deal.service');
+  const seller = await Seller.findById(group.sellerId)
+    .select('businessName address rating ratingCount kyc.status')
+    .lean();
+  return {
+    basePricePaise: group.basePricePaise,
+    tiers: [...(group.tiers || [])]
+      .sort((a, b) => a.size - b.size)
+      .map((tier) => ({
+        size: tier.size,
+        discountBps: tier.discountBps,
+        pricePaise: dealStatus({ basePricePaise: group.basePricePaise, tiers: [tier] }, tier.size)
+          .pricePaise,
+      })),
+    ...dealStatus(group, group.memberCount),
+    seller: seller ? { ...toPublicSeller(seller), address: seller.address || null } : null,
+  };
 };
 
 /**
@@ -391,24 +469,15 @@ const extendDeadline = async (groupId, userId) => {
 const startAuctionEarly = async (groupId, userId) => {
   const group = await loadLedGroup(groupId, userId);
   assertDecisionWindow(group);
-  const [settings, category] = await Promise.all([
-    getGroupSettings(),
-    Category.findById(group.categoryId).select('rules.auction').lean(),
-  ]);
-  const durationHours = category?.rules?.auction?.durationHours ?? 24;
-  const startsAt = new Date();
-
-  await transition(group, GROUP_STATUS.AUCTION_LIVE, {
+  const settings = await getGroupSettings();
+  // Same start as a full group: category rules, catalog ceiling, dealers invited
+  const { startAuction } = require('../auction/auction.service');
+  await startAuction(group, {
     reason: 'leader_started_early',
     actor: { type: 'user', id: userId },
     ctx: { thresholdBps: settings.earlyStartThresholdBps },
-    set: {
-      'auction.startsAt': startsAt,
-      'auction.endsAt': new Date(startsAt.getTime() + durationHours * HOUR_MS),
-      'auction.extensions': 0,
-      'auction.dealerCount': 0,
-    },
     unset: { leaderDecisionDueAt: 1 },
+    rethrow: true,
   });
   return getGroup(groupId, { userId });
 };
@@ -435,6 +504,8 @@ const cancelGroup = async (groupId, userId) => {
 };
 
 module.exports = {
+  getGroupAuction,
+  decideSingleBid,
   SEATED,
   createGroup,
   getGroup,

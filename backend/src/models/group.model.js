@@ -31,6 +31,15 @@ const auctionSchema = new Schema(
     winnerBidId: { type: Schema.Types.ObjectId, ref: 'Bid' },
     runnerUpBidId: { type: Schema.Types.ObjectId, ref: 'Bid' },
     pausedAt: Date,
+    bidCount: { type: Number, default: 0, min: 0 },
+    joinedDealerCount: { type: Number, default: 0, min: 0 },
+    // Minimum-dealers rule: extended once by 24 h when fewer than 2 dealers bid
+    minDealerExtensionUsed: { type: Boolean, default: false },
+    // Bidding stopped (time up) while waiting for the leader (single dealer) or runner-up
+    closedAt: Date,
+    singleBidDecisionDueAt: Date,
+    runnerUpOfferDueAt: Date,
+    lastPriceAlertAt: Date, // "new lowest price" push throttle for buyers
   },
   { _id: false },
 );
@@ -71,6 +80,11 @@ const groupSchema = new Schema(
     // Kept from the token when a member leaves after seats lock (snapshot at creation, PAY-3)
     backoutFeePaise: { type: Number, default: 0, validate: paiseValidator },
     tiers: [tierSchema],
+    // Seller-led deals: price per unit before tier discounts (AUC-9)
+    basePricePaise: { type: Number, validate: paiseValidator },
+    // After a win: members may leave (refund minus back-out fee) until this time
+    exitWindowEndsAt: Date,
+    winningPricePaise: { type: Number, validate: paiseValidator },
 
     deadline: { type: Date, required: true },
     deadlineExtended: { type: Boolean, default: false }, // leader may extend once (GRP-5)

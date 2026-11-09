@@ -73,7 +73,8 @@ const assertCanJoin = (group, userId, membership, { code, reservedSeats, now = n
     membership.offerExpiresAt &&
     new Date(membership.offerExpiresAt) > now;
 
-  if (group.status === GROUP_STATUS.FULL && hasOffer && group.memberCount < group.targetSize) {
+  const offerSeatOpen = group.status === GROUP_STATUS.FULL || isInExitWindow(group, now);
+  if (offerSeatOpen && hasOffer && group.memberCount < group.targetSize) {
     return { viaOffer: true };
   }
   if (group.status === GROUP_STATUS.FULL) {
@@ -97,13 +98,24 @@ const assertCanJoin = (group, userId, membership, { code, reservedSeats, now = n
 };
 
 /**
+ * Is a won group still in its 24 h exit window?
+ * @param {Object} group - Group
+ * @param {Date} [now]
+ * @returns {boolean}
+ */
+const isInExitWindow = (group, now = new Date()) =>
+  [GROUP_STATUS.WON, GROUP_STATUS.PURCHASING].includes(group.status) &&
+  Boolean(group.exitWindowEndsAt) &&
+  new Date(group.exitWindowEndsAt) > now;
+
+/**
  * What leaving would refund (PAY-3).
  * @param {Object} group - Group
  * @param {Object|null} membership - Seated membership with paymentId
  * @param {Object|null} payment - Paid token payment
  * @returns {{ canLeave: boolean, reason?: string, refundPaise: number, feePaise: number, tokenPaise: number }}
  */
-const computeLeaveTerms = (group, membership, payment) => {
+const computeLeaveTerms = (group, membership, payment, now = new Date()) => {
   const tokenPaise = payment?.amountPaise ?? group.tokenAmountPaise;
   if (!membership || membership.status !== MEMBER_STATUS.ACTIVE || !payment) {
     return { canLeave: false, reason: 'NOT_A_MEMBER', refundPaise: 0, feePaise: 0, tokenPaise };
@@ -115,7 +127,18 @@ const computeLeaveTerms = (group, membership, payment) => {
     const feePaise = Math.min(group.backoutFeePaise ?? 0, tokenPaise);
     return { canLeave: true, refundPaise: tokenPaise - feePaise, feePaise, tokenPaise };
   }
-  // During the auction seats stay locked; the 24 h exit window after a win comes on Day 10
+  // After a win: 24 h exit window, refund minus the back-out fee (PRD §10.5)
+  if (isInExitWindow(group, now)) {
+    const feePaise = Math.min(group.backoutFeePaise ?? 0, tokenPaise);
+    return {
+      canLeave: true,
+      refundPaise: tokenPaise - feePaise,
+      feePaise,
+      tokenPaise,
+      exitWindowEndsAt: group.exitWindowEndsAt,
+    };
+  }
+  // During the auction (and after the exit window) seats stay locked
   return { canLeave: false, reason: 'SEATS_LOCKED', refundPaise: 0, feePaise: 0, tokenPaise };
 };
 
@@ -188,12 +211,15 @@ const leaveGroup = async (groupId, userId) => {
     reason:
       group.status === GROUP_STATUS.OPEN
         ? REFUND_REASON.LEFT_OPEN_GROUP
-        : REFUND_REASON.LEFT_AFTER_LOCK,
+        : group.status === GROUP_STATUS.FULL
+          ? REFUND_REASON.LEFT_AFTER_LOCK
+          : REFUND_REASON.LEFT_AFTER_WIN,
     amountPaise: terms.refundPaise,
     feePaise: terms.feePaise,
   });
   await publishGroupCount(groupId);
-  if (group.status === GROUP_STATUS.FULL) await offerNextSeat(groupId);
+  // Freed seats go to the waitlist (after a win: at the same price, PRD §10.5)
+  if (group.status !== GROUP_STATUS.OPEN) await offerNextSeat(groupId);
   log.info(
     { groupId, userId, refundPaise: terms.refundPaise, feePaise: terms.feePaise },
     'Member left',
@@ -262,8 +288,11 @@ const leaveWaitlist = async (groupId, userId) => {
  * @returns {Promise<number>} New offers made
  */
 const offerNextSeat = async (groupId, now = new Date()) => {
-  const group = await Group.findById(groupId).select('status memberCount targetSize').lean();
-  if (!group || group.status !== GROUP_STATUS.FULL) return 0;
+  const group = await Group.findById(groupId)
+    .select('status memberCount targetSize exitWindowEndsAt')
+    .lean();
+  if (!group) return 0;
+  if (group.status !== GROUP_STATUS.FULL && !isInExitWindow(group, now)) return 0;
   const free = group.targetSize - group.memberCount;
   if (free <= 0) return 0;
 
@@ -330,6 +359,7 @@ const expireSeatOffers = async (now = new Date()) => {
 
 module.exports = {
   SEATED,
+  isInExitWindow,
   assertCommunityAccess,
   assertCanJoin,
   computeLeaveTerms,

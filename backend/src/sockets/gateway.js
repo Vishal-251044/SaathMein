@@ -10,6 +10,8 @@ const config = require('../config/env');
 const { getRedis } = require('../config/redis');
 const Group = require('../models/group.model');
 const GroupMember = require('../models/groupMember.model');
+const SellerStaff = require('../models/sellerStaff.model');
+const AuctionDealer = require('../models/auctionDealer.model');
 const { verifyAccessToken } = require('../services/auth/token.service');
 const { createLogger } = require('../utils/logger');
 const {
@@ -88,6 +90,32 @@ const initSockets = async (httpServer) => {
   io.on('connection', (socket) => {
     const { userId } = socket.data;
     socket.join(rooms.user(userId));
+    // Dealer team members also get their business room (rank updates, outbid)
+    SellerStaff.findOne({ userId, status: 'active' })
+      .select('sellerId')
+      .lean()
+      .then((membership) => {
+        if (!membership) return;
+        socket.data.sellerId = String(membership.sellerId);
+        socket.join(rooms.seller(membership.sellerId));
+      })
+      .catch(() => {});
+
+    // Dealer web: watch an auction the dealer joined (anonymous lowest price, timer)
+    socket.on(SOCKET_EVENTS.AUCTION_JOIN, async ({ groupId } = {}, ack = () => {}) => {
+      try {
+        if (!socket.data.sellerId || !/^[a-f0-9]{24}$/.test(String(groupId))) {
+          return ack({ ok: false, error: 'NOT_FOUND' });
+        }
+        const joined = await AuctionDealer.exists({ groupId, sellerId: socket.data.sellerId });
+        if (!joined) return ack({ ok: false, error: 'NOT_JOINED' });
+        socket.join(rooms.auction(groupId));
+        return ack({ ok: true });
+      } catch (err) {
+        log.error({ err: err.message, groupId }, '[SocketGateway] auction join failed');
+        return ack({ ok: false, error: 'SERVER_ERROR' });
+      }
+    });
 
     socket.on(SOCKET_EVENTS.JOIN_GROUP, async ({ groupId, code } = {}, ack = () => {}) => {
       try {

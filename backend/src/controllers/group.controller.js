@@ -126,7 +126,31 @@ const leaveWaitlist = asyncHandler(async (req, res) => {
   return sendSuccess(res, { message: 'You left the waitlist' });
 });
 
+/** GET /api/groups/:groupId/auction?code= */
+const getGroupAuction = asyncHandler(async (req, res) => {
+  const auction = await groupService.getGroupAuction(req.params.groupId, {
+    userId: req.auth?.userId,
+    code: req.validatedQuery?.code,
+  });
+  return sendSuccess(res, { message: 'Auction fetched', data: { auction } });
+});
+
+/** POST /api/groups/:groupId/auction/decision { accept } */
+const decideSingleBid = asyncHandler(async (req, res) => {
+  const group = await groupService.decideSingleBid(
+    req.params.groupId,
+    req.auth.userId,
+    req.body.accept,
+  );
+  return sendSuccess(res, {
+    message: req.body.accept ? 'Offer accepted' : 'Group cancelled; tokens will be refunded',
+    data: { group },
+  });
+});
+
 module.exports = {
+  getGroupAuction,
+  decideSingleBid,
   leavePreview,
   leaveGroup,
   joinWaitlist,

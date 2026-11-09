@@ -30,6 +30,14 @@ jest.mock('../../src/services/seller/sellerAdmin.service', () => ({
   })),
 }));
 
+jest.mock('../../src/services/auction/bid.service', () => ({
+  placeBid: jest.fn(async () => ({ rank: 1 })),
+}));
+jest.mock('../../src/services/auction/winner.service', () => ({
+  ...jest.requireActual('../../src/services/auction/winner.service'),
+  backOut: jest.fn(async () => ({})),
+}));
+
 const request = require('supertest');
 const { Types } = require('mongoose');
 const app = require('../../src/app');
@@ -38,6 +46,8 @@ const SellerStaff = require('../../src/models/sellerStaff.model');
 const Seller = require('../../src/models/seller.model');
 const AuditLog = require('../../src/models/auditLog.model');
 const sellerAccount = require('../../src/services/seller/sellerAccount.service');
+const bidService = require('../../src/services/auction/bid.service');
+const winnerService = require('../../src/services/auction/winner.service');
 const { signAccessToken } = require('../../src/services/auth/token.service');
 const { TOKEN_AUDIENCE, STAFF_ROLE } = require('../../src/constants/enums');
 
@@ -124,6 +134,68 @@ describe('/api/seller', () => {
   it('needs the X-Requested-With header to refresh by cookie (CSRF)', async () => {
     const res = await request(app).post('/api/seller/auth/refresh');
     expect(res.status).toBe(403);
+  });
+});
+
+describe('/api/seller/auctions (Day 9)', () => {
+  const groupId = new Types.ObjectId().toString();
+  const auth = () => ({ Authorization: `Bearer ${appToken()}` });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    Seller.findById.mockReturnValue(lean({ status: 'active' }));
+  });
+
+  it('lets team staff place a bid (the service checks the rules)', async () => {
+    membershipIs('staff');
+    const res = await request(app)
+      .post(`/api/seller/auctions/${groupId}/bids`)
+      .set(auth())
+      .send({ pricePerUnitPaise: 8_500_000, breakdown: { basePaise: 8_500_000 } });
+    expect(bidService.placeBid).toHaveBeenCalledWith(
+      groupId,
+      { sellerId, userId },
+      expect.objectContaining({ pricePerUnitPaise: 8_500_000 }),
+      expect.any(Object),
+    );
+    expect(res.status).toBe(201);
+  });
+
+  it('rejects rupee floats and unknown fields in a bid (422)', async () => {
+    membershipIs('staff');
+    const res = await request(app)
+      .post(`/api/seller/auctions/${groupId}/bids`)
+      .set(auth())
+      .send({ pricePerUnitPaise: 85000.5, breakdown: { basePaise: 85000.5, sneaky: 1 } });
+    expect(res.status).toBe(422);
+    expect(bidService.placeBid).not.toHaveBeenCalled();
+  });
+
+  it('joining requires accepting the commitment', async () => {
+    membershipIs('staff');
+    const res = await request(app)
+      .post(`/api/seller/auctions/${groupId}/join`)
+      .set(auth())
+      .send({ acceptCommitment: false, deliveryBy: '2026-11-20', priceValidityDays: 7 });
+    expect(res.status).toBe(422);
+  });
+
+  it('only the owner may back out of a won group', async () => {
+    membershipIs('staff');
+    const body = { reason: 'Stock ran out at our showroom' };
+    const staff = await request(app)
+      .post(`/api/seller/auctions/${groupId}/back-out`)
+      .set(auth())
+      .send(body);
+    expect(staff.status).toBe(403);
+
+    membershipIs('owner');
+    const owner = await request(app)
+      .post(`/api/seller/auctions/${groupId}/back-out`)
+      .set(auth())
+      .send(body);
+    expect(owner.status).toBe(200);
+    expect(winnerService.backOut).toHaveBeenCalledWith(groupId, { sellerId, userId }, body.reason);
   });
 });
 

@@ -23,6 +23,8 @@ const { assertCanJoin } = require('../groups/membership.service');
 const { transition } = require('../groups/stateMachine');
 const { runGroupEffects } = require('../groups/groupEffects');
 const { publishNewMember } = require('../groups/groupLive');
+const { onDealMemberJoined } = require('../deals/deal.service');
+const { issueDealCode } = require('../auction/dealCode.service');
 const razorpay = require('./razorpay.service');
 const { recordLedger } = require('./ledger.service');
 const { queueRefund, REFUND_REASON } = require('./refund.service');
@@ -215,7 +217,17 @@ const confirmCapturedPayment = async (paymentOrId, entity, { source = 'webhook' 
     const seatGroup = await Group.findOneAndUpdate(
       {
         _id: groupId,
-        status: hasOffer ? { $in: [GROUP_STATUS.OPEN, GROUP_STATUS.FULL] } : GROUP_STATUS.OPEN,
+        // A waitlist seat offer also works in a won group during its exit window
+        status: hasOffer
+          ? {
+              $in: [
+                GROUP_STATUS.OPEN,
+                GROUP_STATUS.FULL,
+                GROUP_STATUS.WON,
+                GROUP_STATUS.PURCHASING,
+              ],
+            }
+          : GROUP_STATUS.OPEN,
         $expr: { $lt: ['$memberCount', '$targetSize'] },
       },
       { $inc: { memberCount: 1 } },
@@ -241,13 +253,24 @@ const confirmCapturedPayment = async (paymentOrId, entity, { source = 'webhook' 
         reason: 'target_reached',
         session,
       });
-      return { outcome: 'joined', full };
+      return { outcome: 'joined', full, seatGroup };
     }
-    return { outcome: 'joined' };
+    return { outcome: 'joined', seatGroup };
   });
 
   // Live counter + new-member animation for everyone watching (LIV-1)
-  if (result.outcome === 'joined') await publishNewMember(groupId, payment.userId);
+  if (result.outcome === 'joined') {
+    await publishNewMember(groupId, payment.userId);
+    // Seller-led deal: a tier may have just unlocked (AUC-9)
+    await onDealMemberJoined(result.seatGroup);
+    // Seat taken after a win (waitlist offer): this member needs a deal code too
+    if ([GROUP_STATUS.WON, GROUP_STATUS.PURCHASING].includes(result.seatGroup.status)) {
+      const member = await GroupMember.findOne({ groupId, userId: payment.userId })
+        .select('_id dealCode')
+        .lean();
+      if (member) await issueDealCode(member);
+    }
+  }
   if (result.full) await runGroupEffects(result.full, GROUP_STATUS.OPEN);
   if (result.outcome === 'seat_unavailable' || result.outcome === 'mismatch') {
     await queueRefund(payment._id, {
