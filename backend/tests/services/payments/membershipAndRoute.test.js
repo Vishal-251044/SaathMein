@@ -148,6 +148,28 @@ describe('leaveGroup', () => {
     expect(Group.findById).toHaveBeenCalledTimes(3); // load, live counter, offerNextSeat
   });
 
+  it('after a win, takes the held token back from the dealer before refunding (exit window)', async () => {
+    const exitEnds = new Date(Date.now() + 3_600_000);
+    given(group({ status: 'won', exitWindowEndsAt: exitEnds }));
+    const held = {
+      ...payment,
+      status: 'transferred',
+      transfer: {
+        razorpayTransferId: 'trf_1',
+        amountPaise: 50_000,
+        commissionPaise: 50_000,
+        status: 'processed',
+      },
+    };
+    Payment.findOne.mockReturnValue(lean(held));
+    Payment.findById.mockReturnValue(lean(held));
+    await membership.leaveGroup(groupId, userId);
+    expect(razorpay.reverseTransfer).toHaveBeenCalledWith('trf_1', 50_000);
+    expect(enqueueRefund).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'left_after_win', amountPaise: 90_100, feePaise: 9_900 }),
+    );
+  });
+
   it('does not refund when the group changed meanwhile (auction started)', async () => {
     given(group());
     Group.updateOne.mockResolvedValue({ modifiedCount: 0 });
@@ -216,6 +238,31 @@ describe('Route transfers', () => {
       ],
       { id: 'session' },
     );
+  });
+
+  it('re-transfers a token whose earlier transfer was reversed (runner-up takes over)', async () => {
+    Payment.findById.mockReturnValue(
+      lean({ ...payment, transfer: { status: 'reversed', razorpayTransferId: 'trf_old' } }),
+    );
+    Seller.findById.mockReturnValue(lean({ razorpayAccountId: 'acc_D2' }));
+    razorpay.createTransfer.mockResolvedValue({ items: [{ id: 'trf_2' }] });
+    const result = await route.createHeldTransfer(paymentId, {
+      sellerId: 's2',
+      pricePerUnitPaise: 9_000_000,
+      commissionRule: rule,
+    });
+    expect(result.outcome).toBe('created');
+  });
+
+  it('does not create a second transfer while one is live', async () => {
+    Payment.findById.mockReturnValue(lean({ ...payment, transfer: { status: 'processed' } }));
+    const result = await route.createHeldTransfer(paymentId, {
+      sellerId: 's1',
+      pricePerUnitPaise: 9_000_000,
+      commissionRule: rule,
+    });
+    expect(result.outcome).toBe('already');
+    expect(razorpay.createTransfer).not.toHaveBeenCalled();
   });
 
   it('never transfers a refunded token', async () => {

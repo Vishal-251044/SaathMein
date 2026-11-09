@@ -25,6 +25,7 @@ const { getAuctionSettings } = require('../settings.service');
 const { emitToGroup } = require('../../sockets/emitter');
 const { ineligibilityReason } = require('../auction/eligibility');
 const { issueDealCodes } = require('../auction/dealCode.service');
+const { holdGroupTransfersSafe } = require('../auction/settlement.service');
 const { toProductCard } = require('../catalog/productPresenter');
 const {
   GROUP_STATUS,
@@ -247,6 +248,7 @@ const closeSellerDeal = async (group, reason) => {
     },
   });
   await issueDealCodes(group._id);
+  await holdGroupTransfersSafe(group._id); // PAY-4
   const seller = await Seller.findById(group.sellerId).select('businessName').lean();
   await notifyGroupMembers(updated, NOTIFICATION_TYPE.AUCTION_WON, {
     price: formatINR(pricePaise),

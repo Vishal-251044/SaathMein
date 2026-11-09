@@ -56,6 +56,8 @@ const ERROR_KEYS: Record<string, string> = {
   TOO_MANY_PINNED: 'errors.tooManyPinned',
   OWN_MESSAGE: 'errors.validation',
   POLL_CLOSED: 'errors.pollClosed',
+  // Auctions (Day 9)
+  AUCTION_NOT_LIVE: 'errors.groupChanged',
   // Firebase phone auth (PhoneAuthError.code)
   INVALID_CODE: 'errors.invalidCode',
   CODE_EXPIRED: 'errors.codeExpired',

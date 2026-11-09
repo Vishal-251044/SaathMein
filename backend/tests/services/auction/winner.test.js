@@ -23,6 +23,10 @@ jest.mock('../../../src/services/auction/dealCode.service', () => ({
   issueDealCodes: jest.fn(async () => 5),
   clearDealCodes: jest.fn(),
 }));
+jest.mock('../../../src/services/auction/settlement.service', () => ({
+  holdGroupTransfersSafe: jest.fn(),
+  reverseGroupTransfers: jest.fn(async () => ({ reversed: 0, failed: 0 })),
+}));
 jest.mock('../../../src/services/settings.service', () => ({
   getAuctionSettings: jest.fn(async () => ({
     exitWindowHours: 24,
@@ -39,6 +43,7 @@ const SellerStaff = require('../../../src/models/sellerStaff.model');
 const AuctionDealer = require('../../../src/models/auctionDealer.model');
 const Product = require('../../../src/models/product.model');
 const { transition } = require('../../../src/services/groups/stateMachine');
+const settlement = require('../../../src/services/auction/settlement.service');
 const {
   issueDealCodes,
   clearDealCodes,
@@ -111,6 +116,8 @@ describe('declareWinner', () => {
       { $set: { status: 'runner_up' } },
     );
     expect(issueDealCodes).toHaveBeenCalledWith(group._id);
+    // Tokens go to the dealer on hold (PAY-4)
+    expect(settlement.holdGroupTransfersSafe).toHaveBeenCalledWith(group._id);
   });
 });
 
@@ -143,6 +150,7 @@ describe('backOut', () => {
       'auction_suspension',
     ]);
     expect(clearDealCodes).toHaveBeenCalled();
+    expect(settlement.reverseGroupTransfers).toHaveBeenCalledWith('g', 'dealer_backed_out');
     const [, to, options] = transition.mock.calls[0];
     expect(to).toBe(S.RUNNER_UP);
     expect(options.ctx.runnerUpBidId).toBe(runnerUp._id);

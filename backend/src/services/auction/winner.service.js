@@ -29,6 +29,7 @@ const emailService = require('../email.service');
 const { emitToAuction } = require('../../sockets/emitter');
 const { toPublicSeller } = require('../seller/sellerPresenter');
 const { issueDealCodes, clearDealCodes } = require('./dealCode.service');
+const { holdGroupTransfersSafe, reverseGroupTransfers } = require('./settlement.service');
 const {
   BID_STATUS,
   GROUP_STATUS,
@@ -122,6 +123,8 @@ const declareWinner = async (group, winnerBid, runnerUpBid, { reason, actor } = 
   }
 
   await issueDealCodes(group._id);
+  // Tokens minus commission to the dealer, on hold until each purchase is confirmed (PAY-4)
+  await holdGroupTransfersSafe(group._id);
   await announceWinner(updated, winnerBid);
   log.info(
     { groupId: String(group._id), price: winnerBid.pricePerUnitPaise, reason },
@@ -213,6 +216,8 @@ const backOut = async (groupId, { sellerId, userId }, reason) => {
   );
   await AuctionDealer.updateOne({ groupId, sellerId }, { $set: { status: 'backed_out' } });
   await clearDealCodes(groupId);
+  // Take the held tokens back before they go to the runner-up or are refunded (PAY-4)
+  await reverseGroupTransfers(groupId, 'dealer_backed_out');
   log.warn({ groupId, sellerId, reason }, 'Winning dealer backed out');
 
   const runnerUpBid = group.auction?.runnerUpBidId
@@ -293,6 +298,7 @@ const respondToRunnerUpOffer = async (groupId, { sellerId, userId }, accept) => 
   await Bid.updateOne({ _id: bid._id }, { $set: { status: BID_STATUS.WON } });
   await AuctionDealer.updateOne({ groupId, sellerId }, { $set: { status: 'won' } });
   await issueDealCodes(groupId);
+  await holdGroupTransfersSafe(groupId);
   await announceWinner(updated, bid);
   return updated;
 };

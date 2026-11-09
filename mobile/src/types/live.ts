@@ -13,6 +13,10 @@ export const SOCKET_EVENTS = {
   CHAT_MESSAGE: 'chat:message',
   CHAT_UPDATE: 'chat:update',
   NOTIFICATION: 'notification:new',
+  AUCTION_LOWEST: 'auction:lowest',
+  AUCTION_EXTENDED: 'auction:extended',
+  AUCTION_WON: 'auction:won',
+  DEAL_TIER: 'deal:tier',
 } as const;
 
 export interface GroupCountEvent {
@@ -69,4 +73,22 @@ export interface AppNotification {
   data: { groupId?: string; url?: string; type?: string };
   read: boolean;
   createdAt: string;
+}
+
+/** New lowest price (shared numbers only, never dealer names — AUC-6). */
+export interface AuctionLowestEvent {
+  groupId: string;
+  lowestPricePaise: number | null;
+  savedPerMemberPaise: number | null;
+  dealerCount: number;
+  bidCount: number;
+  endsAt: string | null;
+  extensions: number;
+}
+
+export interface AuctionExtendedEvent {
+  groupId: string;
+  endsAt: string;
+  extensions?: number;
+  closedAt?: string;
 }

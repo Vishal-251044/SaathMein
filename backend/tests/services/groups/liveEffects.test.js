@@ -20,6 +20,9 @@ jest.mock('../../../src/services/payments/refund.service', () => ({
     GROUP_CANCELLED: 'group_cancelled',
   },
 }));
+jest.mock('../../../src/services/auction/settlement.service', () => ({
+  reverseGroupTransfers: jest.fn(async () => ({ reversed: 0, failed: 0 })),
+}));
 jest.mock('../../../src/jobs/queues', () => ({ scheduleAuctionClose: jest.fn() }));
 jest.mock('../../../src/models/group.model', () => ({
   find: jest.fn(),

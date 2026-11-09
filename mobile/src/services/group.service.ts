@@ -79,6 +79,23 @@ export async function extendGroup(groupId: string): Promise<GroupDetail> {
 export async function startAuctionEarly(groupId: string): Promise<GroupDetail> {
   return (await unwrap<{ group: GroupDetail }>(api.post(`/groups/${groupId}/start-auction`))).group;
 }
+/**
+ * Leader: accept the only dealer's price, or cancel with full refunds (decided 8 Nov 2026).
+ * @param input.accept - true = buy at that price
+ */
+export async function decideSingleBid({
+  groupId,
+  accept,
+}: {
+  groupId: string;
+  accept: boolean;
+}): Promise<GroupDetail> {
+  return (
+    await unwrap<{ group: GroupDetail }>(
+      api.post(`/groups/${groupId}/auction/decision`, { accept }),
+    )
+  ).group;
+}
 
 /** Leader: cancel a group nobody has paid for. */
 export async function cancelGroup(groupId: string): Promise<GroupDetail> {

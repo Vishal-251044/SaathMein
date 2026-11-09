@@ -106,6 +106,14 @@ function useLeaderAction(action: (groupId: string) => Promise<GroupDetail>) {
 export const useExtendGroup = () => useLeaderAction(groupService.extendGroup);
 /** @returns Mutation: start the auction early */
 export const useStartAuctionEarly = () => useLeaderAction(groupService.startAuctionEarly);
+/** @returns Mutation `{ groupId, accept }`: the leader's answer when only one dealer bid */
+export function useDecideSingleBid() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: groupService.decideSingleBid,
+    onSuccess: (group) => cacheGroup(queryClient, group),
+  });
+}
 /** @returns Mutation: cancel an empty group */
 export const useCancelGroup = () => useLeaderAction(groupService.cancelGroup);
 

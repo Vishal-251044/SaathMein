@@ -3,7 +3,7 @@
  * Use these instead of inline animation values. Only transform and opacity are animated.
  * Layout animations follow the phone's "reduce motion" setting (ReduceMotion.System).
  */
-import { Easing, FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
+import { Easing, FadeIn, FadeInDown, ReduceMotion, ZoomIn } from 'react-native-reanimated';
 
 /** Durations in ms (fast and subtle: 150–400 ms). */
 export const DURATION = { fast: 150, base: 250, slow: 400 } as const;
@@ -32,3 +32,11 @@ export function enterUp(index = 0, stagger = 60) {
 
 /** Plain fade entrance. */
 export const enterFade = FadeIn.duration(DURATION.base).reduceMotion(ReduceMotion.System);
+
+/** New lowest auction price: the number drops in from above (AUC-9). */
+export const enterPriceDrop = FadeInDown.duration(DURATION.base)
+  .easing(EASE_OUT)
+  .reduceMotion(ReduceMotion.System);
+
+/** Small pop for badges such as "New lowest price" or "Tier unlocked". */
+export const enterPop = ZoomIn.duration(DURATION.base).reduceMotion(ReduceMotion.System);

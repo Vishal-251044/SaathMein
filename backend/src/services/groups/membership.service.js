@@ -13,6 +13,7 @@ const { createLogger } = require('../../utils/logger');
 const { withTransaction } = require('../../utils/transaction');
 const { getPaymentSettings } = require('../settings.service');
 const { queueRefund, REFUND_REASON } = require('../payments/refund.service');
+const { reverseHeldTransfer } = require('../payments/route.service');
 const { isQuietHours, quietHoursEnd } = require('../notifications/notification.service');
 const { publishGroupCount, notifyAboutGroup } = require('./groupLive');
 const {
@@ -151,7 +152,11 @@ const loadMember = async (groupId, userId) => {
   if (!group) throw ApiError.notFound('Group not found');
   const membership = await GroupMember.findOne({ groupId, userId }).lean();
   const payment = membership?.paymentId
-    ? await Payment.findOne({ _id: membership.paymentId, status: PAYMENT_STATUS.PAID }).lean()
+    ? await Payment.findOne({
+        _id: membership.paymentId,
+        // After a win the token may be held at the dealer (transferred, on hold)
+        status: { $in: [PAYMENT_STATUS.PAID, PAYMENT_STATUS.TRANSFERRED] },
+      }).lean()
     : null;
   return { group, membership, payment };
 };
@@ -186,6 +191,12 @@ const leaveGroup = async (groupId, userId) => {
         : 'You are not a paid member of this group',
       { code: 'CANNOT_LEAVE', details: { reason: terms.reason } },
     );
+  }
+
+  // Token held at the dealer (exit window after a win): take it back first, so it can be
+  // refunded (PAY-4). If this fails the member stays and can try again.
+  if (payment.status === PAYMENT_STATUS.TRANSFERRED) {
+    await reverseHeldTransfer(payment._id, 'member_exit');
   }
 
   await withTransaction(async (session) => {

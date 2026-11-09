@@ -3,7 +3,9 @@
  * status timeline, share code, and the leader's tools (extend / start early, join
  * requests, cancel an empty group), joining with the token / waitlist / leaving with a
  * refund (Day 7) and my money timeline, live updates over Socket.io with a polling
- * fallback, chat entry and WhatsApp sharing (Day 8). The live auction card comes on Day 9.
+ * fallback, chat entry and WhatsApp sharing (Day 8). Day 9: live auction card (falling
+ * price, chart, timer), the leader's single-dealer decision, seller-led deal tiers and the
+ * winner card with my deal code and the 24 h exit window.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -27,6 +29,10 @@ import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { GroupStatusTimeline } from '@/components/features/GroupStatusTimeline';
 import { JoinGroupBar } from '@/components/features/JoinGroupBar';
+import { DealTierLadder } from '@/components/features/auction/DealTierLadder';
+import { LiveAuctionCard } from '@/components/features/auction/LiveAuctionCard';
+import { SingleBidDecisionCard } from '@/components/features/auction/SingleBidDecisionCard';
+import { WinnerCard } from '@/components/features/auction/WinnerCard';
 import { NewMemberToast } from '@/components/features/NewMemberToast';
 import { JoinRequestsCard } from '@/components/features/JoinRequestsCard';
 import { LeaderDecisionCard } from '@/components/features/LeaderDecisionCard';
@@ -209,6 +215,26 @@ export default function GroupScreen() {
                 </AppText>
               </View>
             </Animated.View>
+
+            {['won', 'purchasing', 'completed'].includes(group.status) ? (
+              <WinnerCard group={group} />
+            ) : null}
+            {group.status === 'runner_up' ? (
+              <Notice tone="info" message={t('auction.runnerUpNotice')} />
+            ) : null}
+            {group.auction && group.status === 'auction_live' ? (
+              <Animated.View entering={enterUp(2)} className="gap-4">
+                <SingleBidDecisionCard group={group} />
+                <LiveAuctionCard auction={group.auction} />
+              </Animated.View>
+            ) : null}
+            {group.deal ? (
+              <DealTierLadder
+                deal={group.deal}
+                memberCount={group.memberCount}
+                isOpen={['open', 'full'].includes(group.status)}
+              />
+            ) : null}
 
             {group.leaderDecision ? <LeaderDecisionCard group={group} /> : null}
             {group.isLeader && group.requiresApproval && group.status === 'open' ? (

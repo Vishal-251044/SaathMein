@@ -29,7 +29,10 @@ const log = createLogger('RouteService');
 const createHeldTransfer = async (paymentId, { sellerId, pricePerUnitPaise, commissionRule }) => {
   const payment = await Payment.findById(paymentId).lean();
   if (!payment) throw ApiError.notFound('Payment not found');
-  if (payment.transfer && payment.transfer.status !== 'failed') return { outcome: 'already' };
+  // A failed or reversed transfer (dealer backed out) can be replaced by a new one
+  if (payment.transfer && !['failed', 'reversed'].includes(payment.transfer.status)) {
+    return { outcome: 'already' };
+  }
   if (payment.status !== PAYMENT_STATUS.PAID || committedRefundPaise(payment) > 0) {
     throw ApiError.conflict('This token was refunded, so it cannot go to the dealer', {
       code: 'TOKEN_NOT_HELD',

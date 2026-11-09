@@ -12,6 +12,7 @@
 const { scheduleAuctionClose } = require('../../jobs/queues');
 const { createLogger } = require('../../utils/logger');
 const { refundGroupMembers, REFUND_REASON } = require('../payments/refund.service');
+const { reverseGroupTransfers } = require('../auction/settlement.service');
 const { publishGroupStatus, notifyGroupMembers, groupRecipients } = require('./groupLive');
 const { GROUP_STATUS, GROUP_TYPE, NOTIFICATION_TYPE } = require('../../constants/enums');
 
@@ -53,6 +54,8 @@ const runGroupEffects = async (group, from) => {
     if (reason) {
       // Who to tell, read before refunds mark members refunded
       const recipients = await groupRecipients(group._id);
+      // Tokens held at a dealer come back first (only refundable once reversed)
+      await reverseGroupTransfers(group._id, `group_${group.status}`);
       const count = await refundGroupMembers(group._id, reason);
       if (recipients.length) {
         await notifyGroupMembers(group, NOTIFICATION_TYPE.GROUP_ENDED, {}, { userIds: recipients });

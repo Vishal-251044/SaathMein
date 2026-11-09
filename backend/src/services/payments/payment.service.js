@@ -25,6 +25,7 @@ const { runGroupEffects } = require('../groups/groupEffects');
 const { publishNewMember } = require('../groups/groupLive');
 const { onDealMemberJoined } = require('../deals/deal.service');
 const { issueDealCode } = require('../auction/dealCode.service');
+const { holdGroupTransfersSafe } = require('../auction/settlement.service');
 const razorpay = require('./razorpay.service');
 const { recordLedger } = require('./ledger.service');
 const { queueRefund, REFUND_REASON } = require('./refund.service');
@@ -269,6 +270,8 @@ const confirmCapturedPayment = async (paymentOrId, entity, { source = 'webhook' 
         .select('_id dealCode')
         .lean();
       if (member) await issueDealCode(member);
+      // The new member's token joins the dealer's held transfers (PAY-4)
+      await holdGroupTransfersSafe(groupId);
     }
   }
   if (result.full) await runGroupEffects(result.full, GROUP_STATUS.OPEN);

@@ -78,11 +78,19 @@ export interface GroupDetail extends GroupCard {
     waitlistPosition: number | null;
     /** A freed seat is held for me until then (pay to take it). */
     seatOfferExpiresAt: string | null;
+    /** Show at the dealer after the group is won (AUC-8). */
+    dealCode: string | null;
   } | null;
   /** Kept from the token if I leave after seats lock. */
   backoutFeePaise: number;
   statusHistory: GroupStatusEntry[];
-  auction: { startsAt: string; endsAt: string; dealerCount: number } | null;
+  auction: GroupAuction | null;
+  /** Seller-led deals only (AUC-9). */
+  deal: GroupDeal | null;
+  /** Price per unit after a win. */
+  winningPricePaise: number | null;
+  /** Members may leave (refund minus back-out fee) until then. */
+  exitWindowEndsAt: string | null;
   leaderDecision: { dueAt: string; canExtend: boolean; canStartEarly: boolean } | null;
   awaitingLeaderDecision: boolean;
   canCancel: boolean;
@@ -110,4 +118,52 @@ export interface JoinRequest {
   firstName: string | null;
   avatarUrl: string | null;
   requestedAt: string;
+}
+
+/** Public dealer card (winner of an auction, or the dealer of a seller-led deal). */
+export interface PublicDealer {
+  id: string;
+  businessName: string;
+  area: string | null;
+  rating: number | null;
+  ratingCount: number;
+  verified: boolean;
+  address: { line1?: string; area?: string; pincode?: string } | null;
+}
+
+/** Live auction for buyers (AUC-9): anonymous falling price, never dealer names while live. */
+export interface GroupAuction {
+  status: GroupStatus;
+  ceilingPaise: number | null;
+  lowestPricePaise: number | null;
+  savedPerMemberPaise: number | null;
+  dealerCount: number;
+  joinedDealerCount: number;
+  bidCount: number;
+  startsAt: string | null;
+  endsAt: string | null;
+  extensions: number;
+  closedAt: string | null;
+  paused: boolean;
+  history: { pricePaise: number; at: string }[];
+  winner: (PublicDealer & { pricePaise: number | null }) | null;
+  /** Only one dealer bid: the leader accepts that price or cancels (decided 8 Nov 2026). */
+  singleBidDecision: { dueAt: string; pricePaise: number; canDecide: boolean } | null;
+}
+
+export interface DealTier {
+  size: number;
+  discountBps: number;
+  pricePaise: number;
+}
+
+/** Seller-led deal (AUC-9): price drops as tiers unlock. */
+export interface GroupDeal {
+  basePricePaise: number;
+  tiers: DealTier[];
+  currentTier: DealTier | null;
+  nextTier: DealTier | null;
+  pricePaise: number;
+  membersToNext: number | null;
+  seller: PublicDealer | null;
 }

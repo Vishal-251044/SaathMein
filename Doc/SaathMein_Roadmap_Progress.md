@@ -274,21 +274,33 @@ Notes:
 ### Day 9 — Dealer Live Auction: Lowest Price Wins (Tue 3 Nov)
 **Done when:** a full group of 5 test buyers gets live bids from 3 test dealers; each bid must beat the lowest; a last-minute bid extends the timer; at close the lowest dealer wins automatically and all 5 members get deal codes for that dealer.
 
-- [ ] Mobile: live auction card (falling price, dealers bidding, time left, "₹X saved so far")
-- [ ] Mobile: price-drop chart and "new lowest price" animation
-- [ ] Mobile: winner screen (dealer name, address, rating, final price)
-- [ ] Mobile: 24 h exit window with refund preview
-- [ ] Mobile: seller-led deal page (tier ladder, "X more to unlock")
-- [ ] Backend: group full → auction_live; notify eligible dealers (city, category, rating)
-- [ ] Backend: `POST /seller/auctions/:groupId/join` (commitment) and `/bids` (ceiling, min step, breakdown totals, atomic lowest-price update)
-- [ ] Backend: socket events auction:lowest, auction:extended, auction:won; outbid push + email
-- [ ] Backend: auction close job (exactly once; lowest wins, earliest on tie; deal codes for all members)
-- [ ] Backend: anti-sniping, minimum-dealers rule, runner-up fallback
-- [ ] Backend: `POST /seller/deals` with tiers; automatic tier-unlock broadcast
-- [ ] Web: dealer Live auctions list and Upcoming groups
-- [ ] Web: dealer bid screen (price + breakdown, current lowest, my rank, timer)
-- [ ] Web: dealer Won groups with members and deal codes
-- [ ] Tests: concurrent bids, tie, extension, runner-up, 0 / 1 dealer
+- [x] Mobile: live auction card (falling price, dealers bidding, time left, "₹X saved so far")
+- [x] Mobile: price-drop chart and "new lowest price" animation
+- [x] Mobile: winner screen (dealer name, address, rating, final price)
+- [x] Mobile: 24 h exit window with refund preview
+- [x] Mobile: seller-led deal page (tier ladder, "X more to unlock")
+- [x] Backend: group full → auction_live; notify eligible dealers (city, category, rating)
+- [x] Backend: `POST /seller/auctions/:groupId/join` (commitment) and `/bids` (ceiling, min step, breakdown totals, atomic lowest-price update)
+- [x] Backend: socket events auction:lowest, auction:extended, auction:won; outbid push + email
+- [x] Backend: auction close job (exactly once; lowest wins, earliest on tie; deal codes for all members)
+- [x] Backend: anti-sniping, minimum-dealers rule, runner-up fallback
+- [x] Backend: `POST /seller/deals` with tiers; automatic tier-unlock broadcast
+- [x] Web: dealer Live auctions list and Upcoming groups
+- [x] Web: dealer bid screen (price + breakdown, current lowest, my rank, timer)
+- [x] Web: dealer Won groups with members and deal codes
+- [x] Tests: concurrent bids, tie, extension, runner-up, 0 / 1 dealer
+
+Notes:
+- Built 9 Nov 2026. Backend: 484 tests pass (bid rules incl. the compare-and-set race, min step, ceiling, breakdown, anti-sniping cap; close: tie, min-dealers extension, 0 / 1 dealer; winner, back-out, runner-up, timeouts; deal tiers; eligibility; settlement holds/reversals; exit-window refund; dealer route permissions). Web builds; mobile typecheck + lint pass.
+- Decisions (8 Nov 2026): open question 2 → verified dealers with fewer than 3 reviews may bid (3.5 minimum applies from 3 reviews); open question 4 → seller-led deal below its first tier at the deadline is expired and every token refunded; only one dealer after the 24 h minimum-dealers extension → bidding stops and the leader has 24 h to accept that price or cancel with full refunds (no answer = cancel).
+- Rules live in `settings.auctions` (min rating, reviews for rating, extensions, decision / exit / runner-up hours, price-alert throttle, bid cooldown, back-out suspension days) and the category's `rules.auction` (duration, ₹200 / 0.25% step, 5 min anti-sniping ×6, min 2 dealers). The ceiling is the city's catalog price for the variant (cheapest variant for "any variant").
+- Bids: inside a transaction, compare-and-set on the current lowest bid + end time, so two simultaneous bids cannot both win (the loser gets `BID_RACE` and retries). Bids are permanent. Dealers see only the anonymous lowest price and their own rank; buyers see the falling price, never dealer names, until the result.
+- Close runs once (job id per end time + Redis lock + state machine). Won → 24 h exit window (leave = refund minus back-out fee; freed seats go to the waitlist at the same price), deal codes (10 characters) for every seated member.
+- Money (PAY-4): on every win (auction, runner-up, seller-led deal, seat taken after a win) each seated token minus commission goes to the dealer's Razorpay linked account ON HOLD; reversed first when the dealer backs out, the group ends, or a member leaves in the exit window; the minute sweep retries failed holds. A reversed transfer can be replaced (runner-up).
+- Back-out (owner only on the web): rating penalty + 30-day auction suspension; the group is offered to the runner-up for 24 h, else cancelled / no deal with full refunds.
+- Web: socket.io-client 4.8.1 added (approved list); `NEXT_PUBLIC_SOCKET_URL` added to `web/.env.local` + `.env.example`.
+- MOVED to Day 10: the winning dealer joining the group chat (Day 8 note); deal-code QR + scan / confirm.
+- Not verified end-to-end yet (needs MongoDB, Redis + worker, Razorpay test keys, dealers with Route accounts). "Done when" check: 5 test buyers fill a group; 3 verified test dealers join from /seller/auctions and bid; place one bid in the last 5 minutes (timer +5 min); after close the lowest dealer wins and all 5 members see their deal code on the group page.
 
 ### Day 10 — Deal Codes, Purchases & Commission (Wed 4 Nov)
 **Done when:** the winning dealer scans a deal code; the purchase completes; the Route hold is released to the dealer minus commission in test mode; the buyer gets a saving card and leaves a review.
@@ -472,3 +484,6 @@ Notes:
 | 30 Oct 2026 | Deadline at ≥70%: leader has 48 h to extend once (+7 days, capped at category max) or start early; else expired | Day 6 |
 | 8 Nov 2026 | Open question 1: token is a part-payment of the bill; dealer gets token minus commission via Route (on hold) | Days 7, 9, 10 |
 | 8 Nov 2026 | Open question 3: buyer convenience fee charged at purchase, ₹0 at launch | Days 7, 10 |
+| 8 Nov 2026 | Open question 2: verified unrated dealers (< 3 reviews) may bid; 3.5 minimum once rated | Day 9 |
+| 8 Nov 2026 | Open question 4: seller-led deal below its first tier at the deadline → expired, all tokens refunded | Day 9 |
+| 8 Nov 2026 | Single dealer after the minimum-dealers extension → leader has 24 h to accept or cancel (refund all); no answer = cancel | Day 9 |

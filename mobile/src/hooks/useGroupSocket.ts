@@ -1,6 +1,7 @@
 /**
  * useGroupSocket — follow one group live (LIV-1): joins its room, applies the counter,
- * new members, status changes and chat messages straight into the TanStack Query cache,
+ * new members, status changes, chat messages and the live auction (falling price, timer
+ * extensions, winner, deal tier unlocks — Day 9) straight into the TanStack Query cache,
  * and reports whether we are live so screens can fall back to polling.
  */
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
@@ -14,6 +15,8 @@ import {
 } from '@/lib/socket';
 import type { GroupDetail } from '@/types/group';
 import {
+  type AuctionExtendedEvent,
+  type AuctionLowestEvent,
   type ChatMessage,
   type ChatPage,
   type GroupCountEvent,
@@ -85,6 +88,46 @@ export function useGroupSocket(groupId: string | undefined, code?: string) {
       queryClient.invalidateQueries({ queryKey: ['group', groupId] });
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     };
+    // Falling price: merge the shared numbers and add a point to the price chart
+    const onLowest = (event: AuctionLowestEvent) => {
+      if (event.groupId !== groupId) return;
+      queryClient.setQueryData<GroupDetail>(['group', groupId], (group) => {
+        if (!group?.auction) return group;
+        const { groupId: _id, ...numbers } = event;
+        const history =
+          event.lowestPricePaise != null
+            ? [
+                ...group.auction.history,
+                { pricePaise: event.lowestPricePaise, at: new Date().toISOString() },
+              ]
+            : group.auction.history;
+        return { ...group, auction: { ...group.auction, ...numbers, history } };
+      });
+    };
+    const onExtended = (event: AuctionExtendedEvent) => {
+      if (event.groupId !== groupId) return;
+      if (event.closedAt) {
+        // Bidding stopped with one dealer: the leader's decision card needs fresh data
+        queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+        return;
+      }
+      queryClient.setQueryData<GroupDetail>(['group', groupId], (group) =>
+        group?.auction
+          ? {
+              ...group,
+              auction: {
+                ...group.auction,
+                endsAt: event.endsAt,
+                extensions: event.extensions ?? group.auction.extensions,
+              },
+            }
+          : group,
+      );
+    };
+    // Winner, deal codes, tier unlocks change many fields: reload the page data
+    const onReload = ({ groupId: id }: { groupId: string }) => {
+      if (id === groupId) queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+    };
     const onChat = ({ groupId: id, message }: { groupId: string; message: ChatMessage }) => {
       if (id !== groupId) return;
       queryClient.setQueryData<InfiniteData<ChatPage>>(chatKey(groupId), (data) =>
@@ -99,6 +142,10 @@ export function useGroupSocket(groupId: string | undefined, code?: string) {
     socket.on(SOCKET_EVENTS.GROUP_STATUS, onStatus);
     socket.on(SOCKET_EVENTS.CHAT_MESSAGE, onChat);
     socket.on(SOCKET_EVENTS.CHAT_UPDATE, onChat);
+    socket.on(SOCKET_EVENTS.AUCTION_LOWEST, onLowest);
+    socket.on(SOCKET_EVENTS.AUCTION_EXTENDED, onExtended);
+    socket.on(SOCKET_EVENTS.AUCTION_WON, onReload);
+    socket.on(SOCKET_EVENTS.DEAL_TIER, onReload);
 
     return () => {
       socket.emit(SOCKET_EVENTS.LEAVE_GROUP, { groupId });
@@ -108,6 +155,10 @@ export function useGroupSocket(groupId: string | undefined, code?: string) {
       socket.off(SOCKET_EVENTS.GROUP_STATUS, onStatus);
       socket.off(SOCKET_EVENTS.CHAT_MESSAGE, onChat);
       socket.off(SOCKET_EVENTS.CHAT_UPDATE, onChat);
+      socket.off(SOCKET_EVENTS.AUCTION_LOWEST, onLowest);
+      socket.off(SOCKET_EVENTS.AUCTION_EXTENDED, onExtended);
+      socket.off(SOCKET_EVENTS.AUCTION_WON, onReload);
+      socket.off(SOCKET_EVENTS.DEAL_TIER, onReload);
     };
   }, [groupId, code, queryClient]);
 
