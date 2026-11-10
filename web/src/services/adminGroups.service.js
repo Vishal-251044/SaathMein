@@ -2,6 +2,7 @@
  * Admin groups service — /api/admin/groups (read-only list + CSV export, MON-1).
  */
 import api from '@/services/api';
+import { saveBlob } from '@/utils/genericFunctions';
 
 /**
  * @param {{ cityId?: string, categoryId?: string, status?: string, visibility?: string,
@@ -23,12 +24,5 @@ export const downloadGroupsCsv = async (params) => {
     params: { ...params, format: 'csv', page: undefined, limit: undefined },
     responseType: 'blob',
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `saathmein-groups-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  saveBlob(blob, `saathmein-groups-${new Date().toISOString().slice(0, 10)}.csv`);
 };

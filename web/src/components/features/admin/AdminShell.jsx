@@ -24,9 +24,9 @@ export default function AdminShell({ children }) {
   const roleLabel = STAFF_ROLE_LABELS[staff.role] || staff.role;
 
   return (
-    <div className="min-h-dvh bg-bg-band lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="min-h-dvh bg-bg-band lg:grid lg:grid-cols-[260px_minmax(0,1fr)] print:block! print:bg-white">
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh border-r border-line bg-surface lg:block">
+      <aside className="sticky top-0 hidden h-dvh print:hidden border-r border-line bg-surface lg:block">
         <AdminSidebar role={staff.role} />
       </aside>
 
@@ -71,7 +71,7 @@ export default function AdminShell({ children }) {
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur-md sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 print:hidden items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur-md sm:px-6">
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}

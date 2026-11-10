@@ -17,6 +17,7 @@ import {
   MapPin,
   Shapes,
   Inbox,
+  Receipt,
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
@@ -38,6 +39,7 @@ export const ADMIN_NAV_ITEMS = [
     roles: ['admin', 'deal_manager', 'support'],
   },
   { label: 'Auctions', icon: Gavel, availableOn: 'Day 9', roles: ['admin', 'deal_manager'] },
+  { label: 'Commissions', href: '/admin/commissions', icon: Receipt, roles: ['admin', 'finance'] },
   { label: 'Payments', icon: CreditCard, availableOn: 'Day 13', roles: ['admin', 'finance'] },
   { label: 'Disputes', icon: Scale, availableOn: 'Day 12', roles: ['admin', 'support'] },
   { label: 'Curation', icon: Megaphone, availableOn: 'Day 11', roles: ['admin'] },

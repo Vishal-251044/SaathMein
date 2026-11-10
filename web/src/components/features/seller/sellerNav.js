@@ -23,8 +23,8 @@ export const SELLER_NAV_ITEMS = [
   { label: 'Live auctions', href: '/seller/auctions', icon: Gavel },
   { label: 'Won groups', href: '/seller/won', icon: Trophy },
   { label: 'Group deals', href: '/seller/deals', icon: Tags },
-  { label: 'Purchases', icon: ShoppingBag, availableOn: 'Day 10' },
-  { label: 'Payouts', icon: IndianRupee, availableOn: 'Day 10' },
+  { label: 'Purchases', href: '/seller/purchases', icon: ShoppingBag },
+  { label: 'Payouts', href: '/seller/payouts', icon: IndianRupee },
   { label: 'Insights', icon: LineChart, availableOn: 'Day 17' },
 ];
 

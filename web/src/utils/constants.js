@@ -48,6 +48,9 @@ export const ROUTES = Object.freeze({
   SELLER_WON: '/seller/won',
   SELLER_DEALS: '/seller/deals',
   SELLER_DEAL_NEW: '/seller/deals/new',
+  SELLER_PURCHASES: '/seller/purchases',
+  SELLER_PAYOUTS: '/seller/payouts',
+  SELLER_INVOICES: '/seller/invoices',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
 });

@@ -90,8 +90,8 @@ export default function SellerShell({ seller, children }) {
   const kyc = KYC_STATUS_META[seller.kyc.status] || KYC_STATUS_META.not_submitted;
 
   return (
-    <div className="min-h-dvh bg-bg-band lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-dvh border-r border-line bg-surface lg:block">
+    <div className="min-h-dvh bg-bg-band lg:grid lg:grid-cols-[260px_minmax(0,1fr)] print:block! print:bg-white">
+      <aside className="sticky top-0 hidden h-dvh print:hidden border-r border-line bg-surface lg:block">
         <SellerSidebar role={seller.role} />
       </aside>
 
@@ -135,7 +135,7 @@ export default function SellerShell({ seller, children }) {
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur-md sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 print:hidden items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur-md sm:px-6">
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}

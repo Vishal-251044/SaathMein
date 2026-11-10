@@ -99,3 +99,19 @@ export const formatDateTime = (value) =>
         minute: '2-digit',
       })
     : '';
+
+/**
+ * Save a downloaded file (e.g. a CSV export) in the browser.
+ * @param {Blob} blob - File contents
+ * @param {string} filename - Suggested file name
+ */
+export const saveBlob = (blob, filename) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
