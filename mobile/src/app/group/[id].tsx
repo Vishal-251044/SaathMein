@@ -5,7 +5,8 @@
  * refund (Day 7) and my money timeline, live updates over Socket.io with a polling
  * fallback, chat entry and WhatsApp sharing (Day 8). Day 9: live auction card (falling
  * price, chart, timer), the leader's single-dealer decision, seller-led deal tiers and the
- * winner card with my deal code and the 24 h exit window.
+ * winner card with my deal code and the 24 h exit window. Day 10: deal-code ticket (QR),
+ * invoice upload, "You saved ₹X" card and the dealer review.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import {
@@ -33,6 +34,9 @@ import { DealTierLadder } from '@/components/features/auction/DealTierLadder';
 import { LiveAuctionCard } from '@/components/features/auction/LiveAuctionCard';
 import { SingleBidDecisionCard } from '@/components/features/auction/SingleBidDecisionCard';
 import { WinnerCard } from '@/components/features/auction/WinnerCard';
+import { DealCodeTicket } from '@/components/features/purchase/DealCodeTicket';
+import { InvoiceCard } from '@/components/features/purchase/InvoiceCard';
+import { SavedCard } from '@/components/features/purchase/SavedCard';
 import { NewMemberToast } from '@/components/features/NewMemberToast';
 import { JoinRequestsCard } from '@/components/features/JoinRequestsCard';
 import { LeaderDecisionCard } from '@/components/features/LeaderDecisionCard';
@@ -218,6 +222,31 @@ export default function GroupScreen() {
 
             {['won', 'purchasing', 'completed'].includes(group.status) ? (
               <WinnerCard group={group} />
+            ) : null}
+            {group.myPurchase &&
+            ['pending', 'invoice_uploaded', 'objected'].includes(group.myPurchase.status) ? (
+              <View className="gap-4">
+                <DealCodeTicket
+                  purchase={group.myPurchase}
+                  dealerName={
+                    group.auction?.winner?.businessName ?? group.deal?.seller?.businessName ?? null
+                  }
+                />
+                <InvoiceCard purchase={group.myPurchase} />
+              </View>
+            ) : null}
+            {group.myPurchase?.status === 'completed' ? (
+              <SavedCard
+                purchase={group.myPurchase}
+                productName={group.product.name}
+                dealerName={
+                  group.auction?.winner?.businessName ?? group.deal?.seller?.businessName ?? null
+                }
+                shareUrl={group.shareUrl}
+              />
+            ) : null}
+            {group.myPurchase?.status === 'expired' ? (
+              <Notice tone="info" message={t('purchase.expiredNotice')} />
             ) : null}
             {group.status === 'runner_up' ? (
               <Notice tone="info" message={t('auction.runnerUpNotice')} />

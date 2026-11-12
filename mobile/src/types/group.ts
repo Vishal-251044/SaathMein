@@ -87,6 +87,8 @@ export interface GroupDetail extends GroupCard {
   auction: GroupAuction | null;
   /** Seller-led deals only (AUC-9). */
   deal: GroupDeal | null;
+  /** My purchase after a win: deal-code ticket, invoice, review, saving (Day 10). */
+  myPurchase: GroupPurchase | null;
   /** Price per unit after a win. */
   winningPricePaise: number | null;
   /** Members may leave (refund minus back-out fee) until then. */
@@ -166,4 +168,28 @@ export interface GroupDeal {
   pricePaise: number;
   membersToNext: number | null;
   seller: PublicDealer | null;
+}
+
+export type PurchaseStatus =
+  'pending' | 'invoice_uploaded' | 'objected' | 'completed' | 'expired' | 'cancelled';
+
+/** My purchase from the winning dealer (PUR-1 to PUR-4). */
+export interface GroupPurchase {
+  id: string;
+  groupId: string;
+  status: PurchaseStatus;
+  dealCode: string;
+  /** Signed QR payload; only while the code can be used. */
+  qrPayload: string | null;
+  pricePaise: number;
+  tokenPaise: number;
+  /** Price minus the token already paid (token is part-payment). */
+  payAtShopPaise: number;
+  savedPaise: number | null;
+  validUntil: string;
+  invoiceUploadedAt: string | null;
+  autoCompleteAt: string | null;
+  completedAt: string | null;
+  canReview: boolean;
+  reviewedAt: string | null;
 }

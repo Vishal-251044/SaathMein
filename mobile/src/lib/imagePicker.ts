@@ -57,3 +57,33 @@ export async function pickChatImage(): Promise<PickedImage | null> {
   const saved = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.8 });
   return { uri: saved.uri, mimeType: 'image/jpeg' };
 }
+
+const INVOICE_IMAGE_WIDTH = 1600;
+
+/**
+ * Photo of the shop invoice (PUR-2): camera or gallery, at most 1600 px wide (still
+ * readable for the Day 19 invoice check), JPEG.
+ * @param source - 'camera' or 'library'
+ * @returns The photo, or null when the user cancels
+ * @throws Error PHOTO_PERMISSION_DENIED when access is refused
+ */
+export async function pickInvoiceImage(source: 'camera' | 'library'): Promise<PickedImage | null> {
+  const permission =
+    source === 'camera'
+      ? await ImagePicker.requestCameraPermissionsAsync()
+      : await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!permission.granted) throw new Error('PHOTO_PERMISSION_DENIED');
+
+  const options: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 1 };
+  const result =
+    source === 'camera'
+      ? await ImagePicker.launchCameraAsync(options)
+      : await ImagePicker.launchImageLibraryAsync(options);
+  const asset = result.assets?.[0];
+  if (result.canceled || !asset) return null;
+
+  const width = Math.min(asset.width || INVOICE_IMAGE_WIDTH, INVOICE_IMAGE_WIDTH);
+  const rendered = await ImageManipulator.manipulate(asset.uri).resize({ width }).renderAsync();
+  const saved = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.85 });
+  return { uri: saved.uri, mimeType: 'image/jpeg' };
+}

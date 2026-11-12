@@ -305,19 +305,32 @@ Notes:
 ### Day 10 — Deal Codes, Purchases & Commission (Wed 4 Nov)
 **Done when:** the winning dealer scans a deal code; the purchase completes; the Route hold is released to the dealer minus commission in test mode; the buyer gets a saving card and leaves a review.
 
-- [ ] Mobile: deal-code ticket (QR + code, seller, price, validity)
-- [ ] Mobile: upload invoice photo
-- [ ] Mobile: "You saved ₹X" share card
-- [ ] Mobile: review the seller after purchase
-- [ ] Backend: unique signed deal codes for every member when the auction is won
-- [ ] Backend: `POST /seller/purchases/confirm` (scan or enter code)
-- [ ] Backend: completion rules (seller confirms, or invoice + 48 h with no objection)
-- [ ] Backend: auction won → Route transfers on hold; completion → hold released, commission entry, review request
-- [ ] Backend: monthly commission invoices with GST numbering
-- [ ] Web: seller Purchases (scan QR with webcam or enter code)
-- [ ] Web: seller Payouts page
-- [ ] Web: Admin Commissions page
-- [ ] Tests: commission math for every category
+- [x] Mobile: deal-code ticket (QR + code, seller, price, validity)
+- [x] Mobile: upload invoice photo
+- [x] Mobile: "You saved ₹X" share card
+- [x] Mobile: review the seller after purchase
+- [x] Backend: unique signed deal codes for every member when the auction is won
+- [x] Backend: `POST /seller/purchases/confirm` (scan or enter code)
+- [x] Backend: completion rules (seller confirms, or invoice + 48 h with no objection)
+- [x] Backend: auction won → Route transfers on hold; completion → hold released, commission entry, review request
+- [x] Backend: monthly commission invoices with GST numbering
+- [x] Web: seller Purchases (scan QR with webcam or enter code)
+- [x] Web: seller Payouts page
+- [x] Web: Admin Commissions page
+- [x] Tests: commission math for every category
+
+Notes:
+- Built 10 Nov 2026. Backend: 538 tests pass (commission split for car / two-wheeler / mobile / laptop / groceries / solar rules, GST CGST+SGST vs IGST, FY numbering, IST months, invoice issue idempotent; signed QR + forged QR; confirm completes once, expired / used / other dealer's code refused; invoice 48 h + objection; expiry refund minus fee with hold reversal and retry; hold-release retry; reviews; Commissions permissions Support / Deal Manager 403). Web builds; mobile typecheck + lint pass.
+- Decisions (9 Nov 2026): unused deal code at the end of the dealer's price validity → hold reversed, token refunded minus the back-out fee, reminder 48 h before; invoice + 48 h without objection completes the purchase until the Day 19 AI invoice check is added in front; QR libraries react-native-qrcode-svg (mobile) and jsqr (web) approved; commission invoices are print-ready web pages (browser "Save as PDF"), no PDF library.
+- A purchase record is created with each deal code (price, token, validity = dealer's 7–15 days from the win; seller-led deals `settings.purchases.sellerDealValidityDays` = 15). QR = `SM1.<code>.<HMAC>` signed with `DEAL_CODE_SECRET`; dealers may also type the code (rate-limited). Token is part-payment: the ticket shows "pay at the shop" = price − token.
+- Completion (dealer confirm or invoice path): member → purchased, commission recorded (`commissions`), the member's held Route transfer released (created first if the win-time one had failed), "You saved ₹X" push + review. First sale moves the group to purchasing; when no code is open it is completed. Leaving in the exit window cancels the member's code.
+- Commission is earned at completion; the part kept from the token was already recorded in the ledger at transfer time (no double entry). Monthly invoices on the 1st at 03:00 IST (BullMQ) or "Issue invoices" in Admin → Commissions; number SM/2026-27/0001 from an atomic counter; GST 18% on top of commission, CGST+SGST when the dealer GSTIN state = ours, else IGST; balance due = total − kept from tokens.
+- PENDING (owner / CA): SaathMein legal name, GSTIN, address and SAC code go in `settings.billing` (placeholders now); confirm with the CA that GST is charged on top of the commission (current setting) and the SAC code. Admin settings screen is Day 11.
+- Reviews: only completed buyers, once per purchase; dealer rating updated atomically (running average).
+- Seller web: Purchases (webcam QR scan or typed code → preview → confirm; view invoice, object within 48 h), Payouts (on hold / released / taken back, settlements, invoices), printable invoice page; Admin → Commissions (filters, totals, CSV, invoices, issue a month) for Owner / Admin / Finance.
+- New env: `DEAL_CODE_SECRET` in `backend/.env` + `.env.example` (production refuses a weak value).
+- MOVED to Day 12: winning dealer in the group chat (from Day 9) and objected invoices → disputes queue. Mobile "My deal codes" list screen uses `GET /users/me/deal-codes` — the ticket is on the group page for now.
+- Not verified end-to-end yet (needs MongoDB, Redis + worker, Razorpay test keys with Route, Cloudinary). "Done when" check: win a group in test mode → the dealer opens /seller/purchases and scans a member's QR (or types the code) → confirm → Payment.transfer.status = released and a hold_release ledger row; the buyer sees "You saved ₹X" and leaves a review.
 
 ### Day 11 — Discovery, Home Feed & Community Groups (Thu 5 Nov)
 **Done when:** Home shows real ranked sections for Pune; a society group is joinable only with its code; referral credits appear after a referred purchase.
@@ -487,3 +500,7 @@ Notes:
 | 8 Nov 2026 | Open question 2: verified unrated dealers (< 3 reviews) may bid; 3.5 minimum once rated | Day 9 |
 | 8 Nov 2026 | Open question 4: seller-led deal below its first tier at the deadline → expired, all tokens refunded | Day 9 |
 | 8 Nov 2026 | Single dealer after the minimum-dealers extension → leader has 24 h to accept or cancel (refund all); no answer = cancel | Day 9 |
+| 9 Nov 2026 | Unused deal code at price-validity end → hold reversed, refund minus back-out fee (reminder 48 h before) | Day 10 |
+| 9 Nov 2026 | Invoice + 48 h with no dealer objection completes a purchase; AI invoice check added in front on Day 19 | Days 10, 19 |
+| 9 Nov 2026 | QR libraries approved: react-native-qrcode-svg (mobile), jsqr (web) | Day 10 |
+| 9 Nov 2026 | Commission invoices: printable web page (no PDF library); 18% GST on top of commission, SM/FY/seq numbering — pending CA confirmation | Day 10 |

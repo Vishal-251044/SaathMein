@@ -134,7 +134,11 @@
     "chatTooFast": "You are sending messages too fast. Please wait a moment.",
     "pollLeaderOnly": "Only the group leader can start a poll.",
     "tooManyPinned": "You can pin up to 3 messages. Unpin one first.",
-    "pollClosed": "This poll is closed."
+    "pollClosed": "This poll is closed.",
+    "purchaseClosed": "This purchase can no longer be changed.",
+    "dealCodeExpired": "This deal code expired with the dealer's price.",
+    "alreadyReviewed": "You already reviewed this purchase.",
+    "photoPermission": "Allow camera and photo access in your phone settings to add a photo."
   },
   "language": {
     "title": "Choose your language",
@@ -527,5 +531,36 @@
     "tierUnlockedA11y": "Unlocked: {{size}} buyers, {{price}}",
     "tierLockedA11y": "Locked: {{size}} buyers, {{price}}",
     "refundRule": "If the first tier is not reached by the deadline, every token is refunded in full."
+  },
+  "purchase": {
+    "ticketTitle": "Your deal code",
+    "qrA11y": "Deal code QR. Show it to the dealer to scan.",
+    "dealer": "Dealer",
+    "price": "Price, all-inclusive",
+    "tokenPaid": "Token already paid",
+    "payAtShop": "Pay at the shop",
+    "validUntil": "Valid until {{date}} ({{time}})",
+    "invoiceTitle": "Bought already?",
+    "invoiceBody": "If the dealer did not scan your code, add a photo of the invoice. Your purchase completes in 48 hours unless the dealer objects.",
+    "takePhoto": "Take photo",
+    "fromGallery": "From gallery",
+    "invoiceSent": "Invoice sent",
+    "invoiceWaiting": "Your purchase completes in {{time}} unless the dealer objects.",
+    "invoiceObjected": "The dealer objected to your invoice. SaathMein support will look into it and contact you.",
+    "completeTitle": "Purchase complete",
+    "youSaved": "You saved {{amount}}",
+    "boughtAt": "{{name}} at {{price}}",
+    "shareSaving": "Share your saving",
+    "shareMessage": "I saved {{amount}} on {{name}} by buying together on SaathMein. Join the next group: {{link}}",
+    "rateDealer": "Rate {{name}}",
+    "theDealer": "the dealer",
+    "thanksReview": "Thanks for your review.",
+    "reviewTitle": "How was {{name}}?",
+    "starsA11y_one": "{{count}} star",
+    "starsA11y_other": "{{count}} stars",
+    "reviewTextLabel": "Tell others (optional)",
+    "reviewTextHint": "Was the price honoured? Was delivery on time?",
+    "submitReview": "Submit review",
+    "expiredNotice": "Your deal code expired before you bought. Your token is being refunded minus the back-out fee."
   }
 }

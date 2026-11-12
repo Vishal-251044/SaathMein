@@ -58,6 +58,12 @@ const ERROR_KEYS: Record<string, string> = {
   POLL_CLOSED: 'errors.pollClosed',
   // Auctions (Day 9)
   AUCTION_NOT_LIVE: 'errors.groupChanged',
+  // Purchases (Day 10)
+  PURCHASE_CLOSED: 'errors.purchaseClosed',
+  DEAL_CODE_EXPIRED: 'errors.dealCodeExpired',
+  PURCHASE_NOT_COMPLETED: 'errors.purchaseClosed',
+  ALREADY_REVIEWED: 'errors.alreadyReviewed',
+  PHOTO_PERMISSION_DENIED: 'errors.photoPermission',
   // Firebase phone auth (PhoneAuthError.code)
   INVALID_CODE: 'errors.invalidCode',
   CODE_EXPIRED: 'errors.codeExpired',
@@ -74,5 +80,7 @@ export function getErrorMessageKey(error: unknown): string {
   if (error instanceof ApiClientError || error instanceof PhoneAuthError) {
     return ERROR_KEYS[error.code] ?? 'errors.generic';
   }
+  // Local errors thrown with a code as the message (photo permission, upload failed)
+  if (error instanceof Error && ERROR_KEYS[error.message]) return ERROR_KEYS[error.message];
   return 'errors.generic';
 }

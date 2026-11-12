@@ -31,7 +31,9 @@ export function WinnerCard({ group }: { group: GroupDetail }) {
   const price = group.winningPricePaise;
   const marketPrice = group.auction?.ceilingPaise ?? group.deal?.basePricePaise ?? null;
   const saved = price != null && marketPrice ? Math.max(0, marketPrice - price) : 0;
-  const dealCode = group.myMembership?.dealCode ?? null;
+  const hasCode = Boolean(group.myMembership?.dealCode);
+  // The full ticket (QR, validity) is shown by DealCodeTicket when the purchase exists
+  const dealCode = group.myPurchase ? null : (group.myMembership?.dealCode ?? null);
   if (!dealer || price == null) return null;
 
   return (
@@ -108,7 +110,7 @@ export function WinnerCard({ group }: { group: GroupDetail }) {
         </View>
       ) : null}
 
-      {group.status === 'won' && group.exitWindowEndsAt && !exit.isOver && dealCode ? (
+      {group.status === 'won' && group.exitWindowEndsAt && !exit.isOver && hasCode ? (
         <AppText variant="caption">
           {t('auction.exitWindow', {
             time: exit.label,
