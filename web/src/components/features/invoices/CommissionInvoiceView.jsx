@@ -167,6 +167,15 @@ export default function CommissionInvoiceView({ query, backHref }) {
             label="Already kept from buyers' tokens"
             value={`− ${formatINR(invoice.fromTokensPaise)}`}
           />
+          {invoice.recoveries?.length
+            ? invoice.recoveries.map((item, index) => (
+                <TotalRow
+                  key={`${item.createdAt}-${index}`}
+                  label={`${item.reason} (no GST)`}
+                  value={`+ ${formatINR(item.amountPaise)}`}
+                />
+              ))
+            : null}
           <TotalRow label="Balance due" value={formatINR(invoice.balanceDuePaise)} strong />
         </dl>
       </article>

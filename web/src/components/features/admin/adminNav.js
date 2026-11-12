@@ -41,7 +41,7 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'Auctions', icon: Gavel, availableOn: 'Day 9', roles: ['admin', 'deal_manager'] },
   { label: 'Commissions', href: '/admin/commissions', icon: Receipt, roles: ['admin', 'finance'] },
   { label: 'Payments', icon: CreditCard, availableOn: 'Day 13', roles: ['admin', 'finance'] },
-  { label: 'Disputes', icon: Scale, availableOn: 'Day 12', roles: ['admin', 'support'] },
+  { label: 'Disputes', href: '/admin/disputes', icon: Scale, roles: ['admin', 'support'] },
   { label: 'Curation', href: '/admin/curation', icon: Megaphone, roles: ['admin'] },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['admin'] },
   { label: 'Team and audit', icon: ShieldCheck, availableOn: 'Day 13', roles: [] },

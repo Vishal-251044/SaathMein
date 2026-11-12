@@ -48,7 +48,15 @@ export function WonGroupPanel({ auction, isOwner }) {
             key={member.dealCode || index}
             className="flex items-center justify-between gap-3 px-5 py-3 sm:px-6"
           >
-            <span className="font-semibold text-ink">{member.firstName || 'Member'}</span>
+            <span className="min-w-0">
+              <span className="block font-semibold text-ink">{member.firstName || 'Member'}</span>
+              {member.phone ? (
+                <span className="block font-mono text-xs text-muted">
+                  {member.phone}
+                  {member.phoneMasked ? ' · full number after the exit window' : ''}
+                </span>
+              ) : null}
+            </span>
             <span className="inline-flex items-center gap-2 rounded-button border border-dashed border-line px-3 py-1 font-mono text-sm font-bold tracking-wider text-ink">
               <Ticket className="size-4 text-muted" strokeWidth={2} aria-hidden="true" />
               {member.dealCode || 'Pending'}

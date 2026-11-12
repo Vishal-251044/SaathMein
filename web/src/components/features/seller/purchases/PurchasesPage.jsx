@@ -57,6 +57,7 @@ function PurchaseSummary({ purchase }) {
       <div>
         <dt className="text-muted">Buyer</dt>
         <dd className="font-semibold text-ink">{purchase.buyerFirstName || 'Member'}</dd>
+        {purchase.phone ? <dd className="font-mono text-xs text-muted">{purchase.phone}</dd> : null}
       </div>
       <div>
         <dt className="text-muted">Price (all-inclusive)</dt>

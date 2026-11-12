@@ -8,6 +8,7 @@ import {
   Home,
   IndianRupee,
   LineChart,
+  Scale,
   ShoppingBag,
   Store,
   Tags,
@@ -25,6 +26,7 @@ export const SELLER_NAV_ITEMS = [
   { label: 'Group deals', href: '/seller/deals', icon: Tags },
   { label: 'Purchases', href: '/seller/purchases', icon: ShoppingBag },
   { label: 'Payouts', href: '/seller/payouts', icon: IndianRupee },
+  { label: 'Disputes', href: '/seller/disputes', icon: Scale },
   { label: 'Insights', icon: LineChart, availableOn: 'Day 17' },
 ];
 
