@@ -19,7 +19,7 @@ const inAppPath = z
   .string()
   .trim()
   .regex(
-    /^\/(category|group|product|groups\/browse)(\/[A-Za-z0-9_-]+)?(\?[A-Za-z0-9=&_-]*)?$/,
+    /^\/(category|group|product|browse)(\/[A-Za-z0-9_-]+)?(\?[A-Za-z0-9=&_-]*)?$/,
     'Use an in-app path like /category/<id>',
   );
 

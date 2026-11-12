@@ -227,7 +227,7 @@ function Banners({ items, cities }) {
           label="Link inside the app (optional)"
           value={form.linkPath}
           onChange={set('linkPath')}
-          placeholder="/category/<id> or /groups/browse?type=seller_led"
+          placeholder="/category/<id> or /browse?type=seller_led"
         />
         <Select label="City" value={form.cityId} onChange={set('cityId')}>
           <option value="">All cities</option>

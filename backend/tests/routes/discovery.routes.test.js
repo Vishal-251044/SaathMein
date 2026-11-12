@@ -82,7 +82,7 @@ describe('Admin → Curation and Settings', () => {
     const ok = await request(app)
       .post('/api/admin/curation')
       .set(asStaff(STAFF_ROLE.ADMIN))
-      .send({ type: 'banner', title: 'Sale', linkPath: '/groups/browse?type=seller_led' });
+      .send({ type: 'banner', title: 'Sale', linkPath: '/browse?type=seller_led' });
     expect(ok.status).toBe(201);
     expect(curation.createItem).toHaveBeenCalledTimes(1);
   });
