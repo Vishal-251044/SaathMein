@@ -1,7 +1,7 @@
 /**
- * Home tab: greeting and city, promise card, category grid (Day 4), "Popular in {city}"
- * product rail (Day 5), chosen interests (placeholder until real group sections arrive on
- * Day 11) and how it works.
+ * Home tab: greeting and city, ranked group sections from GET /feed/home (Day 11, DIS-1:
+ * banners, featured, near you, ending soon, almost full, seller deals, trending), category
+ * grid, "Popular in {city}" products, "Browse all groups" and how it works.
  */
 import { router } from 'expo-router';
 import { Bell, MapPin, UsersRound } from 'lucide-react-native';
@@ -10,13 +10,13 @@ import { Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { CategoryGrid } from '@/components/features/CategoryGrid';
-import { EmptyState } from '@/components/features/EmptyState';
 import { HeroCard } from '@/components/features/HeroCard';
 import { HowItWorksSteps } from '@/components/features/HowItWorksSteps';
-import { InterestsSummaryCard } from '@/components/features/InterestsSummaryCard';
+import { HomeFeedSections } from '@/components/features/home/HomeFeedSections';
 import { PopularProductsRail } from '@/components/features/PopularProductsRail';
 import { Screen } from '@/components/layout/Screen';
 import { AppText } from '@/components/ui/AppText';
+import { Button } from '@/components/ui/Button';
 import { LogoMark } from '@/components/ui/LogoMark';
 import { useCities } from '@/hooks/useCatalog';
 import { useUnreadCount } from '@/hooks/useNotifications';
@@ -80,25 +80,23 @@ export default function HomeScreen() {
 
       <HeroCard />
 
+      <HomeFeedSections />
+
+      <View className="mt-6">
+        <Button
+          label={t('home.browseAll')}
+          icon={UsersRound}
+          variant="secondary"
+          onPress={() => router.push('/browse')}
+        />
+      </View>
+
       <AppText variant="heading" className="mb-3 mt-8">
         {t('home.browseCategories')}
       </AppText>
       <CategoryGrid />
 
       <PopularProductsRail cityName={localizedName(city, i18n.language) || t('catalog.yourCity')} />
-
-      {user ? (
-        <View className="mt-8">
-          <InterestsSummaryCard interests={user.interests} />
-        </View>
-      ) : null}
-
-      <EmptyState
-        icon={UsersRound}
-        title={t('home.emptyTitle')}
-        body={t('home.emptyBody')}
-        className="mt-6"
-      />
 
       <AppText variant="heading" className="mb-3 mt-8">
         {t('home.howTitle')}

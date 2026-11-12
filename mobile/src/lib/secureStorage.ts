@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   DEVICE_ID: 'sm.device.id',
   LANGUAGE: 'sm.settings.language',
   RECENT_SEARCHES: 'sm.search.recent',
+  PENDING_REFERRAL: 'sm.referral.pending',
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

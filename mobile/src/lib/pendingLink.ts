@@ -11,6 +11,12 @@ export function inviteCodeFromPath(path: string): string | null {
   return match ? match[1].toUpperCase() : null;
 }
 
+/** Referral code from a /r/<code> path, if any (REF-1). */
+export function referralCodeFromPath(path: string): string | null {
+  const match = /(?:^|\/)r\/([A-Za-z0-9]{6,12})(?:[/?#]|$)/.exec(path);
+  return match ? match[1].toUpperCase() : null;
+}
+
 /** Remember an invite to open later. */
 export function setPendingInvite(code: string): void {
   pendingInviteCode = code;

@@ -64,6 +64,15 @@ const ERROR_KEYS: Record<string, string> = {
   PURCHASE_NOT_COMPLETED: 'errors.purchaseClosed',
   ALREADY_REVIEWED: 'errors.alreadyReviewed',
   PHOTO_PERMISSION_DENIED: 'errors.photoPermission',
+  // Discovery, referrals, flags (Day 11)
+  REFERRAL_ALREADY_SET: 'errors.referralAlreadySet',
+  REFERRAL_TOO_LATE: 'errors.referralTooLate',
+  REFERRAL_CODE_INVALID: 'errors.referralInvalid',
+  OWN_REFERRAL_CODE: 'errors.referralOwn',
+  REFERRAL_LOOP: 'errors.referralLoop',
+  REFERRALS_OFF: 'errors.featureOff',
+  COMMUNITY_GROUPS_OFF: 'errors.featureOff',
+  MAINTENANCE: 'errors.maintenance',
   // Firebase phone auth (PhoneAuthError.code)
   INVALID_CODE: 'errors.invalidCode',
   CODE_EXPIRED: 'errors.codeExpired',

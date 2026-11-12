@@ -9,7 +9,8 @@
     "save": "Save",
     "back": "Back",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "close": "Close"
   },
   "tabs": {
     "home": "Home",
@@ -35,7 +36,18 @@
     "noInterests": "Tell us what you plan to buy and we will show you the right groups.",
     "browseCategories": "Browse categories",
     "popularIn": "Popular in {{city}}",
-    "popularError": "Could not load popular products."
+    "popularError": "Could not load popular products.",
+    "seeAll": "See all",
+    "seeAllA11y": "See all: {{section}}",
+    "browseAll": "Browse all groups",
+    "sections": {
+      "featured": "Featured deals",
+      "near_you": "Near you",
+      "ending_soon": "Ending soon",
+      "almost_full": "Almost full",
+      "seller_deals": "Seller deals",
+      "trending": "Trending in your city"
+    }
   },
   "search": {
     "title": "Search",
@@ -138,7 +150,14 @@
     "purchaseClosed": "This purchase can no longer be changed.",
     "dealCodeExpired": "This deal code expired with the dealer's price.",
     "alreadyReviewed": "You already reviewed this purchase.",
-    "photoPermission": "Allow camera and photo access in your phone settings to add a photo."
+    "photoPermission": "Allow camera and photo access in your phone settings to add a photo.",
+    "referralAlreadySet": "You already added a referral code.",
+    "referralTooLate": "Referral codes can be added only by new accounts, before the first purchase.",
+    "referralInvalid": "This referral code is not valid. Check it and try again.",
+    "referralOwn": "You cannot use your own code.",
+    "referralLoop": "You invited this person, so you cannot use their code.",
+    "featureOff": "This is paused right now. Please try again later.",
+    "maintenance": "SaathMein is being updated. Please try again in a few minutes."
   },
   "language": {
     "title": "Choose your language",
@@ -328,7 +347,11 @@
     "cancelConfirmTitle": "Cancel this group?",
     "cancelConfirmBody": "Nobody has paid yet. The group will close for everyone.",
     "leaderPayNow": "Pay the refundable token to take your own seat. Then share the code to bring people in.",
-    "memberJoined": "{{name}} joined"
+    "memberJoined": "{{name}} joined",
+    "showQr": "Show invite QR",
+    "qrTitle": "Scan to join the {{name}} group",
+    "qrA11y": "Invite QR code. Scanning it opens this group.",
+    "qrHint": "Print it for your society notice board or show it to neighbours. Any phone camera can scan it."
   },
   "createGroup": {
     "title": "Start a group",
@@ -562,5 +585,75 @@
     "reviewTextHint": "Was the price honoured? Was delivery on time?",
     "submitReview": "Submit review",
     "expiredNotice": "Your deal code expired before you bought. Your token is being refunded minus the back-out fee."
+  },
+  "browse": {
+    "title": "Groups",
+    "count_one": "{{count}} group",
+    "count_other": "{{count}} groups",
+    "filters": "Filters",
+    "filtersCount": "Filters ({{count}})",
+    "sortTitle": "Sort",
+    "sort": {
+      "ending_soon": "Ending soon",
+      "filling": "Almost full",
+      "newest": "Newest"
+    },
+    "typeTitle": "Type",
+    "type": {
+      "buyer_led": "Dealer auction",
+      "seller_led": "Seller deal"
+    },
+    "categoryTitle": "Category",
+    "areaTitle": "Area",
+    "priceTitle": "Price",
+    "price": {
+      "under20k": "Under ₹20,000",
+      "20to50k": "₹20,000 – ₹50,000",
+      "50kto1l": "₹50,000 – ₹1 lakh",
+      "over1l": "Over ₹1 lakh"
+    },
+    "sizeTitle": "Group size",
+    "size": {
+      "small": "Up to 10 people",
+      "medium": "11 to 25 people",
+      "large": "26+ people"
+    },
+    "timeTitle": "Time left",
+    "time": {
+      "h24": "Within 24 hours",
+      "h72": "Within 3 days",
+      "h168": "Within a week"
+    },
+    "clear": "Clear filters",
+    "apply": "Show groups",
+    "emptyTitle": "No groups match",
+    "emptyBody": "Try fewer filters, or start a group for the product you want."
+  },
+  "wallet": {
+    "title": "Wallet & referrals",
+    "profileRow": "Wallet & referrals",
+    "profileRowHint": "Credits and invite friends",
+    "balance": "SaathMein credits",
+    "notCash": "Credits are not cash and cannot be withdrawn. You will soon be able to use them on tokens.",
+    "inviteTitle": "Invite friends",
+    "inviteBody": "When a friend joins with your link and completes their first purchase, you get {{you}} and they get {{friend}} in credits.",
+    "yourCode": "Your code",
+    "shareInvite": "Share invite on WhatsApp",
+    "shareMessage": "Join me on SaathMein: buy phones, bikes and more together and save. Use my code {{code}} and get {{amount}} in credits after your first purchase: {{link}}",
+    "inviteStats": "{{invited}} joined with your code · {{rewarded}} rewarded",
+    "leaderBonus": "Lead a group that completes and get a {{amount}} leader bonus.",
+    "haveCode": "Got a code from a friend?",
+    "friendCode": "Friend's code",
+    "addCode": "Add code",
+    "codeAdded": "You joined with a friend's code. You both get credits after your first purchase.",
+    "historyTitle": "History",
+    "types": {
+      "referral_referrer": "Friend completed a purchase",
+      "referral_friend": "Welcome credit",
+      "leader_bonus": "Group leader bonus",
+      "adjustment": "Adjustment by SaathMein"
+    },
+    "emptyTitle": "No credits yet",
+    "emptyBody": "Invite friends or lead a group to earn credits."
   }
 }

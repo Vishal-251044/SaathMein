@@ -335,16 +335,27 @@ Notes:
 ### Day 11 — Discovery, Home Feed & Community Groups (Thu 5 Nov)
 **Done when:** Home shows real ranked sections for Pune; a society group is joinable only with its code; referral credits appear after a referred purchase.
 
-- [ ] Mobile: Home sections (Near you, Ending soon, Almost full, Seller deals, Trending, Categories)
-- [ ] Mobile: filters (category, area, price, group size, time left, type)
-- [ ] Mobile: community private group, invite code / QR, approve members
-- [ ] Mobile: referral link and wallet screen
-- [ ] Backend: `GET /feed/home` with rule-based ranking v1
-- [ ] Backend: Trending = joins in last 48 h, cached in Redis (5 min)
-- [ ] Backend: referral and wallet credits service
-- [ ] Backend: group-leader bonus on completion
-- [ ] Web: Admin Curation (banners, featured deals, category order)
-- [ ] Web: Admin Settings (fees, token per category, back-out fee, bidding hours, feature flags)
+- [x] Mobile: Home sections (Near you, Ending soon, Almost full, Seller deals, Trending, Categories)
+- [x] Mobile: filters (category, area, price, group size, time left, type)
+- [x] Mobile: community private group, invite code / QR, approve members
+- [x] Mobile: referral link and wallet screen
+- [x] Backend: `GET /feed/home` with rule-based ranking v1
+- [x] Backend: Trending = joins in last 48 h, cached in Redis (5 min)
+- [x] Backend: referral and wallet credits service
+- [x] Backend: group-leader bonus on completion
+- [x] Web: Admin Curation (banners, featured deals, category order)
+- [x] Web: Admin Settings (fees, token per category, back-out fee, bidding hours, feature flags)
+
+Notes:
+- Built 12 Nov 2026. Backend: 574 tests pass (ranking v1, feed sections + public-only + seller-deal flag, trending cache key, referral rules incl. own code / loop / too late / after purchase, credits once per key incl. a concurrent duplicate, leader bonus guard, settings validation per section, Curation / Settings Owner + Admin only, banner links in-app only, maintenance mode). Web builds; mobile typecheck + lint pass.
+- Decisions (12 Nov 2026): wallet credits are earned and shown now; spending on tokens (with refunds back to the wallet) MOVED to Day 13. Defaults ₹100 referrer + ₹100 friend on the friend's first completed purchase (once), ₹500 leader bonus only when the leader's own purchase and at least 3 other members' purchases completed. All amounts and rules in `settings.referrals` (Admin → Settings).
+- Feed ranking v1 (Near you, Seller deals): 40% how full, 30% closing soon (7-day window), 20% matches my interests, 10% new (14 days). Ending soon = open, closes within 72 h; Almost full = 60%+ of target; Trending = most joins in 48 h, Redis 5 min per city (no Redis → computed each time). Near you uses the leader's area, now stored on new groups (older groups have no area). Community groups never appear. AI "Groups for You" replaces Near you on Day 16.
+- Filters on GET /groups: area, type, price range (city price: on-road, else ex-showroom, else MRP), group size, time left. Mobile browse screen is /browse (home "See all" presets).
+- Referral: code created on first use, link https://<domain>/r/<code> (share page + Android App Link /r/). A new account (≤ 30 days, no completed purchase) can add a code once; a link opened before login is added automatically after login. Wallet = append-only `walletTransactions` + `user.walletBalancePaise` in one transaction, unique key per reward.
+- Community groups: invite QR (react-native-qrcode-svg) holds the https share link, so any phone camera opens the group; join by code and leader approval already existed (Day 6).
+- Admin → Curation (Owner, Admin): banners with Hindi / Marathi titles, image (signed Cloudinary upload), in-app link only, city, dates, order; featured groups; category order. Admin → Settings (Owner, Admin): groups, auctions, payments, purchases, billing (GST), referrals and feature flags; per-category values stay in Categories. Every change audited with before / after.
+- Feature flags enforced: referrals, seller-led deals, community groups, maintenance mode (buyers and dealers can read; changes get 503; admin, auth and Razorpay webhooks keep working). Settings are cached 60 s per process, so changes reach the API and worker within a minute.
+- Not verified end-to-end (needs MongoDB + Redis + a seeded Pune catalog with groups). "Done when" check: with a few open groups in Pune, Home shows the sections; a community group opens only with its code / QR; a referred friend's first completed purchase shows ₹100 in both wallets.
 
 ### Day 12 — Trust, Reviews, Reports & Disputes (Fri 6 Nov)
 **Done when:** a buyer opens a "price not honoured" dispute; the seller responds; Support decides a refund; the refund and the seller penalty are both logged.
@@ -504,3 +515,5 @@ Notes:
 | 9 Nov 2026 | Invoice + 48 h with no dealer objection completes a purchase; AI invoice check added in front on Day 19 | Days 10, 19 |
 | 9 Nov 2026 | QR libraries approved: react-native-qrcode-svg (mobile), jsqr (web) | Day 10 |
 | 9 Nov 2026 | Commission invoices: printable web page (no PDF library); 18% GST on top of commission, SM/FY/seq numbering — pending CA confirmation | Day 10 |
+| 12 Nov 2026 | Wallet credits earned + shown on Day 11; spending on tokens moved to Day 13 | Days 11, 13 |
+| 12 Nov 2026 | Referral ₹100 + ₹100 on the friend's first completed purchase; leader bonus ₹500 when leader + 3 others bought (all editable) | Day 11 |

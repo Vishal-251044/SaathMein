@@ -8,6 +8,7 @@ import {
   Heart,
   LogOut,
   MapPin,
+  Gift,
   MessageSquarePlus,
   Pencil,
   Trash2,
@@ -157,6 +158,13 @@ export default function ProfileScreen() {
               : t('profile.notSet')
           }
           href="/edit-interests"
+        />
+        <View className="border-t border-line" />
+        <ProfileRow
+          icon={Gift}
+          label={t('wallet.profileRow')}
+          value={t('wallet.profileRowHint')}
+          href="/wallet"
         />
         <View className="border-t border-line" />
         <ProfileRow

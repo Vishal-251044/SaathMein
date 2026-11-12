@@ -9,6 +9,7 @@
  * invoice upload, "You saved ₹X" card and the dealer review.
  */
 import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import {
   Clock,
   Copy,
@@ -16,6 +17,7 @@ import {
   Lock,
   PackageX,
   MessagesSquare,
+  QrCode,
   Share2,
   UsersRound,
   XCircle,
@@ -29,6 +31,7 @@ import { PressableScale } from '@/components/animations/PressableScale';
 import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { GroupStatusTimeline } from '@/components/features/GroupStatusTimeline';
+import { InviteQrSheet } from '@/components/features/InviteQrSheet';
 import { JoinGroupBar } from '@/components/features/JoinGroupBar';
 import { DealTierLadder } from '@/components/features/auction/DealTierLadder';
 import { LiveAuctionCard } from '@/components/features/auction/LiveAuctionCard';
@@ -88,6 +91,7 @@ export default function GroupScreen() {
     live: connected,
   });
   const cancel = useCancelGroup();
+  const [qrOpen, setQrOpen] = useState(false);
   const timeLeft = useTimeLeft(group?.deadline);
   const isNotFound = error instanceof ApiClientError && error.status === 404;
   const canChat =
@@ -331,7 +335,26 @@ export default function GroupScreen() {
                   >
                     <Share2 size={20} color={colors.ink} strokeWidth={2} />
                   </Pressable>
+                  {group.shareUrl ? (
+                    <Pressable
+                      onPress={() => setQrOpen(true)}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('group.showQr')}
+                      className="h-12 w-12 items-center justify-center rounded-button border border-line"
+                    >
+                      <QrCode size={20} color={colors.ink} strokeWidth={2} />
+                    </Pressable>
+                  ) : null}
                 </View>
+                {group.shareUrl ? (
+                  <InviteQrSheet
+                    visible={qrOpen}
+                    onClose={() => setQrOpen(false)}
+                    shareUrl={group.shareUrl}
+                    inviteCode={group.inviteCode}
+                    productName={group.product.name}
+                  />
+                ) : null}
                 <View className="flex-row items-center gap-1.5">
                   <Copy size={13} color={colors.muted} strokeWidth={2} />
                   <AppText variant="caption">{t('group.inviteHint')}</AppText>
