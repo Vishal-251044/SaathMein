@@ -6,6 +6,8 @@ const validate = require('../middlewares/validate.middleware');
 const { requireAuth } = require('../middlewares/auth.middleware');
 const controller = require('../controllers/user.controller');
 const purchaseController = require('../controllers/purchase.controller');
+const discoveryController = require('../controllers/discovery.controller');
+const discoverySchemas = require('../validators/discovery.validator');
 const schemas = require('../validators/user.validator');
 
 const router = Router();
@@ -15,6 +17,14 @@ router.use(requireAuth);
 router.get('/me', controller.getMe);
 // My deal codes (PRD §12.3 GET /me/deal-codes)
 router.get('/me/deal-codes', purchaseController.myDealCodes);
+// Wallet and referral (REF-1 to REF-3)
+router.get('/me/wallet', validate(discoverySchemas.walletSchema), discoveryController.wallet);
+router.get('/me/referral', discoveryController.referral);
+router.post(
+  '/me/referral',
+  validate(discoverySchemas.applyReferralSchema),
+  discoveryController.applyReferral,
+);
 router.patch('/me', validate(schemas.updateProfileSchema), controller.updateMe);
 router.delete('/me', controller.deleteMe);
 router.post('/me/interests', validate(schemas.saveInterestsSchema), controller.saveInterests);

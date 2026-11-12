@@ -1,5 +1,5 @@
 /**
- * Share links (LIV-4): https://<domain>/g/<code>.
+ * Share links (LIV-4): https://<domain>/g/<code> (group) and /r/<code> (referral, REF-1).
  * - With Android App Links verified (assetlinks.json), Android opens the app directly.
  * - Otherwise this small page shows the group (WhatsApp preview tags too) with "Open in
  *   the app" (intent link that falls back to the Play Store) and "Get the app".
@@ -34,13 +34,13 @@ const assetLinks = (req, res) => {
 
 /**
  * Page HTML.
- * @param {{ code: string, title: string, description: string, imageUrl?: string|null }} view
+ * @param {{ code: string, title: string, description: string, imageUrl?: string|null, path?: 'g'|'r' }} view
  * @returns {string}
  */
-const renderPage = ({ code, title, description, imageUrl }) => {
+const renderPage = ({ code, title, description, imageUrl, path = 'g' }) => {
   const { androidPackage, playStoreUrl, baseUrl } = config.appLinks;
   const intentUrl =
-    `intent://g/${code}#Intent;scheme=saathmein;package=${androidPackage};` +
+    `intent://${path}/${code}#Intent;scheme=saathmein;package=${androidPackage};` +
     `S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
   const safeTitle = escapeHtml(title);
   const safeDescription = escapeHtml(description);
@@ -55,7 +55,7 @@ const renderPage = ({ code, title, description, imageUrl }) => {
 <meta property="og:site_name" content="SaathMein">
 <meta property="og:title" content="${safeTitle}">
 <meta property="og:description" content="${safeDescription}">
-<meta property="og:url" content="${escapeHtml(`${baseUrl}/g/${code}`)}">
+<meta property="og:url" content="${escapeHtml(`${baseUrl}/${path}/${code}`)}">
 ${imageUrl ? `<meta property="og:image" content="${escapeHtml(imageUrl)}">` : ''}
 <style>
   body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#F7F5F1;color:#12131F}
@@ -74,7 +74,7 @@ ${imageUrl ? `<meta property="og:image" content="${escapeHtml(imageUrl)}">` : ''
 <div class="card">
 <h1>${safeTitle}</h1>
 <p>${safeDescription}</p>
-<div class="code" aria-label="Invite code">${escapeHtml(code)}</div>
+<div class="code" aria-label="Code">${escapeHtml(code)}</div>
 <a class="btn primary" href="${escapeHtml(intentUrl)}">Open in the SaathMein app</a>
 <a class="btn secondary" href="${escapeHtml(playStoreUrl)}">Get the app on Google Play</a>
 </div>
@@ -125,4 +125,24 @@ const groupLink = async (req, res) => {
   return res.type('html').send(renderPage(view));
 };
 
-module.exports = { assetLinks, groupLink, renderPage };
+/** GET /r/:code — referral link landing page (REF-1). Never reveals who shared it. */
+const referralLink = (req, res) => {
+  const code = String(req.params.code || '').toUpperCase();
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  const valid = /^[A-Z0-9]{6,12}$/.test(code);
+  return res
+    .status(valid ? 200 : 404)
+    .type('html')
+    .send(
+      renderPage({
+        path: 'r',
+        code: valid ? code : '------',
+        title: valid ? 'Your friend invited you to SaathMein' : 'Link not valid',
+        description: valid
+          ? 'Buy phones, bikes and more together with people near you. Add this code in the app and you both get SaathMein credits after your first purchase.'
+          : 'This SaathMein invite link is not valid.',
+      }),
+    );
+};
+
+module.exports = { assetLinks, groupLink, referralLink, renderPage };

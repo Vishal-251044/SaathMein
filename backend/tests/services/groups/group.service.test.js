@@ -17,6 +17,11 @@ jest.mock('../../../src/services/settings.service', () => ({
     extensionDays: 7,
     maxOpenGroupsPerLeader: 5,
   })),
+  getFeatureFlags: jest.fn(async () => ({
+    communityGroups: true,
+    sellerDeals: true,
+    referrals: true,
+  })),
 }));
 
 const { Types } = require('mongoose');

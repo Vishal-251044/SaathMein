@@ -68,6 +68,21 @@ const DEFAULTS = Object.freeze({
     gstRateBps: 1800, // 18% GST on commission, added on top (confirm with the CA)
     invoicePrefix: 'SM',
   }),
+  // Day 11: referral and wallet credits (REF-1 to REF-3, decided 12 Nov 2026)
+  referrals: Object.freeze({
+    referrerCreditPaise: 10_000, // ₹100 to the person who shared the link
+    friendCreditPaise: 10_000, // ₹100 to the friend, on their first completed purchase
+    leaderBonusPaise: 50_000, // ₹500 to the leader when their group completes
+    leaderBonusMinOtherPurchases: 3, // leader bought + at least 3 other members bought
+    claimWithinDays: 30, // a referral code can be added only by accounts newer than this
+  }),
+  // Day 11: feature flags (F35)
+  flags: Object.freeze({
+    referrals: true,
+    sellerDeals: true,
+    communityGroups: true,
+    maintenanceMode: false, // buyers and dealers see "back soon"; admin keeps working
+  }),
 });
 
 const cache = new Map();
@@ -108,6 +123,12 @@ const getPurchaseSettings = () => getSettings('purchases');
 /** @returns {Promise<typeof DEFAULTS.billing>} Commission invoice (GST) settings */
 const getBillingSettings = () => getSettings('billing');
 
+/** @returns {Promise<typeof DEFAULTS.referrals>} Referral and wallet credit amounts */
+const getReferralSettings = () => getSettings('referrals');
+
+/** @returns {Promise<typeof DEFAULTS.flags>} Feature flags */
+const getFeatureFlags = () => getSettings('flags');
+
 /** Forget cached values (after an admin edit, and in tests). */
 const clearSettingsCache = () => cache.clear();
 
@@ -116,6 +137,8 @@ module.exports = {
   getSettings,
   getGroupSettings,
   getPurchaseSettings,
+  getReferralSettings,
+  getFeatureFlags,
   getBillingSettings,
   getPaymentSettings,
   getAuctionSettings,

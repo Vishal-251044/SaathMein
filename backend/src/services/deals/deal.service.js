@@ -21,7 +21,7 @@ const {
 } = require('../../helpers/genericFunctions');
 const { transition } = require('../groups/stateMachine');
 const { notifyGroupMembers } = require('../groups/groupLive');
-const { getAuctionSettings, getPurchaseSettings } = require('../settings.service');
+const { getAuctionSettings, getPurchaseSettings, getFeatureFlags } = require('../settings.service');
 const { emitToGroup } = require('../../sockets/emitter');
 const { ineligibilityReason } = require('../auction/eligibility');
 const { issueDealCodes } = require('../auction/dealCode.service');
@@ -100,6 +100,9 @@ const assertValidTiers = (tiers, rules) => {
  * @returns {Promise<Object>} The deal (dealer view)
  */
 const createDeal = async ({ sellerId, userId }, input) => {
+  if (!(await getFeatureFlags()).sellerDeals) {
+    throw new ApiError(403, 'Group deals are paused right now', { code: 'SELLER_DEALS_OFF' });
+  }
   const [seller, product, settings] = await Promise.all([
     Seller.findById(sellerId)
       .select('kyc status cities categories rating ratingCount penalties')

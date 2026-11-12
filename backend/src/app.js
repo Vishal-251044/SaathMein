@@ -55,6 +55,7 @@ app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 // Share links and Android App Links verification (outside /api, public)
 app.get('/.well-known/assetlinks.json', deepLinkController.assetLinks);
 app.get('/g/:code', apiLimiter, deepLinkController.groupLink);
+app.get('/r/:code', apiLimiter, deepLinkController.referralLink);
 
 app.use('/api', apiLimiter, apiRoutes);
 

@@ -20,7 +20,7 @@ const {
   buildPaginationMeta,
 } = require('../../helpers/genericFunctions');
 const { recordSignal } = require('../demandSignal.service');
-const { getGroupSettings } = require('../settings.service');
+const { getGroupSettings, getFeatureFlags } = require('../settings.service');
 const { transition, earlyStartMinimum } = require('./stateMachine');
 const { toGroupCard, toGroupDetail } = require('./groupPresenter');
 const { toPublicSeller } = require('../seller/sellerPresenter');
@@ -57,7 +57,7 @@ const LIVE_STATUSES = [GROUP_STATUS.OPEN, GROUP_STATUS.FULL, GROUP_STATUS.AUCTIO
  * @throws {ApiError} 422 CITY_REQUIRED
  */
 const loadBuyer = async (userId) => {
-  const user = await User.findById(userId).select('name cityId').lean();
+  const user = await User.findById(userId).select('name cityId area').lean();
   if (!user) throw ApiError.unauthorized();
   if (!user.cityId) {
     throw new ApiError(422, 'Choose your city first', { code: 'CITY_REQUIRED' });
@@ -116,6 +116,11 @@ const createGroup = async (userId, input) => {
   }
 
   const isCommunity = input.visibility === GROUP_VISIBILITY.COMMUNITY;
+  if (isCommunity && !(await getFeatureFlags()).communityGroups) {
+    throw new ApiError(403, 'Community groups are paused right now', {
+      code: 'COMMUNITY_GROUPS_OFF',
+    });
+  }
   const now = Date.now();
   let group = null;
   // Invite codes are random; retry on the (very rare) duplicate
@@ -130,6 +135,7 @@ const createGroup = async (userId, input) => {
         variantKey,
         categoryId: category._id,
         cityId: user.cityId,
+        area: user.area || undefined, // Near you + area filter (DIS-1, DIS-4)
         leaderId: userId,
         note: input.note,
         targetSize: input.targetSize,
@@ -278,6 +284,27 @@ const sellerDealView = async (group) => {
 };
 
 /**
+ * Products with a city price (on-road, else ex-showroom, else MRP) inside a range.
+ * @param {string} cityId
+ * @param {number} [minPaise]
+ * @param {number} [maxPaise]
+ * @returns {Promise<import('mongoose').Types.ObjectId[]>}
+ */
+const productIdsInPriceRange = async (cityId, minPaise, maxPaise) => {
+  const range = {
+    ...(minPaise ? { $gte: minPaise } : {}),
+    ...(maxPaise ? { $lte: maxPaise } : {}),
+  };
+  const priceIn = (field) => ({ priceByCity: { $elemMatch: { cityId, [field]: range } } });
+  return Product.find({
+    active: true,
+    $or: [priceIn('onRoadPaise'), priceIn('exShowroomPaise'), priceIn('mrpPaise')],
+  })
+    .limit(2000)
+    .distinct('_id');
+};
+
+/**
  * Browse public groups (GRP-4 lists, product page "open groups").
  * @param {{ cityId?: string, categoryId?: string, productId?: string, status?: string,
  *   sort?: 'ending_soon'|'filling'|'newest', page?: string, limit?: string }} query
@@ -296,6 +323,31 @@ const listGroups = async (query, viewer = {}) => {
   if (query.categoryId) filter.categoryId = query.categoryId;
   if (query.productId) filter.productId = query.productId;
   filter.status = !query.status || query.status === 'live' ? { $in: LIVE_STATUSES } : query.status;
+  // Filters (DIS-4)
+  if (query.area) filter.area = query.area;
+  if (query.type) filter.type = query.type;
+  if (query.minSize || query.maxSize) {
+    filter.targetSize = {
+      ...(query.minSize ? { $gte: query.minSize } : {}),
+      ...(query.maxSize ? { $lte: query.maxSize } : {}),
+    };
+  }
+  if (query.endsWithinHours) {
+    filter.deadline = {
+      $gt: new Date(),
+      $lte: new Date(Date.now() + query.endsWithinHours * HOUR_MS),
+    };
+  }
+  if ((query.minPricePaise || query.maxPricePaise) && cityId) {
+    const productIds = await productIdsInPriceRange(
+      cityId,
+      query.minPricePaise,
+      query.maxPricePaise,
+    );
+    filter.productId = query.productId
+      ? { $in: productIds.filter((id) => String(id) === String(query.productId)) }
+      : { $in: productIds };
+  }
 
   const sort =
     query.sort === 'newest'

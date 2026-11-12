@@ -177,6 +177,9 @@ const advanceGroup = async (groupId) => {
     }
     if (open === 0 && group.status === GROUP_STATUS.PURCHASING) {
       await transition(group, GROUP_STATUS.COMPLETED, { reason: 'all_purchases_closed' });
+      // Leader bonus (REF-2); loaded here to keep the wallet out of the purchase import cycle
+      const { onGroupCompleted } = require('../wallet/referral.service');
+      await onGroupCompleted(groupId);
     }
   } catch (err) {
     if (err.code !== 'GROUP_CHANGED') {
@@ -275,6 +278,9 @@ const completePurchase = async (purchaseId, { via, by, now = new Date() }) => {
   await notifyAboutGroup(purchase.userId, group, NOTIFICATION_TYPE.PURCHASE_COMPLETED, {
     saved: formatINR(market ? Math.max(0, market - purchase.pricePaise) : 0),
   });
+  // Referral credits on the buyer's first completed purchase (REF-1)
+  const { onPurchaseCompleted } = require('../wallet/referral.service');
+  await onPurchaseCompleted(done);
   log.info({ purchaseId: String(purchaseId), via }, 'Purchase completed');
   return { outcome: 'completed' };
 };

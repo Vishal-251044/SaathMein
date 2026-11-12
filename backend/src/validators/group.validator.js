@@ -40,6 +40,19 @@ const listGroupsSchema = {
       .enum(['live', GROUP_STATUS.OPEN, GROUP_STATUS.FULL, GROUP_STATUS.AUCTION_LIVE])
       .optional(),
     sort: z.enum(['ending_soon', 'filling', 'newest']).optional(),
+    // Filters (DIS-4)
+    area: z.string().trim().min(1).max(80).optional(),
+    type: z.enum(['buyer_led', 'seller_led']).optional(),
+    minPricePaise: z.coerce.number().int().min(0).optional(),
+    maxPricePaise: z.coerce.number().int().min(0).optional(),
+    minSize: z.coerce.number().int().min(2).max(500).optional(),
+    maxSize: z.coerce.number().int().min(2).max(500).optional(),
+    endsWithinHours: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(24 * 60)
+      .optional(),
     ...pageParams,
   }),
 };

@@ -21,6 +21,7 @@ const UPLOAD_KINDS = {
   avatar: { folder: 'saathmein/avatars', transformation: 'c_limit,w_512,h_512,q_auto:good' },
   product: { folder: 'saathmein/products', transformation: 'c_limit,w_1600,h_1600,q_auto:good' },
   chat: { folder: 'saathmein/chat', transformation: 'c_limit,w_1280,h_1280,q_auto:good' },
+  banner: { folder: 'saathmein/banners', transformation: 'c_limit,w_1600,h_900,q_auto:good' },
 };
 
 /**
@@ -140,6 +141,24 @@ const createProductImageUploadParams = (productId) =>
  */
 const verifyProductImageUpload = (productId, upload) => {
   assertValidUpload(upload, (publicId) => publicId.startsWith(productImagePrefix(productId)));
+  return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
+};
+
+/* ------------------------------ Home banners ------------------------------ */
+
+const BANNER_PREFIX = `${UPLOAD_KINDS.banner.folder}/`;
+
+/** @returns Signed params for one home banner image (Admin → Curation, F34) */
+const createBannerUploadParams = () =>
+  createSignedUpload(`${BANNER_PREFIX}${randomToken(9)}`, 'banner');
+
+/**
+ * Verify a banner upload.
+ * @param {{ publicId: string, version: number, signature: string }} upload - Cloudinary response
+ * @returns {{ publicId: string, url: string }}
+ */
+const verifyBannerUpload = (upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(BANNER_PREFIX));
   return { publicId: upload.publicId, url: imageUrl(upload.publicId, upload.version) };
 };
 
@@ -278,6 +297,8 @@ module.exports = {
   createProductImageUploadParams,
   verifyProductImageUpload,
   createChatImageUploadParams,
+  createBannerUploadParams,
+  verifyBannerUpload,
   verifyChatImageUpload,
   createKycUploadParams,
   verifyKycUpload,

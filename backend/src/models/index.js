@@ -31,4 +31,6 @@ module.exports = {
   Commission: require('./commission.model'),
   CommissionInvoice: require('./commissionInvoice.model'),
   Counter: require('./counter.model'),
+  WalletTransaction: require('./walletTransaction.model'),
+  CurationItem: require('./curationItem.model'),
 };

@@ -183,7 +183,20 @@ const NOTIFICATION_TYPE = Object.freeze({
   PURCHASE_COMPLETED: 'purchase_completed',
   DEAL_CODE_EXPIRED: 'deal_code_expired',
   DEALER_INVOICE_UPLOADED: 'dealer_invoice_uploaded',
+  // Day 11: wallet
+  WALLET_CREDITED: 'wallet_credited',
 });
+
+/** Why wallet credits moved (REF-1 to REF-3). Credits are not cash and never withdrawable. */
+const WALLET_TXN_TYPE = Object.freeze({
+  REFERRAL_REFERRER: 'referral_referrer',
+  REFERRAL_FRIEND: 'referral_friend',
+  LEADER_BONUS: 'leader_bonus',
+  ADJUSTMENT: 'adjustment', // staff correction (Day 13)
+});
+
+/** Admin curation items (F34). */
+const CURATION_TYPE = Object.freeze({ BANNER: 'banner', FEATURED_GROUP: 'featured_group' });
 
 /** One member's purchase from the winning dealer (PUR-1 to PUR-4). */
 const PURCHASE_STATUS = Object.freeze({
@@ -201,6 +214,8 @@ const COMMISSION_INVOICE_STATUS = Object.freeze({ ISSUED: 'issued', PAID: 'paid'
 const values = (enumObject) => Object.values(enumObject);
 
 module.exports = {
+  WALLET_TXN_TYPE,
+  CURATION_TYPE,
   PURCHASE_STATUS,
   COMMISSION_INVOICE_STATUS,
   SOCKET_EVENTS,
