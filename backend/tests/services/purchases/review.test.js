@@ -6,11 +6,16 @@ jest.mock('../../../src/utils/transaction', () => ({
   withTransaction: jest.fn(async (work) => work({ id: 'session' })),
 }));
 
+jest.mock('../../../src/services/trust/rating.service', () => ({
+  recomputeSellerRating: jest.fn(async () => ({ rating: 5, ratingCount: 1, reviewCount: 1 })),
+}));
+
 const { Types } = require('mongoose');
 const Purchase = require('../../../src/models/purchase.model');
 const Review = require('../../../src/models/review.model');
-const Seller = require('../../../src/models/seller.model');
-const { addRating, createReview } = require('../../../src/services/purchases/review.service');
+const { recomputeSellerRating } = require('../../../src/services/trust/rating.service');
+const { createReview } = require('../../../src/services/purchases/review.service');
+const { computeRating } = jest.requireActual('../../../src/services/trust/rating.service');
 
 const userId = String(new Types.ObjectId());
 const purchaseId = String(new Types.ObjectId());
@@ -22,12 +27,24 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe('rating average', () => {
-  it('adds one rating to the running average', () => {
-    expect(addRating(0, 0, 4)).toEqual({ rating: 4, ratingCount: 1 });
-    expect(addRating(4, 1, 5)).toEqual({ rating: 4.5, ratingCount: 2 });
-    expect(addRating(4.5, 2, 3)).toEqual({ rating: 4, ratingCount: 3 });
-    expect(addRating(4.67, 3, 4)).toEqual({ rating: 4.5, ratingCount: 4 });
+describe('rating aggregate (penalties count as 1-star, decided 12 Nov 2026)', () => {
+  it('averages reviews and penalties', () => {
+    expect(computeRating({ sum: 0, count: 0, penalties: 0 })).toEqual({
+      rating: 0,
+      ratingCount: 0,
+      reviewCount: 0,
+    });
+    expect(computeRating({ sum: 9, count: 2, penalties: 0 })).toEqual({
+      rating: 4.5,
+      ratingCount: 2,
+      reviewCount: 2,
+    });
+    // Two 5-star reviews and one rating penalty: (10 + 1) / 3
+    expect(computeRating({ sum: 10, count: 2, penalties: 1 })).toEqual({
+      rating: 3.67,
+      ratingCount: 3,
+      reviewCount: 2,
+    });
   });
 });
 
@@ -40,12 +57,10 @@ describe('createReview', () => {
     jest
       .spyOn(Review, 'create')
       .mockResolvedValue([{ _id: 'r1', rating: 5, createdAt: new Date() }]);
-    const sellerUpdate = jest.spyOn(Seller, 'updateOne').mockResolvedValue({});
 
     await createReview(userId, { purchaseId, rating: 5, text: 'Great' });
     expect(Review.create.mock.calls[0][1]).toEqual({ session: { id: 'session' } });
-    expect(sellerUpdate.mock.calls[0][0]).toEqual({ _id: sellerId });
-    expect(Array.isArray(sellerUpdate.mock.calls[0][1])).toBe(true); // pipeline (atomic)
+    expect(recomputeSellerRating).toHaveBeenCalledWith(sellerId);
   });
 
   it('only after the purchase is completed', async () => {

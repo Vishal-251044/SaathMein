@@ -13,6 +13,7 @@ const adminSellersRoutes = require('./admin.sellers.routes');
 const adminGroupsRoutes = require('./admin.groups.routes');
 const adminCommissionsRoutes = require('./admin.commissions.routes');
 const adminDiscoveryRoutes = require('./admin.discovery.routes');
+const adminTrustRoutes = require('./admin.trust.routes');
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use(adminSellersRoutes); // /sellers, /product-requests, /audit-logs
 router.use(adminGroupsRoutes); // /groups
 router.use(adminCommissionsRoutes); // /commissions, /commission-invoices
 router.use(adminDiscoveryRoutes); // /curation, /settings
+router.use(adminTrustRoutes); // /disputes, /reports
 
 module.exports = router;

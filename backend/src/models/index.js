@@ -33,4 +33,7 @@ module.exports = {
   Counter: require('./counter.model'),
   WalletTransaction: require('./walletTransaction.model'),
   CurationItem: require('./curationItem.model'),
+  Report: require('./report.model'),
+  Dispute: require('./dispute.model'),
+  SellerDue: require('./sellerDue.model'),
 };

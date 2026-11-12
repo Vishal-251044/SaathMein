@@ -17,6 +17,7 @@ const notificationRoutes = require('./notification.routes');
 const adminRoutes = require('./admin');
 const { purchaseRouter, reviewRouter } = require('./purchase.routes');
 const feedRoutes = require('./feed.routes');
+const { reportRouter, disputeRouter } = require('./trust.routes');
 
 const router = Router();
 
@@ -37,6 +38,8 @@ router.use('/notifications', requireDatabase, notificationRoutes);
 router.use('/purchases', requireDatabase, purchaseRouter);
 router.use('/reviews', requireDatabase, reviewRouter);
 router.use('/feed', requireDatabase, feedRoutes);
+router.use('/reports', requireDatabase, reportRouter);
+router.use('/disputes', requireDatabase, disputeRouter);
 router.use(
   ['/categories', '/cities', '/products', '/sellers', '/product-requests'],
   requireDatabase,

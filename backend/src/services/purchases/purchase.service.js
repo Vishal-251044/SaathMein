@@ -36,6 +36,7 @@ const {
 const { queueRefund, REFUND_REASON } = require('../payments/refund.service');
 const { recordCommission } = require('../payments/commission.service');
 const uploadService = require('../upload.service');
+const { phoneForDealer } = require('../trust/privacy');
 const { notifyDealer } = require('../auction/winner.service');
 const { OPEN_PURCHASE, qrPayloadFor, parseDealCodeInput } = require('../auction/dealCode.service');
 const {
@@ -99,6 +100,8 @@ const toSellerPurchase = (purchase) => {
     status: purchase.status,
     dealCode: purchase.dealCode,
     buyerFirstName: firstNameOnly(purchase.userId?.name) || null,
+    // Masked until the exit window ends (privacy, decided 12 Nov 2026)
+    ...phoneForDealer(purchase.userId?.phone, group?.exitWindowEndsAt),
     productName: product ? `${product.brand} ${product.model}` : null,
     variantName: variant?.name || null,
     pricePaise: purchase.pricePaise,
@@ -120,10 +123,10 @@ const populateForSeller = (query) =>
   query
     .populate({
       path: 'groupId',
-      select: 'productId variantKey',
+      select: 'productId variantKey exitWindowEndsAt',
       populate: { path: 'productId', select: PRODUCT_FIELDS },
     })
-    .populate('userId', 'name');
+    .populate('userId', 'name phone');
 
 /* ------------------------------- Buyer reads -------------------------------- */
 
@@ -360,6 +363,9 @@ const objectToInvoice = async ({ sellerId, userId }, purchaseId, reason, now = n
     throw ApiError.conflict('This invoice can no longer be objected to', { code: 'CANNOT_OBJECT' });
   }
   log.warn({ purchaseId: String(purchaseId), sellerId }, 'Dealer objected to invoice');
+  // Goes to the Disputes queue for Support (TRU-4); loaded here to avoid an import cycle
+  const { openFromInvoiceObjection } = require('../trust/dispute.service');
+  await openFromInvoiceObjection(updated, { reason, userId }, now);
   return toSellerPurchase(await populateForSeller(Purchase.findById(purchaseId)).lean());
 };
 
@@ -558,9 +564,16 @@ const processPurchaseTimers = async (now = new Date()) => {
   const settings = await getPurchaseSettings();
   const counts = { reminders: 0, expired: 0, refunds: 0, autoCompleted: 0, released: 0 };
   counts.reminders = await sendExpiryReminders(now, settings);
+  // Purchases with an open dispute wait for Support: no expiry, no auto-completion
+  const { purchasesUnderDispute } = require('../trust/dispute.service');
+  const disputed = await purchasesUnderDispute();
 
   // 1. Price validity over without a purchase → expired (claim first, then money)
-  const ending = await Purchase.find({ status: P.PENDING, validUntil: { $lte: now } })
+  const ending = await Purchase.find({
+    status: P.PENDING,
+    validUntil: { $lte: now },
+    _id: { $nin: disputed },
+  })
     .limit(BATCH)
     .lean();
   for (const purchase of ending) {
@@ -592,6 +605,7 @@ const processPurchaseTimers = async (now = new Date()) => {
   const invoices = await Purchase.find({
     status: P.INVOICE_UPLOADED,
     autoCompleteAt: { $lte: now },
+    _id: { $nin: disputed },
   })
     .limit(BATCH)
     .lean();

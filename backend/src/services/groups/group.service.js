@@ -266,7 +266,7 @@ const getBuyerAuctionLazy = (group, viewer) => {
 const sellerDealView = async (group) => {
   const { dealStatus } = require('../deals/deal.service');
   const seller = await Seller.findById(group.sellerId)
-    .select('businessName address rating ratingCount kyc.status')
+    .select('businessName address rating ratingCount reviewCount kyc.status')
     .lean();
   return {
     basePricePaise: group.basePricePaise,

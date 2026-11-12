@@ -23,6 +23,9 @@ jest.mock('../../../src/services/auction/dealCode.service', () => ({
   issueDealCodes: jest.fn(async () => 5),
   clearDealCodes: jest.fn(),
 }));
+jest.mock('../../../src/services/trust/penalty.service', () => ({
+  applyPenalties: jest.fn(async () => 2),
+}));
 jest.mock('../../../src/services/auction/settlement.service', () => ({
   holdGroupTransfersSafe: jest.fn(),
   reverseGroupTransfers: jest.fn(async () => ({ reversed: 0, failed: 0 })),
@@ -44,6 +47,7 @@ const AuctionDealer = require('../../../src/models/auctionDealer.model');
 const Product = require('../../../src/models/product.model');
 const { transition } = require('../../../src/services/groups/stateMachine');
 const settlement = require('../../../src/services/auction/settlement.service');
+const { applyPenalties } = require('../../../src/services/trust/penalty.service');
 const {
   issueDealCodes,
   clearDealCodes,
@@ -144,11 +148,11 @@ describe('backOut', () => {
 
     await backOut('g', { sellerId: String(sellerA), userId }, 'stock ran out at the showroom');
 
-    const penalties = Seller.updateOne.mock.calls[0][1].$push.penalties.$each;
-    expect(penalties.map((penalty) => penalty.type)).toEqual([
-      'rating_penalty',
-      'auction_suspension',
-    ]);
+    expect(applyPenalties).toHaveBeenCalledWith(
+      String(sellerA),
+      ['rating_penalty', 'auction_suspension'],
+      expect.objectContaining({ reason: 'stock ran out at the showroom', suspensionDays: 30 }),
+    );
     expect(clearDealCodes).toHaveBeenCalled();
     expect(settlement.reverseGroupTransfers).toHaveBeenCalledWith('g', 'dealer_backed_out');
     const [, to, options] = transition.mock.calls[0];

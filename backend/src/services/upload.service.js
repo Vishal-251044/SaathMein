@@ -274,6 +274,46 @@ const verifyInvoiceUpload = (purchaseId, upload) => {
   assertValidUpload(upload, (publicId) => publicId.startsWith(invoicePrefix(purchaseId)));
 };
 
+/* ---------------------------- Dispute evidence ----------------------------- */
+
+const DISPUTE_FOLDER = 'saathmein/disputes';
+
+/**
+ * Folder for one party's dispute evidence: buyers "u_<userId>", dealers "s_<sellerId>".
+ * @param {string} ownerKey
+ * @returns {string}
+ */
+const disputePrefix = (ownerKey) => `${DISPUTE_FOLDER}/${ownerKey}/`;
+
+/**
+ * Signed params for one PRIVATE evidence photo or PDF (TRU-4).
+ * @param {string} ownerKey - "u_<userId>" or "s_<sellerId>"
+ * @returns {{ uploadUrl: string, fields: Object }}
+ */
+const createDisputeEvidenceUploadParams = (ownerKey) => {
+  const cloudinary = requireCloudinary();
+  const params = {
+    timestamp: Math.round(Date.now() / 1000),
+    public_id: `${disputePrefix(ownerKey)}${randomToken(9)}`,
+    type: 'authenticated',
+    allowed_formats: KYC_FORMATS,
+  };
+  const signature = cloudinary.utils.api_sign_request(params, config.cloudinary.apiSecret);
+  return {
+    uploadUrl: `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/image/upload`,
+    fields: { ...params, api_key: config.cloudinary.apiKey, signature },
+  };
+};
+
+/**
+ * Verify an evidence upload belongs to this party and was signed by us.
+ * @param {string} ownerKey
+ * @param {{ publicId: string, version: number, signature: string }} upload
+ */
+const verifyDisputeEvidence = (ownerKey, upload) => {
+  assertValidUpload(upload, (publicId) => publicId.startsWith(disputePrefix(ownerKey)));
+};
+
 /**
  * Delete an image (best effort — a failed delete must never block the user).
  * @param {string} publicId - Cloudinary public id
@@ -306,5 +346,7 @@ module.exports = {
   privateFileUrl,
   createInvoiceUploadParams,
   verifyInvoiceUpload,
+  createDisputeEvidenceUploadParams,
+  verifyDisputeEvidence,
   deleteImage,
 };

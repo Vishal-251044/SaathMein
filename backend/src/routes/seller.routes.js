@@ -15,6 +15,8 @@ const auctionSchemas = require('../validators/auction.validator');
 const auctionController = require('../controllers/sellerAuction.controller');
 const purchaseSchemas = require('../validators/purchase.validator');
 const purchaseController = require('../controllers/sellerPurchase.controller');
+const trustSchemas = require('../validators/trust.validator');
+const trustController = require('../controllers/trust.controller');
 
 const router = Router();
 
@@ -121,6 +123,24 @@ router.get(
   '/commission-invoices/:invoiceId',
   validate(purchaseSchemas.invoiceIdParams),
   purchaseController.commissionInvoice,
+);
+
+// Disputes: buyers' complaints, answered within 48 h (TRU-4) — team members
+router.get(
+  '/disputes',
+  validate(trustSchemas.sellerDisputesSchema),
+  trustController.sellerDisputes,
+);
+router.post('/disputes/evidence-upload-params', trustController.sellerEvidenceParams);
+router.get(
+  '/disputes/:disputeId',
+  validate(trustSchemas.disputeIdParams),
+  trustController.sellerDispute,
+);
+router.post(
+  '/disputes/:disputeId/respond',
+  validate(trustSchemas.respondDisputeSchema),
+  trustController.respondDispute,
 );
 
 // Owner only

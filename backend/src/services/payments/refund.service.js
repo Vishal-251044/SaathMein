@@ -37,6 +37,8 @@ const REFUND_REASON = Object.freeze({
   LEFT_AFTER_WIN: 'left_after_win', // 24 h exit window after the auction (minus back-out fee)
   // Deal code not used before the dealer's price validity ended (decided 9 Nov 2026)
   PRICE_VALIDITY_EXPIRED: 'price_validity_expired',
+  // Support decided a dispute for the buyer (PAY-6: dealer failed to honour)
+  DISPUTE_REFUND: 'dispute_refund',
   GROUP_EXPIRED: 'group_expired',
   NO_DEAL: 'no_deal',
   GROUP_CANCELLED: 'group_cancelled',

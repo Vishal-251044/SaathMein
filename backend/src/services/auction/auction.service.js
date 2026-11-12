@@ -33,6 +33,7 @@ const {
   businessIneligibility,
   ineligibilityReason,
 } = require('./eligibility');
+const { phoneForDealer } = require('../trust/privacy');
 const { declareWinner, dealerAuctionUrl, productNameOf } = require('./winner.service');
 const {
   GROUP_STATUS,
@@ -266,7 +267,7 @@ const getBuyerAuction = async (group, { userId } = {}) => {
     priceHistory(group._id),
     group.sellerId
       ? Seller.findById(group.sellerId)
-          .select('businessName address rating ratingCount kyc.status')
+          .select('businessName address rating ratingCount reviewCount kyc.status')
           .lean()
       : null,
   ]);
@@ -320,12 +321,14 @@ const getSellerAuction = async (groupId, sellerId) => {
   const members = isWinner
     ? (
         await GroupMember.find({ groupId, status: MEMBER_STATUS.ACTIVE })
-          .populate('userId', 'name')
+          .populate('userId', 'name phone')
           .select('userId dealCode joinedAt')
           .lean()
       ).map((member) => ({
         firstName: member.userId?.name?.trim().split(/\s+/)[0] || null,
         dealCode: member.dealCode || null,
+        // Masked until the member can no longer leave (decided 12 Nov 2026)
+        ...phoneForDealer(member.userId?.phone, group.exitWindowEndsAt),
       }))
     : [];
 

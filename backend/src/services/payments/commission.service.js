@@ -11,6 +11,7 @@ const Commission = require('../../models/commission.model');
 const CommissionInvoice = require('../../models/commissionInvoice.model');
 const Counter = require('../../models/counter.model');
 const Seller = require('../../models/seller.model');
+const SellerDue = require('../../models/sellerDue.model');
 const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const { withTransaction } = require('../../utils/transaction');
@@ -98,8 +99,9 @@ const stateOf = (gstin, fallback) => (gstin && /^\d{2}/.test(gstin) ? gstin.slic
  * @param {{ commissionPaise: number, fromTokenPaise: number }[]} lines
  * @param {number} rateBps
  * @param {boolean} intraState
+ * @param {number} [recoveriesPaise] - Dealer dues added without GST (Day 12)
  */
-const invoiceTotals = (lines, rateBps, intraState) => {
+const invoiceTotals = (lines, rateBps, intraState, recoveriesPaise = 0) => {
   const taxablePaise = lines.reduce((sum, line) => sum + line.commissionPaise, 0);
   const fromTokensPaise = lines.reduce((sum, line) => sum + line.fromTokenPaise, 0);
   const gst = gstBreakdown(taxablePaise, rateBps, intraState);
@@ -109,7 +111,8 @@ const invoiceTotals = (lines, rateBps, intraState) => {
     gst,
     totalPaise,
     fromTokensPaise,
-    balanceDuePaise: Math.max(0, totalPaise - fromTokensPaise),
+    recoveriesPaise,
+    balanceDuePaise: Math.max(0, totalPaise - fromTokensPaise) + recoveriesPaise,
   };
 };
 
@@ -165,7 +168,7 @@ const recordCommission = async (purchase, { group, category, payment, productNam
 const issueSellerInvoice = async (sellerId, period, billing) => {
   const existing = await CommissionInvoice.findOne({ sellerId, 'period.key': period.key }).lean();
   if (existing) return existing;
-  const [commissions, seller] = await Promise.all([
+  const [commissions, seller, dues] = await Promise.all([
     Commission.find({
       sellerId,
       invoiceId: { $exists: false },
@@ -174,8 +177,11 @@ const issueSellerInvoice = async (sellerId, period, billing) => {
       .sort({ earnedAt: 1 })
       .lean(),
     Seller.findById(sellerId).select('businessName gstin address').lean(),
+    SellerDue.find({ sellerId, invoiceId: { $exists: false }, createdAt: { $lt: period.to } })
+      .sort({ createdAt: 1 })
+      .lean(),
   ]);
-  if (!commissions.length) return null;
+  if (!commissions.length && !dues.length) return null;
 
   const supplierState = stateOf(billing.gstin, billing.stateCode);
   const recipientState = stateOf(seller?.gstin, null);
@@ -189,7 +195,18 @@ const issueSellerInvoice = async (sellerId, period, billing) => {
     commissionPaise: commission.commissionPaise,
     fromTokenPaise: commission.fromTokenPaise,
   }));
-  const totals = invoiceTotals(lines, billing.gstRateBps, intraState);
+  const recoveries = dues.map((due) => ({
+    dueId: due._id,
+    reason: due.reason,
+    amountPaise: due.amountPaise,
+    createdAt: due.createdAt,
+  }));
+  const totals = invoiceTotals(
+    lines,
+    billing.gstRateBps,
+    intraState,
+    recoveries.reduce((sum, item) => sum + item.amountPaise, 0),
+  );
 
   return withTransaction(async (session) => {
     // Financial year of the billed month (its last moment)
@@ -218,6 +235,7 @@ const issueSellerInvoice = async (sellerId, period, billing) => {
             stateCode: recipientState,
           },
           lines,
+          recoveries,
           ...totals,
         },
       ],
@@ -228,6 +246,13 @@ const issueSellerInvoice = async (sellerId, period, billing) => {
       { $set: { invoiceId: invoice._id } },
       { session },
     );
+    if (dues.length) {
+      await SellerDue.updateMany(
+        { _id: { $in: dues.map((due) => due._id) } },
+        { $set: { invoiceId: invoice._id } },
+        { session },
+      );
+    }
     log.info(
       { sellerId: String(sellerId), invoiceNo, totalPaise: totals.totalPaise },
       'Commission invoice issued',
@@ -250,10 +275,19 @@ const generateMonthlyInvoices = async (periodKey, now = new Date()) => {
     });
   }
   const billing = await getBillingSettings();
-  const sellerIds = await Commission.distinct('sellerId', {
-    invoiceId: { $exists: false },
-    earnedAt: { $gte: period.from, $lt: period.to },
-  });
+  const [commissionSellers, dueSellers] = await Promise.all([
+    Commission.distinct('sellerId', {
+      invoiceId: { $exists: false },
+      earnedAt: { $gte: period.from, $lt: period.to },
+    }),
+    SellerDue.distinct('sellerId', {
+      invoiceId: { $exists: false },
+      createdAt: { $lt: period.to },
+    }),
+  ]);
+  const sellerIds = [
+    ...new Map([...commissionSellers, ...dueSellers].map((id) => [String(id), id])).values(),
+  ];
   let issued = 0;
   let failed = 0;
   for (const sellerId of sellerIds) {
@@ -291,6 +325,12 @@ const toInvoiceView = (invoice) => ({
   gst: invoice.gst,
   totalPaise: invoice.totalPaise,
   fromTokensPaise: invoice.fromTokensPaise,
+  recoveries: (invoice.recoveries || []).map((item) => ({
+    reason: item.reason,
+    amountPaise: item.amountPaise,
+    createdAt: item.createdAt,
+  })),
+  recoveriesPaise: invoice.recoveriesPaise || 0,
   balanceDuePaise: invoice.balanceDuePaise,
   status: invoice.status,
   paidAt: invoice.paidAt || null,

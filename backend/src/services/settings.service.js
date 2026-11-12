@@ -76,6 +76,12 @@ const DEFAULTS = Object.freeze({
     leaderBonusMinOtherPurchases: 3, // leader bought + at least 3 other members bought
     claimWithinDays: 30, // a referral code can be added only by accounts newer than this
   }),
+  // Day 12: disputes and penalties (TRU-4, TRU-5)
+  disputes: Object.freeze({
+    sellerResponseHours: 48, // dealer must answer within this time, else escalated
+    suspensionDays: 30, // default auction suspension for a penalty
+    maxEvidenceFiles: 6,
+  }),
   // Day 11: feature flags (F35)
   flags: Object.freeze({
     referrals: true,
@@ -126,6 +132,9 @@ const getBillingSettings = () => getSettings('billing');
 /** @returns {Promise<typeof DEFAULTS.referrals>} Referral and wallet credit amounts */
 const getReferralSettings = () => getSettings('referrals');
 
+/** @returns {Promise<typeof DEFAULTS.disputes>} Dispute and penalty rules */
+const getDisputeSettings = () => getSettings('disputes');
+
 /** @returns {Promise<typeof DEFAULTS.flags>} Feature flags */
 const getFeatureFlags = () => getSettings('flags');
 
@@ -139,6 +148,7 @@ module.exports = {
   getPurchaseSettings,
   getReferralSettings,
   getFeatureFlags,
+  getDisputeSettings,
   getBillingSettings,
   getPaymentSettings,
   getAuctionSettings,

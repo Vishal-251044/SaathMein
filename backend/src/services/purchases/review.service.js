@@ -1,30 +1,19 @@
 /**
  * Reviews (TRU-2, F28): only a buyer whose purchase completed can rate that dealer, once
- * per purchase. The dealer's average rating and count update atomically in the same
- * transaction. Abusive words are masked like chat messages.
+ * per purchase. The purchase is marked reviewed and the review saved in one
+ * transaction; the rating aggregate is then recomputed (Day 12: penalties
+ * count as 1-star). Abusive words are masked like chat messages.
  */
 const Purchase = require('../../models/purchase.model');
 const Review = require('../../models/review.model');
-const Seller = require('../../models/seller.model');
 const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const { withTransaction } = require('../../utils/transaction');
 const { filterProfanity } = require('../chat/profanity');
+const { recomputeSellerRating } = require('../trust/rating.service');
 const { PURCHASE_STATUS } = require('../../constants/enums');
 
 const log = createLogger('ReviewService');
-
-/**
- * New average after one more rating (pure, for tests), rounded to 2 decimals.
- * @param {number} average - Current average (0 when none)
- * @param {number} count - Current number of ratings
- * @param {number} rating - New rating 1–5
- * @returns {{ rating: number, ratingCount: number }}
- */
-const addRating = (average, count, rating) => ({
-  rating: Math.round((((average || 0) * (count || 0) + rating) / ((count || 0) + 1)) * 100) / 100,
-  ratingCount: (count || 0) + 1,
-});
 
 /**
  * Review the dealer of a completed purchase.
@@ -68,41 +57,10 @@ const createReview = async (userId, { purchaseId, rating, text }) => {
       ],
       { session },
     );
-    // Atomic running average (pipeline update reads the current values)
-    await Seller.updateOne(
-      { _id: purchase.sellerId },
-      [
-        {
-          $set: {
-            rating: {
-              $round: [
-                {
-                  $divide: [
-                    {
-                      $add: [
-                        {
-                          $multiply: [
-                            { $ifNull: ['$rating', 0] },
-                            { $ifNull: ['$ratingCount', 0] },
-                          ],
-                        },
-                        rating,
-                      ],
-                    },
-                    { $add: [{ $ifNull: ['$ratingCount', 0] }, 1] },
-                  ],
-                },
-                2,
-              ],
-            },
-            ratingCount: { $add: [{ $ifNull: ['$ratingCount', 0] }, 1] },
-          },
-        },
-      ],
-      { session },
-    );
     return created;
   });
+  // Rating = reviews + rating penalties (each a 1-star), recomputed from the source rows
+  await recomputeSellerRating(purchase.sellerId);
   log.info({ purchaseId, sellerId: String(purchase.sellerId), rating }, 'Review added');
   return {
     id: String(review._id),
@@ -112,4 +70,4 @@ const createReview = async (userId, { purchaseId, rating, text }) => {
   };
 };
 
-module.exports = { addRating, createReview };
+module.exports = { createReview };

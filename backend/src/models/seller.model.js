@@ -54,6 +54,7 @@ const penaltySchema = new Schema(
     },
     reason: { type: String, required: true, trim: true },
     groupId: { type: Schema.Types.ObjectId, ref: 'Group' },
+    disputeId: { type: Schema.Types.ObjectId, ref: 'Dispute' },
     until: Date,
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     createdAt: { type: Date, default: Date.now },
@@ -118,6 +119,8 @@ const sellerSchema = new Schema(
     rating: { type: Number, min: 0, max: 5, default: 0 },
     ratingCount: { type: Number, min: 0, default: 0 },
     plan: { type: String, enum: values(SELLER_PLAN), default: SELLER_PLAN.FREE },
+    // Published reviews; `ratingCount` also counts rating penalties (each = one 1-star, decided 12 Nov 2026)
+    reviewCount: { type: Number, default: 0, min: 0 },
     penalties: [penaltySchema],
     status: { type: String, enum: values(ACCOUNT_STATUS), default: ACCOUNT_STATUS.ACTIVE },
   },

@@ -21,6 +21,7 @@ const Commission = require('../../../src/models/commission.model');
 const CommissionInvoice = require('../../../src/models/commissionInvoice.model');
 const Counter = require('../../../src/models/counter.model');
 const Seller = require('../../../src/models/seller.model');
+const SellerDue = require('../../../src/models/sellerDue.model');
 const { getBillingSettings } = require('../../../src/services/settings.service');
 const service = require('../../../src/services/payments/commission.service');
 
@@ -45,7 +46,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-const givenSeller = (gstin) => {
+const givenSeller = (gstin, dues = []) => {
   jest.spyOn(CommissionInvoice, 'findOne').mockReturnValue(chain(null));
   jest
     .spyOn(Commission, 'find')
@@ -56,6 +57,8 @@ const givenSeller = (gstin) => {
     .spyOn(CommissionInvoice, 'create')
     .mockImplementation(async ([doc]) => [{ ...doc, _id: 'inv1', toObject: () => doc }]);
   jest.spyOn(Commission, 'updateMany').mockResolvedValue({});
+  jest.spyOn(SellerDue, 'find').mockReturnValue(chain(dues));
+  jest.spyOn(SellerDue, 'updateMany').mockResolvedValue({});
 };
 
 describe('issueSellerInvoice', () => {
@@ -82,6 +85,24 @@ describe('issueSellerInvoice', () => {
     givenSeller('29PQRSX6789K1Z2'); // Karnataka
     const invoice = await service.issueSellerInvoice(sellerId, period, await getBillingSettings());
     expect(invoice.gst).toMatchObject({ intraState: false, igstPaise: 45_000, cgstPaise: 0 });
+  });
+
+  it('adds dealer dues (dispute credits) without GST', async () => {
+    givenSeller('27PQRSX6789K1Z2', [
+      {
+        _id: new Types.ObjectId(),
+        reason: 'Credits given to a buyer after a dispute',
+        amountPaise: 50_000,
+        createdAt: new Date('2026-10-20'),
+      },
+    ]);
+    const invoice = await service.issueSellerInvoice(sellerId, period, await getBillingSettings());
+    expect(invoice).toMatchObject({
+      totalPaise: 295_000, // GST only on commission
+      recoveriesPaise: 50_000,
+      balanceDuePaise: 145_200, // 95,200 + 50,000
+    });
+    expect(SellerDue.updateMany).toHaveBeenCalled();
   });
 
   it('returns the existing invoice instead of billing twice', async () => {

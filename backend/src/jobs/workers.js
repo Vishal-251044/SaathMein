@@ -16,6 +16,7 @@ const { closeAuction, closeOverdueAuctions } = require('../services/auction/auct
 const { processAuctionTimeouts } = require('../services/auction/winner.service');
 const { retryMissingHolds } = require('../services/auction/settlement.service');
 const { processPurchaseTimers } = require('../services/purchases/purchase.service');
+const { processDisputeDeadlines } = require('../services/trust/dispute.service');
 const { generateMonthlyInvoices } = require('../services/payments/commission.service');
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
@@ -35,6 +36,7 @@ const PROCESSORS = {
     const auctionTimeouts = await processAuctionTimeouts();
     const holdsCreated = await retryMissingHolds();
     const purchases = await processPurchaseTimers();
+    const disputesEscalated = await processDisputeDeadlines();
     return {
       ...deadlines,
       auctionsClosed,
@@ -45,6 +47,7 @@ const PROCESSORS = {
       auctionTimeouts,
       holdsCreated,
       purchases,
+      disputesEscalated,
     };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),

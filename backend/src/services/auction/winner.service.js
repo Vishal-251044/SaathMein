@@ -30,6 +30,7 @@ const { emitToAuction } = require('../../sockets/emitter');
 const { toPublicSeller } = require('../seller/sellerPresenter');
 const { issueDealCodes, clearDealCodes } = require('./dealCode.service');
 const { holdGroupTransfersSafe, reverseGroupTransfers } = require('./settlement.service');
+const { applyPenalties } = require('../trust/penalty.service');
 const {
   BID_STATUS,
   GROUP_STATUS,
@@ -157,7 +158,7 @@ const declareWinner = async (group, winnerBid, runnerUpBid, { reason, actor } = 
 const announceWinner = async (group, winnerBid) => {
   const [seller, productName, dealers] = await Promise.all([
     Seller.findById(winnerBid.sellerId)
-      .select('businessName address rating ratingCount kyc.status geo')
+      .select('businessName address rating ratingCount reviewCount kyc.status geo')
       .lean(),
     productNameOf(group),
     AuctionDealer.find({ groupId: group._id }).select('sellerId').lean(),
@@ -210,26 +211,14 @@ const backOut = async (groupId, { sellerId, userId }, reason) => {
   const settings = await getAuctionSettings();
   const now = new Date();
 
-  // Penalty: rating penalty + suspension from auctions
-  await Seller.updateOne(
-    { _id: sellerId },
-    {
-      $push: {
-        penalties: {
-          $each: [
-            { type: 'rating_penalty', reason, groupId, createdBy: userId },
-            {
-              type: 'auction_suspension',
-              reason,
-              groupId,
-              until: new Date(now.getTime() + settings.backOutSuspensionDays * DAY_MS),
-              createdBy: userId,
-            },
-          ],
-        },
-      },
-    },
-  );
+  // Penalty: rating penalty (one 1-star) + suspension from auctions (TRU-5)
+  await applyPenalties(sellerId, ['rating_penalty', 'auction_suspension'], {
+    reason,
+    groupId,
+    staffId: userId,
+    suspensionDays: settings.backOutSuspensionDays,
+    now,
+  });
   await AuctionDealer.updateOne({ groupId, sellerId }, { $set: { status: 'backed_out' } });
   await clearDealCodes(groupId);
   // Take the held tokens back before they go to the runner-up or are refunded (PAY-4)

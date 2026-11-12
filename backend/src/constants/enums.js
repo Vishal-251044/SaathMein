@@ -185,6 +185,50 @@ const NOTIFICATION_TYPE = Object.freeze({
   DEALER_INVOICE_UPLOADED: 'dealer_invoice_uploaded',
   // Day 11: wallet
   WALLET_CREDITED: 'wallet_credited',
+  // Day 12: disputes
+  DISPUTE_UPDATE: 'dispute_update',
+  DEALER_DISPUTE_OPENED: 'dealer_dispute_opened',
+});
+
+/** What can be reported (TRU-3). */
+const REPORT_TARGET = Object.freeze({
+  GROUP: 'group',
+  MEMBER: 'member',
+  SELLER: 'seller',
+  MESSAGE: 'message',
+  REVIEW: 'review',
+});
+
+const REPORT_REASON = Object.freeze({
+  SPAM: 'spam',
+  FRAUD: 'fraud',
+  ABUSE: 'abuse',
+  PRICE_NOT_HONOURED: 'price_not_honoured',
+  OTHER: 'other',
+});
+
+const REPORT_STATUS = Object.freeze({ OPEN: 'open', RESOLVED: 'resolved', DISMISSED: 'dismissed' });
+
+/** Dispute lifecycle (TRU-4): buyer opens → dealer has 48 h → Support decides. */
+const DISPUTE_STATUS = Object.freeze({
+  AWAITING_SELLER: 'awaiting_seller',
+  SELLER_RESPONDED: 'seller_responded',
+  SELLER_MISSED: 'seller_missed', // 48 h passed without a reply (escalated)
+  RESOLVED: 'resolved',
+});
+
+const DISPUTE_TYPE = Object.freeze({
+  PRICE_NOT_HONOURED: 'price_not_honoured',
+  PRODUCT_ISSUE: 'product_issue',
+  INVOICE_OBJECTION: 'invoice_objection', // dealer objected to the buyer's invoice (Day 10)
+  OTHER: 'other',
+});
+
+/** Support's decision (decided 12 Nov 2026). */
+const DISPUTE_OUTCOME = Object.freeze({
+  REFUND: 'refund', // token still on hold: reverse the transfer and refund the bank
+  CREDIT: 'credit', // token already released: wallet credits, owed by the dealer
+  NO_REFUND: 'no_refund', // decided for the dealer (penalties may still apply)
 });
 
 /** Why wallet credits moved (REF-1 to REF-3). Credits are not cash and never withdrawable. */
@@ -193,6 +237,7 @@ const WALLET_TXN_TYPE = Object.freeze({
   REFERRAL_FRIEND: 'referral_friend',
   LEADER_BONUS: 'leader_bonus',
   ADJUSTMENT: 'adjustment', // staff correction (Day 13)
+  DISPUTE_CREDIT: 'dispute_credit', // dispute decided for the buyer after the token was released
 });
 
 /** Admin curation items (F34). */
@@ -214,6 +259,12 @@ const COMMISSION_INVOICE_STATUS = Object.freeze({ ISSUED: 'issued', PAID: 'paid'
 const values = (enumObject) => Object.values(enumObject);
 
 module.exports = {
+  REPORT_TARGET,
+  REPORT_REASON,
+  REPORT_STATUS,
+  DISPUTE_STATUS,
+  DISPUTE_TYPE,
+  DISPUTE_OUTCOME,
   WALLET_TXN_TYPE,
   CURATION_TYPE,
   PURCHASE_STATUS,

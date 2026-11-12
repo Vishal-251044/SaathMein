@@ -6,6 +6,51 @@ const { NOTIFICATION_TYPE: T } = require('../../constants/enums');
 
 /** @type {Record<string, Record<string, (data: Object) => { title: string, body: string }>>} */
 const TEMPLATES = {
+  // Day 12: disputes (TRU-4)
+  [T.DEALER_DISPUTE_OPENED]: {
+    en: (d) => ({
+      title: 'A buyer opened a dispute',
+      body: `${d.productName}: please answer on the Disputes page within ${d.hours} hours.`,
+    }),
+    hi: (d) => ({
+      title: 'एक खरीदार ने शिकायत दर्ज की',
+      body: `${d.productName}: कृपया ${d.hours} घंटे के अंदर Disputes पेज पर जवाब दें।`,
+    }),
+    mr: (d) => ({
+      title: 'एका खरेदीदाराने तक्रार नोंदवली',
+      body: `${d.productName}: कृपया ${d.hours} तासांत Disputes पेजवर उत्तर द्या.`,
+    }),
+  },
+  [T.DISPUTE_UPDATE]: {
+    en: (d) => ({
+      title:
+        d.status === 'resolved' ? 'Your dispute is decided' : 'The dealer answered your dispute',
+      body:
+        d.status === 'resolved'
+          ? 'Open the app to see the decision.'
+          : 'SaathMein Support will now review it.',
+    }),
+    hi: (d) => ({
+      title:
+        d.status === 'resolved'
+          ? 'आपकी शिकायत पर फैसला हो गया'
+          : 'डीलर ने आपकी शिकायत का जवाब दिया',
+      body:
+        d.status === 'resolved'
+          ? 'फैसला देखने के लिए ऐप खोलें।'
+          : 'अब SaathMein सपोर्ट इसकी जाँच करेगा।',
+    }),
+    mr: (d) => ({
+      title:
+        d.status === 'resolved'
+          ? 'तुमच्या तक्रारीवर निर्णय झाला'
+          : 'डीलरने तुमच्या तक्रारीला उत्तर दिले',
+      body:
+        d.status === 'resolved'
+          ? 'निर्णय पाहण्यासाठी अ‍ॅप उघडा.'
+          : 'आता SaathMein सपोर्ट याची तपासणी करेल.',
+    }),
+  },
   // Day 10: purchases (PUR-1 to PUR-4)
   [T.DEAL_CODE_EXPIRING]: {
     en: (d) => ({

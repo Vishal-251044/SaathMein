@@ -54,7 +54,18 @@ const commissionInvoiceSchema = new Schema(
     },
     totalPaise: paise, // taxable + GST
     fromTokensPaise: paise, // already kept from buyers' tokens
-    balanceDuePaise: paise, // total − kept from tokens (never below 0)
+    // Dealer dues outside commission (e.g. credits after a dispute), no GST (Day 12)
+    recoveries: [
+      {
+        _id: false,
+        dueId: { type: Schema.Types.ObjectId, ref: 'SellerDue' },
+        reason: String,
+        amountPaise: paise,
+        createdAt: Date,
+      },
+    ],
+    recoveriesPaise: { type: Number, default: 0, validate: paiseValidator },
+    balanceDuePaise: paise, // total − kept from tokens (never below 0) + recoveries
     status: {
       type: String,
       enum: values(COMMISSION_INVOICE_STATUS),

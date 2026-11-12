@@ -79,8 +79,9 @@ const toPublicSeller = (seller, { distanceKm = null } = {}) => ({
   businessName: seller.businessName,
   area: seller.address?.area || null,
   cityId: str(seller.address?.cityId),
+  // Rating includes rating penalties (each a 1-star); the count shown is published reviews
   rating: seller.ratingCount ? seller.rating : null,
-  ratingCount: seller.ratingCount || 0,
+  ratingCount: seller.reviewCount ?? seller.ratingCount ?? 0,
   verified: seller.kyc?.status === KYC_STATUS.APPROVED,
   distanceKm,
 });

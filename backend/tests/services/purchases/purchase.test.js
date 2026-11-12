@@ -30,6 +30,10 @@ jest.mock('../../../src/services/payments/refund.service', () => ({
   queueRefund: jest.fn(async () => true),
   REFUND_REASON: { PRICE_VALIDITY_EXPIRED: 'price_validity_expired' },
 }));
+jest.mock('../../../src/services/trust/dispute.service', () => ({
+  purchasesUnderDispute: jest.fn(async () => []),
+  openFromInvoiceObjection: jest.fn(async () => ({})),
+}));
 jest.mock('../../../src/services/upload.service', () => ({
   createInvoiceUploadParams: jest.fn(() => ({ uploadUrl: 'u', fields: {} })),
   verifyInvoiceUpload: jest.fn(),
