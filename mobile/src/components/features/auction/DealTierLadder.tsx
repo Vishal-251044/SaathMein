@@ -6,7 +6,8 @@
  */
 import { BadgeCheck, Check, Lock, Store } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { AppText } from '@/components/ui/AppText';
@@ -31,9 +32,19 @@ export function DealTierLadder({ deal, memberCount, isOpen }: Props) {
       {deal.seller ? (
         <View className="flex-row items-center gap-2">
           <Store size={18} color={colors.ink} strokeWidth={2} />
-          <AppText variant="bodyStrong" className="flex-shrink">
-            {t('deal.by', { name: deal.seller.businessName })}
-          </AppText>
+          <Pressable
+            onPress={() =>
+              deal.seller &&
+              router.push({ pathname: '/seller/[id]', params: { id: deal.seller.id } })
+            }
+            accessibilityRole="link"
+            accessibilityHint={t('dealer.openProfile')}
+            className="min-h-12 flex-shrink justify-center"
+          >
+            <AppText variant="bodyStrong" color="primary">
+              {t('deal.by', { name: deal.seller.businessName })}
+            </AppText>
+          </Pressable>
           {deal.seller.verified ? (
             <BadgeCheck
               size={16}

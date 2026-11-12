@@ -5,17 +5,19 @@
 import { router, type Href } from 'expo-router';
 import {
   ChevronRight,
+  FileText,
   Heart,
   LogOut,
   MapPin,
   Gift,
   MessageSquarePlus,
   Pencil,
+  Scale,
   Trash2,
 } from 'lucide-react-native';
 import { type ComponentType, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, type ColorValue, Pressable, View } from 'react-native';
+import { Alert, type ColorValue, Linking, Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { LanguageSwitcher } from '@/components/features/LanguageSwitcher';
@@ -32,8 +34,17 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuthStore } from '@/stores/auth.store';
 import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { WEB_URL } from '@/utils/constants';
 import { formatIndianPhone } from '@/utils/genericFunctions';
 import { localizedName } from '@/utils/localize';
+
+/** Legal pages on the website (e-commerce rules). */
+const LEGAL_LINKS = [
+  { key: 'terms', path: '/legal/terms' },
+  { key: 'privacy', path: '/legal/privacy' },
+  { key: 'refunds', path: '/legal/refund-policy' },
+  { key: 'grievance', path: '/legal/grievance-officer' },
+] as const;
 
 type IconType = ComponentType<{ size?: number; color?: ColorValue; strokeWidth?: number }>;
 
@@ -43,17 +54,23 @@ function ProfileRow({
   label,
   value,
   href,
+  url,
 }: {
   icon: IconType;
   label: string;
   value?: string;
-  href: Href;
+  href?: Href;
+  /** Opens in the browser (legal pages on the website). */
+  url?: string;
 }) {
   const { colors } = useThemeColors();
   return (
     <Pressable
-      onPress={() => router.push(href)}
-      accessibilityRole="button"
+      onPress={() => {
+        if (href) router.push(href);
+        else if (url) Linking.openURL(url).catch(() => {});
+      }}
+      accessibilityRole={url ? 'link' : 'button'}
       accessibilityLabel={value ? `${label}, ${value}` : label}
       className="min-h-14 flex-row items-center gap-3 px-4 py-3"
     >
@@ -160,6 +177,8 @@ export default function ProfileScreen() {
           href="/edit-interests"
         />
         <View className="border-t border-line" />
+        <ProfileRow icon={Scale} label={t('dispute.listTitle')} href="/my-disputes" />
+        <View className="border-t border-line" />
         <ProfileRow
           icon={Gift}
           label={t('wallet.profileRow')}
@@ -179,6 +198,22 @@ export default function ProfileScreen() {
         {t('profile.language')}
       </AppText>
       <LanguageSwitcher />
+
+      <AppText variant="heading" className="mb-3 mt-8">
+        {t('legal.title')}
+      </AppText>
+      <View className="overflow-hidden rounded-card border border-line bg-surface">
+        {LEGAL_LINKS.map((item, index) => (
+          <View key={item.path}>
+            {index ? <View className="border-t border-line" /> : null}
+            <ProfileRow
+              icon={FileText}
+              label={t(`legal.${item.key}`)}
+              url={`${WEB_URL}${item.path}`}
+            />
+          </View>
+        ))}
+      </View>
 
       {__DEV__ ? (
         <>

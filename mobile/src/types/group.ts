@@ -50,6 +50,8 @@ export interface GroupCard {
 }
 
 export interface GroupMemberPreview {
+  /** Opaque id (reports only). Absent in live "new member" events. */
+  id?: string;
   firstName: string | null;
   avatarUrl: string | null;
   isLeader: boolean;

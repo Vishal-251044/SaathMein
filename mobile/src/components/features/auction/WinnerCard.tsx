@@ -6,7 +6,8 @@
  */
 import { BadgeCheck, MapPin, Star, Ticket } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { AppText } from '@/components/ui/AppText';
@@ -44,9 +45,16 @@ export function WinnerCard({ group }: { group: GroupDetail }) {
       <View className="gap-1">
         <AppText variant="caption">{t('auction.winnerTitle')}</AppText>
         <View className="flex-row items-center gap-1.5">
-          <AppText variant="heading" className="flex-shrink">
-            {dealer.businessName}
-          </AppText>
+          <Pressable
+            onPress={() => router.push({ pathname: '/seller/[id]', params: { id: dealer.id } })}
+            accessibilityRole="link"
+            accessibilityHint={t('dealer.openProfile')}
+            className="min-h-12 flex-shrink justify-center"
+          >
+            <AppText variant="heading" color="primary">
+              {dealer.businessName}
+            </AppText>
+          </Pressable>
           {dealer.verified ? (
             <BadgeCheck
               size={18}

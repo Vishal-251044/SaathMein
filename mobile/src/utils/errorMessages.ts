@@ -73,6 +73,12 @@ const ERROR_KEYS: Record<string, string> = {
   REFERRALS_OFF: 'errors.featureOff',
   COMMUNITY_GROUPS_OFF: 'errors.featureOff',
   MAINTENANCE: 'errors.maintenance',
+  // Trust (Day 12)
+  ALREADY_REPORTED: 'errors.alreadyReported',
+  OWN_TARGET: 'errors.ownTarget',
+  DISPUTE_ALREADY_OPEN: 'errors.disputeOpen',
+  NOT_DISPUTABLE: 'errors.notDisputable',
+  TOO_MANY_FILES: 'errors.tooManyFiles',
   // Firebase phone auth (PhoneAuthError.code)
   INVALID_CODE: 'errors.invalidCode',
   CODE_EXPIRED: 'errors.codeExpired',

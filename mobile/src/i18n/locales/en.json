@@ -157,7 +157,12 @@
     "referralOwn": "You cannot use your own code.",
     "referralLoop": "You invited this person, so you cannot use their code.",
     "featureOff": "This is paused right now. Please try again later.",
-    "maintenance": "SaathMein is being updated. Please try again in a few minutes."
+    "maintenance": "SaathMein is being updated. Please try again in a few minutes.",
+    "alreadyReported": "You already reported this. Our team is looking into it.",
+    "ownTarget": "You cannot report yourself or your own content.",
+    "disputeOpen": "You already have an open dispute for this purchase.",
+    "notDisputable": "This purchase can no longer be disputed.",
+    "tooManyFiles": "Add at most 6 photos."
   },
   "language": {
     "title": "Choose your language",
@@ -351,7 +356,10 @@
     "showQr": "Show invite QR",
     "qrTitle": "Scan to join the {{name}} group",
     "qrA11y": "Invite QR code. Scanning it opens this group.",
-    "qrHint": "Print it for your society notice board or show it to neighbours. Any phone camera can scan it."
+    "qrHint": "Print it for your society notice board or show it to neighbours. Any phone camera can scan it.",
+    "reportGroup": "Report this group",
+    "reportMemberHint": "Long press to report this member",
+    "problemWithDealer": "Problem with the dealer?"
   },
   "createGroup": {
     "title": "Start a group",
@@ -655,5 +663,92 @@
     },
     "emptyTitle": "No credits yet",
     "emptyBody": "Invite friends or lead a group to earn credits."
+  },
+  "report": {
+    "title": {
+      "group": "Report this group",
+      "member": "Report this member",
+      "seller": "Report this dealer",
+      "message": "Report this message",
+      "review": "Report this review"
+    },
+    "reasons": {
+      "spam": "Spam",
+      "fraud": "Fraud or scam",
+      "abuse": "Abuse or harassment",
+      "price_not_honoured": "Price not honoured",
+      "other": "Something else"
+    },
+    "detailsLabel": "Tell us more (optional)",
+    "send": "Send report",
+    "thanks": "Thanks. Our team will review this. We do not tell the person who reported it."
+  },
+  "dealer": {
+    "title": "Dealer",
+    "noRating": "New dealer",
+    "reviews_one": "{{count}} review",
+    "reviews_other": "{{count}} reviews",
+    "groupsWon_one": "{{count}} group won",
+    "groupsWon_other": "{{count}} groups won",
+    "since": "On SaathMein since {{date}}",
+    "report": "Report this dealer",
+    "reportReview": "Report this review",
+    "reviewsTitle": "Reviews from buyers",
+    "starsA11y_one": "{{count}} star",
+    "starsA11y_other": "{{count}} stars",
+    "noReviewsTitle": "No reviews yet",
+    "noReviewsBody": "Only buyers who completed a purchase can review a dealer.",
+    "openProfile": "Opens the dealer profile"
+  },
+  "dispute": {
+    "newTitle": "Problem with the dealer",
+    "newIntro": "Tell us what happened. The dealer has 48 hours to answer, then SaathMein Support decides. Photos of the invoice or quotation help most.",
+    "typeLabel": "What went wrong?",
+    "types": {
+      "price_not_honoured": "Price not honoured",
+      "product_issue": "Problem with the product",
+      "invoice_objection": "Dealer objected to my invoice",
+      "other": "Something else"
+    },
+    "quotedLabel": "Price the dealer asked (₹, optional)",
+    "descriptionLabel": "What happened?",
+    "descriptionHint": "At least 20 characters. Do not share card or UPI details.",
+    "photosLabel": "Photos ({{count}} of {{max}})",
+    "submit": "Open dispute",
+    "listTitle": "My disputes",
+    "title": "Dispute",
+    "emptyTitle": "No disputes",
+    "emptyBody": "If a dealer does not honour your price, open a dispute from your group.",
+    "status": {
+      "awaiting_seller": "Waiting for the dealer",
+      "seller_responded": "Support is reviewing",
+      "seller_missed": "Support is reviewing",
+      "resolved": "Decided"
+    },
+    "quoted": "Dealer asked {{price}}",
+    "files_one": "{{count}} photo attached",
+    "files_other": "{{count}} photos attached",
+    "waitingDealer": "The dealer can answer until {{time}}.",
+    "dealerSays": "The dealer says",
+    "decisionTitle": "Decision",
+    "refunded": "{{amount}} refunded to your account",
+    "credited": "{{amount}} added to your SaathMein wallet",
+    "noRefund": "No refund",
+    "timelineTitle": "Timeline",
+    "actions": {
+      "opened": "You opened the dispute",
+      "invoice_objected": "The dealer objected to your invoice",
+      "responded": "The dealer answered",
+      "responded_late": "The dealer answered late",
+      "seller_missed_deadline": "The dealer did not answer in time",
+      "decided": "Support decided"
+    }
+  },
+  "legal": {
+    "title": "Legal",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "refunds": "Refund and cancellation policy",
+    "grievance": "Grievance officer"
   }
 }

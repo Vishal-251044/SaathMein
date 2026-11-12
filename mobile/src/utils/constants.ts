@@ -9,6 +9,12 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5000
 /** Socket.io server (live groups, chat, notifications). Defaults to the API host. */
 export const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL ?? API_URL.replace(/\/api\/?$/, '');
 
+/** Public website (legal pages). */
+export const WEB_URL = (
+  process.env.EXPO_PUBLIC_WEB_URL ??
+  `https://${process.env.EXPO_PUBLIC_APP_LINK_HOST ?? 'saathmein.in'}`
+).replace(/\/+$/, '');
+
 /** Polling interval for live screens while the socket is down (LIV-1 fallback). */
 export const LIVE_FALLBACK_POLL_MS = 15_000;
 

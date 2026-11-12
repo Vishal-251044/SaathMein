@@ -13,9 +13,11 @@ import { useState } from 'react';
 import {
   Clock,
   Copy,
+  Flag,
   Crown,
   Lock,
   PackageX,
+  Scale,
   MessagesSquare,
   QrCode,
   Share2,
@@ -32,6 +34,7 @@ import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { GroupStatusTimeline } from '@/components/features/GroupStatusTimeline';
 import { InviteQrSheet } from '@/components/features/InviteQrSheet';
+import { ReportSheet } from '@/components/features/trust/ReportSheet';
 import { JoinGroupBar } from '@/components/features/JoinGroupBar';
 import { DealTierLadder } from '@/components/features/auction/DealTierLadder';
 import { LiveAuctionCard } from '@/components/features/auction/LiveAuctionCard';
@@ -56,6 +59,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimeLeft } from '@/hooks/useTimeLeft';
 import { ApiClientError } from '@/services/api';
 import { enterUp } from '@/utils/animations';
+import type { ReportTarget } from '@/types/trust';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
 
@@ -92,6 +96,7 @@ export default function GroupScreen() {
   });
   const cancel = useCancelGroup();
   const [qrOpen, setQrOpen] = useState(false);
+  const [reporting, setReporting] = useState<{ type: ReportTarget; id: string } | null>(null);
   const timeLeft = useTimeLeft(group?.deadline);
   const isNotFound = error instanceof ApiClientError && error.status === 404;
   const canChat =
@@ -367,15 +372,23 @@ export default function GroupScreen() {
               {group.members.length ? (
                 <View className="flex-row flex-wrap gap-2">
                   {group.members.map((member, index) => (
-                    <View
+                    <Pressable
                       key={`${member.firstName}-${index}`}
+                      // Long press to report a member (TRU-3)
+                      onLongPress={() =>
+                        member.id && canChat
+                          ? setReporting({ type: 'member', id: member.id })
+                          : undefined
+                      }
+                      accessibilityRole="text"
+                      accessibilityHint={canChat ? t('group.reportMemberHint') : undefined}
                       className="rounded-full bg-bg-band px-3 py-1.5"
                     >
                       <AppText variant="caption" color="ink">
                         {member.firstName ?? t('group.someone')}
                         {member.isLeader ? ` · ${t('group.leaderTag')}` : ''}
                       </AppText>
-                    </View>
+                    </Pressable>
                   ))}
                 </View>
               ) : (
@@ -392,6 +405,30 @@ export default function GroupScreen() {
               <GroupStatusTimeline status={group.status} history={group.statusHistory} />
             </View>
 
+            {group.myPurchase &&
+            ['pending', 'invoice_uploaded', 'objected', 'completed'].includes(
+              group.myPurchase.status,
+            ) ? (
+              <Button
+                label={t('group.problemWithDealer')}
+                icon={Scale}
+                variant="secondary"
+                onPress={() =>
+                  router.push({
+                    pathname: '/dispute/new',
+                    params: { purchaseId: group.myPurchase?.id ?? '' },
+                  })
+                }
+              />
+            ) : null}
+
+            <Button
+              label={t('group.reportGroup')}
+              icon={Flag}
+              variant="ghost"
+              onPress={() => setReporting({ type: 'group', id: group.id })}
+            />
+
             {group.canCancel ? (
               <View className="gap-2">
                 {cancel.error ? <Notice message={t(getErrorMessageKey(cancel.error))} /> : null}
@@ -406,6 +443,15 @@ export default function GroupScreen() {
             ) : null}
           </View>
         </ScrollView>
+      ) : null}
+      {reporting && group ? (
+        <ReportSheet
+          visible
+          onClose={() => setReporting(null)}
+          targetType={reporting.type}
+          targetId={reporting.id}
+          groupId={group.id}
+        />
       ) : null}
     </View>
   );

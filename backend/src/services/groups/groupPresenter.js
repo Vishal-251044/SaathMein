@@ -82,6 +82,8 @@ const toGroupDetail = (
     members: members
       .filter((member) => member.userId)
       .map((member) => ({
+        // Opaque id so members can be reported (TRU-3); never a phone number
+        id: str(member.userId._id),
         firstName: firstNameOnly(member.userId.name) || null,
         avatarUrl: member.userId.avatar?.url || null,
         isLeader: str(member.userId._id) === str(group.leaderId),

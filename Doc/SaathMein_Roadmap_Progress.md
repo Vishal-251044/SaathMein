@@ -360,16 +360,26 @@ Notes:
 ### Day 12 — Trust, Reviews, Reports & Disputes (Fri 6 Nov)
 **Done when:** a buyer opens a "price not honoured" dispute; the seller responds; Support decides a refund; the refund and the seller penalty are both logged.
 
-- [ ] Mobile: report a group, member, seller, message or review
-- [ ] Mobile: disputes (open with evidence, timeline, status)
-- [ ] Mobile: seller profile (rating, reviews, verified badge)
-- [ ] Backend: reviews API (completed buyers only) and rating aggregates
-- [ ] Backend: reports + disputes API with timeline; 48 h seller SLA job
-- [ ] Backend: seller penalties (warning, rating penalty, bidding suspension)
-- [ ] Backend: privacy — phone numbers hidden until acceptance
-- [ ] Web: Admin Disputes and Reports queue with evidence viewer
-- [ ] Web: seller respond to disputes
-- [ ] Web: legal pages (terms, privacy, refund policy, grievance officer)
+- [x] Mobile: report a group, member, seller, message or review
+- [x] Mobile: disputes (open with evidence, timeline, status)
+- [x] Mobile: seller profile (rating, reviews, verified badge)
+- [x] Backend: reviews API (completed buyers only) and rating aggregates
+- [x] Backend: reports + disputes API with timeline; 48 h seller SLA job
+- [x] Backend: seller penalties (warning, rating penalty, bidding suspension)
+- [x] Backend: privacy — phone numbers hidden until acceptance
+- [x] Web: Admin Disputes and Reports queue with evidence viewer
+- [x] Web: seller respond to disputes
+- [x] Web: legal pages (terms, privacy, refund policy, grievance officer)
+
+Notes:
+- Built 12 Nov 2026. Backend: 609 tests pass (dispute open rules, every decision money path — refund with hold reversal, refund while the token is with SaathMein, credits only once released and never above the token, wrong path refused, no double decision, penalties; 48 h escalation and late answers; reports visibility, duplicates, own content, actions per target, closing every report on a target; rating with penalties; phone masking; invoice dues; Disputes / Reports queue Owner + Admin + Support only, decision reason required and audited). Web builds; mobile typecheck + lint pass.
+- Decisions (12 Nov 2026): Support refund = token with SaathMein or on hold → hold reversed and full token refunded to the bank, deal code cancelled; token already released → SaathMein wallet credits (up to the token), recorded as a dealer due billed (without GST) on the next monthly commission invoice. A rating penalty counts as one 1-star rating in the dealer average (`ratingCount` includes penalties for the 3.5 auction rule; buyers see the number of reviews). The winning dealer sees a member's phone masked until the 24 h exit window ends, then in full; other members never see phones. Legal pages are full drafts marked "pending legal review".
+- Disputes: buyer opens on a purchase (code issued, invoice uploaded, objected or completed) with up to 6 private photos and chat message ids; one open dispute per purchase; the dealer has 48 h (`settings.disputes.sellerResponseHours`), then the minute sweep escalates it (a late answer is still recorded). A dealer objecting to a buyer's invoice now opens a dispute for Support. While a dispute is open the purchase does not expire or auto-complete.
+- Reports: group, member (long press in the group; members now carry an opaque id), dealer, chat message (also counts toward the auto-hide after 3), review. Support: dismiss, hide / show again (reviews recompute the rating), warn dealer, suspend account; one decision closes every open report on that target.
+- Penalties come from one service (disputes, reports, a winner backing out). Public dealer profile GET /sellers/:id + /reviews; mobile dealer screen opens from the winner card and the deal ladder.
+- PENDING (owner): fill `web/src/utils/legal.js` (company name, address, CIN, GSTIN, support contacts, grievance officer) and have a lawyer review the four pages, then set `isDraft: false`. New mobile env `EXPO_PUBLIC_WEB_URL` (legal links in Profile).
+- MOVED to Day 13: the winning dealer in the group chat (moved from Day 9/10), staff "suspend account" un-suspend and penalty removal screens, wallet spending on tokens.
+- Not verified end-to-end (needs MongoDB, Redis + worker, Razorpay test mode, Cloudinary). "Done when" check: after a win, the buyer opens "Problem with the dealer?" → price not honoured with a photo; the dealer answers on /seller/disputes; Support opens /admin/disputes, chooses Refund + Rating penalty with a reason; the refund appears in the buyer's money timeline and ledger, and the penalty on the dealer; both are in the audit log.
 
 ### Day 13 — Full Owner Console & Live Monitoring (Sat 7 Nov)
 **Done when:** the Owner watches a test auction live with dealer names, sees payments, holds and refunds on the Payment monitor, receives an alert when a webhook fails, cancels a test group (everyone refunded) and every action appears in the audit log.
@@ -517,3 +527,7 @@ Notes:
 | 9 Nov 2026 | Commission invoices: printable web page (no PDF library); 18% GST on top of commission, SM/FY/seq numbering — pending CA confirmation | Day 10 |
 | 12 Nov 2026 | Wallet credits earned + shown on Day 11; spending on tokens moved to Day 13 | Days 11, 13 |
 | 12 Nov 2026 | Referral ₹100 + ₹100 on the friend's first completed purchase; leader bonus ₹500 when leader + 3 others bought (all editable) | Day 11 |
+| 12 Nov 2026 | Dispute refunds: on hold / with SaathMein → full bank refund; released → wallet credits billed to the dealer | Days 12, 13 |
+| 12 Nov 2026 | Rating penalty = one 1-star rating in the dealer average | Day 12 |
+| 12 Nov 2026 | Winning dealer sees member phones only after the 24 h exit window (masked before) | Day 12 |
+| 12 Nov 2026 | Legal pages drafted, marked pending legal review; details in web/src/utils/legal.js | Day 12 |
