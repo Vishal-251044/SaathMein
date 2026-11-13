@@ -1,0 +1,105 @@
+# Render Blueprint — SaathMein API + BullMQ worker (Day 14, decided 13 Nov 2026).
+# Create it in Render: New → Blueprint → pick this repo (branch main). Secrets marked
+# `sync: false` are asked for once in the dashboard and never stored in git.
+# The web app (seller dashboard + admin console) deploys to Vercel separately.
+
+envVarGroups:
+  # Shared by the API and the worker (same database, Redis, secrets)
+  - name: saathmein-backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: STAFF_JWT_ACCESS_SECRET
+        generateValue: true
+      - key: STAFF_JWT_REFRESH_SECRET
+        generateValue: true
+      - key: DEAL_CODE_SECRET
+        generateValue: true
+      # 64 hex characters: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+      - key: TWO_FACTOR_ENCRYPTION_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Razorpay TEST keys until the CA / lawyer confirm (open question 9, decided 13 Nov 2026)
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0.1"
+
+services:
+  - type: web
+    name: saathmein-api
+    runtime: node
+    region: singapore # closest Render region to Pune
+    plan: starter # always on (free instances sleep and drop sockets)
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: RELEASE=$RENDER_GIT_COMMIT npm start
+    healthCheckPath: /api/health
+    autoDeploy: false # deploy main deliberately
+    envVarGroups:
+      - saathmein-backend
+    envVars:
+      # Browser origins of the Vercel web app, comma separated (no localhost in production)
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SELLER_WEB_URL
+        sync: false
+      # Public base of share links (<base>/g/<code>) and Android App Links
+      - key: APP_LINK_BASE_URL
+        sync: false
+      - key: ANDROID_SHA256_CERT_FINGERPRINTS
+        sync: false
+      - key: EXPO_ACCESS_TOKEN
+        sync: false
+
+  - type: worker
+    name: saathmein-worker
+    runtime: node
+    region: singapore
+    plan: starter
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: RELEASE=$RENDER_GIT_COMMIT npm run worker
+    autoDeploy: false
+    envVarGroups:
+      - saathmein-backend
+    envVars:
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SELLER_WEB_URL
+        sync: false
+      - key: APP_LINK_BASE_URL
+        sync: false

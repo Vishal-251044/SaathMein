@@ -23,6 +23,7 @@ const { generateMonthlyInvoices } = require('../services/payments/commission.ser
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
 const { runReconciliation } = require('../services/payments/reconciliation.service');
+const { captureError } = require('../config/sentry');
 
 const log = createLogger('Workers');
 
@@ -83,6 +84,10 @@ const startWorkers = async () => {
         { queue: name, jobId: job?.id, attempts: job?.attemptsMade, err: err.message },
         'Job failed',
       );
+      // Report only the final failure (retries are normal)
+      if (!job || job.attemptsMade >= (job.opts?.attempts || 1)) {
+        captureError(err, { queue: name, jobId: job?.id });
+      }
       // PRD Alerts: "auction job failed to close" goes to the Owner and Deal Manager
       if (name === QUEUE_NAMES.AUCTION_CLOSE) {
         raiseAlert({

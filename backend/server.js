@@ -3,6 +3,8 @@
  * Loads config, connects MongoDB and Redis, starts the HTTP server and handles
  * graceful shutdown. Socket.io (live groups, chat, notifications) shares the HTTP server.
  */
+// Sentry first, so it can instrument everything loaded after it (Day 14)
+const { captureError, flushSentry } = require('./src/config/sentry');
 const http = require('http');
 const config = require('./src/config/env');
 const app = require('./src/app');
@@ -42,7 +44,7 @@ const shutdown = (signal) => {
   setTimeout(() => process.exit(1), 10000).unref();
 
   server.close(async () => {
-    await Promise.allSettled([disconnectDB(), disconnectRedis()]);
+    await Promise.allSettled([disconnectDB(), disconnectRedis(), flushSentry()]);
     log.info('Shutdown complete');
     process.exit(0);
   });
@@ -52,10 +54,12 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('unhandledRejection', (reason) => {
   log.error({ err: reason }, 'Unhandled promise rejection');
+  captureError(reason, { kind: 'unhandledRejection' });
 });
 process.on('uncaughtException', (err) => {
   log.fatal({ err }, 'Uncaught exception — exiting');
-  process.exit(1);
+  captureError(err, { kind: 'uncaughtException' });
+  flushSentry().finally(() => process.exit(1));
 });
 
 start();

@@ -99,6 +99,8 @@ const initSockets = async (httpServer) => {
     serveClient: false,
     pingInterval: 25_000,
     pingTimeout: 20_000,
+    // Clients only send small control events (join, leave); refuse big frames (Day 14)
+    maxHttpBufferSize: 16 * 1024,
   });
 
   const redis = getRedis();

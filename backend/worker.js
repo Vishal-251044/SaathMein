@@ -2,6 +2,8 @@
  * SaathMein background worker entry point (separate process from the API):
  * group deadlines and auction close (BullMQ). Run with `npm run worker`.
  */
+// Sentry first, so failed jobs are reported (Day 14)
+const { flushSentry } = require('./src/config/sentry');
 const { connectDB, disconnectDB } = require('./src/config/db');
 const { connectRedis, disconnectRedis } = require('./src/config/redis');
 const { createLogger } = require('./src/utils/logger');
@@ -24,7 +26,7 @@ const shutdown = async (signal) => {
   setTimeout(() => process.exit(1), 15000).unref();
   await Promise.allSettled(workers.map((worker) => worker.close()));
   await closeQueues();
-  await Promise.allSettled([disconnectDB(), disconnectRedis()]);
+  await Promise.allSettled([disconnectDB(), disconnectRedis(), flushSentry()]);
   process.exit(0);
 };
 

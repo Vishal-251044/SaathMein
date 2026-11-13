@@ -17,16 +17,36 @@ const nextConfig = {
   partialPrefetching: true,
   turbopack: {
     rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
+      '*.css': {
+        loaders: ['@tailwindcss/turbopack'],
+        as: '*.css',
       },
     },
+  },
+  // Security headers on every page (Day 14 hardening). The console must never be framed.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        ],
+      },
+    ];
   },
   async rewrites() {
     return [
       { source: '/g/:code', destination: `${backendOrigin}/g/:code` },
-      { source: '/.well-known/assetlinks.json', destination: `${backendOrigin}/.well-known/assetlinks.json` },
+      // Referral links (REF-1) are served by the backend too
+      { source: '/r/:code', destination: `${backendOrigin}/r/:code` },
+      {
+        source: '/.well-known/assetlinks.json',
+        destination: `${backendOrigin}/.well-known/assetlinks.json`,
+      },
     ];
   },
 };

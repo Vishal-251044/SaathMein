@@ -97,6 +97,12 @@ const envSchema = z.object({
   OWNER_EMAIL: z.string().default(''),
   OWNER_PASSWORD: z.string().default(''),
   OWNER_NAME: z.string().default('Owner'),
+
+  // Sentry error monitoring (Day 14). Empty or placeholder = off.
+  SENTRY_DSN: z.string().default(''),
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
+  // Release name for Sentry (Render sets RENDER_GIT_COMMIT; we pass it through)
+  RELEASE: z.string().default(''),
 });
 
 /**
@@ -154,6 +160,28 @@ if (isProduction && !isTwoFactorKeyValid) {
   fail('TWO_FACTOR_ENCRYPTION_KEY must be 64 hex characters (32 bytes) in production');
 }
 
+// Day 14 hardening: production never starts half-configured (money, queues, sockets)
+const isPlaceholder = (value) => !value || /^your_.*_here$/.test(value);
+if (isProduction) {
+  const missing = [
+    'RAZORPAY_KEY_ID',
+    'RAZORPAY_KEY_SECRET',
+    'RAZORPAY_WEBHOOK_SECRET',
+    'REDIS_URL',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_PRIVATE_KEY',
+  ].filter((key) => isPlaceholder(env[key]));
+  if (missing.length) fail(`Production needs real values for: ${missing.join(', ')}`);
+  if (!isRealUrl(env.MONGODB_URI, ['mongodb://', 'mongodb+srv://'])) {
+    fail('MONGODB_URI must be a real MongoDB connection string in production');
+  }
+  const localOrigins = env.CORS_ORIGINS.split(',').filter((origin) =>
+    /localhost|127\.0\.0\.1/.test(origin),
+  );
+  if (localOrigins.length)
+    fail(`CORS_ORIGINS must not include local origins in production: ${localOrigins.join(', ')}`);
+}
+
 /**
  * Key that encrypts TOTP secrets. Outside production a placeholder falls back to a
  * fixed development key, so 2FA can be tested before real secrets exist.
@@ -174,6 +202,12 @@ const config = Object.freeze({
   corsOrigins: env.CORS_ORIGINS.split(',')
     .map((origin) => origin.trim())
     .filter(Boolean),
+  sentry: {
+    dsn: env.SENTRY_DSN,
+    isConfigured: env.SENTRY_DSN.startsWith('https://'),
+    tracesSampleRate: env.SENTRY_TRACES_SAMPLE_RATE,
+    release: env.RELEASE || undefined,
+  },
   mongo: {
     uri: env.MONGODB_URI,
     isConfigured: isRealUrl(env.MONGODB_URI, ['mongodb://', 'mongodb+srv://']),

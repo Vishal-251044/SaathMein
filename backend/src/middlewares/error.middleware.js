@@ -5,6 +5,7 @@
 const mongoose = require('mongoose');
 const ApiError = require('../utils/ApiError');
 const config = require('../config/env');
+const { captureError } = require('../config/sentry');
 const { createLogger } = require('../utils/logger');
 
 const log = createLogger('ErrorHandler');
@@ -67,6 +68,11 @@ const errorHandler = (err, req, res, _next) => {
 
   if (apiError.statusCode >= 500) {
     log.error({ ...context, err: apiError.cause || err }, 'Unhandled error');
+    captureError(apiError.cause || err, {
+      reqId: req.id,
+      route: req.route?.path,
+      method: req.method,
+    });
   } else {
     log.warn({ ...context, code: apiError.code }, apiError.message);
   }
