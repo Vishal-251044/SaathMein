@@ -1,7 +1,8 @@
 /**
  * End-to-end test of the staff login service with mocked models:
  * password → mandatory 2FA setup → session + backup codes → later login with TOTP,
- * replay rejection, backup code use and lockout after 5 failures.
+ * replay rejection, backup code use, lockout after 5 failures and the new-device email
+ * (ADL-4).
  */
 jest.mock('../../../src/models/user.model', () => ({
   findOne: jest.fn(),
@@ -18,12 +19,21 @@ jest.mock('../../../src/services/auth/session.service', () => ({
   rotateRefreshToken: jest.fn(),
   revokeByRefreshToken: jest.fn(),
 }));
+jest.mock('../../../src/models/session.model', () => ({ exists: jest.fn(async () => null) }));
+jest.mock('../../../src/services/email.service', () => ({
+  sendStaffNewDevice: jest.fn(async () => ({ sent: true })),
+}));
 
 const bcrypt = require('bcrypt');
 const { generate } = require('otplib');
 const { Types } = require('mongoose');
 const User = require('../../../src/models/user.model');
-const { startSession } = require('../../../src/services/auth/session.service');
+const {
+  startSession,
+  revokeByRefreshToken,
+} = require('../../../src/services/auth/session.service');
+const Session = require('../../../src/models/session.model');
+const { sendStaffNewDevice } = require('../../../src/services/email.service');
 const staffAuth = require('../../../src/services/auth/staffAuth.service');
 
 const PASSWORD = 'Correct-Horse-42!';
@@ -144,5 +154,43 @@ describe('staff login flow', () => {
     await expect(
       staffAuth.loginWithPassword({ email: user.email, password: PASSWORD }),
     ).rejects.toMatchObject({ statusCode: 403 });
+  });
+
+  it('emails the staff member when they sign in from a browser not used before (ADL-4)', async () => {
+    const step1 = await staffAuth.loginWithPassword({ email: user.email, password: PASSWORD });
+    const code = await generate({ secret: step1.setup.secret });
+    // First ever login: no history → no email
+    const first = await staffAuth.verifySecondFactor({
+      challengeToken: step1.challengeToken,
+      code,
+      context: { ip: '1.2.3.4', userAgent: 'Laptop Chrome' },
+    });
+    expect(sendStaffNewDevice).not.toHaveBeenCalled();
+
+    // Later login from an unknown browser: history exists, this user agent does not
+    Session.exists.mockImplementation(async (filter) => (filter.userAgent ? null : { _id: 's' }));
+    const again = await staffAuth.loginWithPassword({ email: user.email, password: PASSWORD });
+    await staffAuth.verifySecondFactor({
+      challengeToken: again.challengeToken,
+      code: first.backupCodes[0],
+      context: { ip: '5.6.7.8', userAgent: 'Unknown phone' },
+    });
+    expect(sendStaffNewDevice).toHaveBeenCalledWith(
+      expect.objectContaining({ to: user.email, ip: '5.6.7.8', device: 'Unknown phone' }),
+    );
+    Session.exists.mockImplementation(async () => null);
+  });
+
+  it('logout returns who signed out (for the audit log), or null for a dead session', async () => {
+    revokeByRefreshToken.mockResolvedValueOnce(String(user._id));
+    User.findById.mockReturnValueOnce({
+      select: () => ({ lean: async () => ({ staffRole: 'finance' }) }),
+    });
+    await expect(staffAuth.logoutStaff('rt')).resolves.toEqual({
+      userId: String(user._id),
+      role: 'finance',
+    });
+    revokeByRefreshToken.mockResolvedValueOnce(null);
+    await expect(staffAuth.logoutStaff('dead')).resolves.toBeNull();
   });
 });

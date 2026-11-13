@@ -195,3 +195,9 @@ export interface GroupPurchase {
   canReview: boolean;
   reviewedAt: string | null;
 }
+
+/** A row of "My deal codes": the purchase plus what was bought and where. */
+export interface MyDealCode extends GroupPurchase {
+  productName: string | null;
+  dealerName: string | null;
+}

@@ -3,13 +3,13 @@
  * (/purchases, /reviews, /users/me/deal-codes). Invoice photos go straight to Cloudinary
  * as PRIVATE files with server-signed params.
  */
-import type { GroupPurchase } from '@/types/group';
+import type { GroupPurchase, MyDealCode } from '@/types/group';
 
 import { api, unwrap } from './api';
 
 /** My open and recently completed deal codes. */
-export async function getMyDealCodes(): Promise<GroupPurchase[]> {
-  return (await unwrap<{ purchases: GroupPurchase[] }>(api.get('/users/me/deal-codes'))).purchases;
+export async function getMyDealCodes(): Promise<MyDealCode[]> {
+  return (await unwrap<{ purchases: MyDealCode[] }>(api.get('/users/me/deal-codes'))).purchases;
 }
 
 /**

@@ -4,6 +4,8 @@
  */
 jest.mock('../../src/models/user.model', () => ({ findById: jest.fn(), updateOne: jest.fn() }));
 jest.mock('../../src/models/session.model', () => ({ updateMany: jest.fn() }));
+jest.mock('../../src/models/payment.model', () => ({ exists: jest.fn(async () => null) }));
+jest.mock('../../src/models/sellerStaff.model', () => ({ exists: jest.fn(async () => null) }));
 jest.mock('../../src/services/city.service', () => ({ getActiveCityAndArea: jest.fn() }));
 jest.mock('../../src/services/category.service', () => ({ assertActiveCategories: jest.fn() }));
 jest.mock('../../src/services/demandSignal.service', () => ({
@@ -15,6 +17,8 @@ jest.mock('../../src/services/upload.service', () => ({ deleteImage: jest.fn() }
 const { Types } = require('mongoose');
 const User = require('../../src/models/user.model');
 const Session = require('../../src/models/session.model');
+const Payment = require('../../src/models/payment.model');
+const SellerStaff = require('../../src/models/sellerStaff.model');
 const { getActiveCityAndArea } = require('../../src/services/city.service');
 const { assertActiveCategories } = require('../../src/services/category.service');
 const {
@@ -139,5 +143,32 @@ describe('profile.service', () => {
     );
     expect(deleteUserSignals).toHaveBeenCalledWith(user._id);
     expect(deleteImage).toHaveBeenCalledWith('saathmein/avatars/x');
+  });
+
+  it('refuses to delete while a token is held (leave the group or finish the purchase first)', async () => {
+    const user = makeUser();
+    User.findById.mockResolvedValue(user);
+    User.updateOne.mockClear();
+    Payment.exists.mockResolvedValueOnce({ _id: 'p1' });
+    await expect(profileService.deleteAccount(String(user._id))).rejects.toMatchObject({
+      statusCode: 409,
+      code: 'ACCOUNT_HAS_ACTIVE_TOKEN',
+    });
+    expect(User.updateOne).not.toHaveBeenCalled();
+    // Only tokens with SaathMein or on hold at a dealer count (a released one = bought)
+    const filter = Payment.exists.mock.calls.at(-1)[0];
+    expect(filter.$or).toEqual([
+      { status: 'paid' },
+      { status: 'transferred', 'transfer.status': { $in: ['pending', 'processed'] } },
+    ]);
+  });
+
+  it('refuses to delete the owner of a dealer business', async () => {
+    const user = makeUser();
+    User.findById.mockResolvedValue(user);
+    SellerStaff.exists.mockResolvedValueOnce({ _id: 's1' });
+    await expect(profileService.deleteAccount(String(user._id))).rejects.toMatchObject({
+      code: 'ACCOUNT_OWNS_BUSINESS',
+    });
   });
 });

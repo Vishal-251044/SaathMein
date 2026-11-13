@@ -1,8 +1,9 @@
 /**
  * usePurchase — invoice upload (camera / gallery → private upload → attach) and dealer
- * review mutations. Both refresh the group page, which carries `myPurchase`.
+ * review mutations. Both refresh the group page, which carries `myPurchase`. Also
+ * useMyDealCodes for the "My deal codes" screen (kept offline).
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { pickInvoiceImage } from '@/lib/imagePicker';
 import * as purchaseService from '@/services/purchase.service';
@@ -38,4 +39,9 @@ export function useCreateReview(groupId: string) {
     mutationFn: purchaseService.createReview,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['group', groupId] }),
   });
+}
+
+/** @returns My open and completed deal codes (saved for offline use at the showroom) */
+export function useMyDealCodes() {
+  return useQuery({ queryKey: ['purchases', 'mine'], queryFn: purchaseService.getMyDealCodes });
 }

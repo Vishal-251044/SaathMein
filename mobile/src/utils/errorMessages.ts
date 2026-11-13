@@ -12,6 +12,9 @@ const ERROR_KEYS: Record<string, string> = {
   INVALID_PHONE: 'errors.invalidPhone',
   ACCOUNT_SUSPENDED: 'errors.accountSuspended',
   ACCOUNT_DELETED: 'errors.accountSuspended',
+  // Account deletion is refused while money is in play (Day 14)
+  ACCOUNT_HAS_ACTIVE_TOKEN: 'errors.accountHasActiveToken',
+  ACCOUNT_OWNS_BUSINESS: 'errors.accountOwnsBusiness',
   FIREBASE_NOT_CONFIGURED: 'errors.loginUnavailable',
   DATABASE_UNAVAILABLE: 'errors.serviceUnavailable',
   INVALID_FIREBASE_TOKEN: 'errors.codeExpired',

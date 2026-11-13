@@ -13,6 +13,7 @@ import {
   MessageSquarePlus,
   Pencil,
   Scale,
+  Ticket,
   Trash2,
 } from 'lucide-react-native';
 import { type ComponentType, useEffect } from 'react';
@@ -176,6 +177,8 @@ export default function ProfileScreen() {
           }
           href="/edit-interests"
         />
+        <View className="border-t border-line" />
+        <ProfileRow icon={Ticket} label={t('dealCodes.title')} href="/deal-codes" />
         <View className="border-t border-line" />
         <ProfileRow icon={Scale} label={t('dispute.listTitle')} href="/my-disputes" />
         <View className="border-t border-line" />

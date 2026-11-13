@@ -173,8 +173,21 @@ const markRefundFailed = async (razorpayRefundId, error = 'Refund failed at Razo
     { refunds: { $elemMatch: { razorpayRefundId, status: 'pending' } } },
     { $set: { 'refunds.$.status': 'failed', 'refunds.$.lastError': error } },
   );
-  // TODO(Day 13): alert Finance on the Payment monitor
   log.error({ razorpayRefundId, error }, '[RefundService] refund failed at Razorpay — will retry');
+  if (result.modifiedCount) {
+    // Finance sees it on the Payment monitor and gets the alert (MON-4); lazy require
+    // avoids a load cycle (alerts → notifications → payments)
+    require('../alerts/alert.service')
+      .raiseAlert({
+        type: 'payment',
+        severity: 'warning',
+        title: 'A refund failed at Razorpay',
+        message: `${error}. It will be retried automatically; check the Payment monitor.`,
+        subjectType: 'payment',
+        dedupeKey: `refund:failed:${razorpayRefundId}`,
+      })
+      .catch(() => {});
+  }
   return result.modifiedCount > 0;
 };
 

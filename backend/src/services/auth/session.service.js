@@ -154,11 +154,19 @@ const rotateRefreshToken = async (refreshToken, audience, context = {}) => {
  */
 const revokeByRefreshToken = async (refreshToken, audience) => {
   const sessionId = parseRefreshToken(refreshToken);
-  if (!sessionId) return;
-  await Session.updateOne(
-    { _id: sessionId, audience, refreshTokenHash: hashRefreshToken(refreshToken, audience) },
+  if (!sessionId) return null;
+  const session = await Session.findOneAndUpdate(
+    {
+      _id: sessionId,
+      audience,
+      refreshTokenHash: hashRefreshToken(refreshToken, audience),
+      revokedAt: null,
+    },
     { $set: { revokedAt: new Date(), revokedReason: 'logout' } },
-  );
+    { projection: { userId: 1 } },
+  ).lean();
+  // Who signed out (for the staff audit log); null when the session was already gone
+  return session ? String(session.userId) : null;
 };
 
 /**

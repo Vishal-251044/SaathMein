@@ -296,18 +296,16 @@ describe('48 h dealer SLA', () => {
   });
 
   it('a late answer is recorded and the dispute moves on to Support', async () => {
-    jest
-      .spyOn(Dispute, 'findOne')
-      .mockReturnValue(
-        lean({
-          _id: disputeId,
-          buyerId,
-          sellerId,
-          groupId: 'g',
-          status: 'seller_missed',
-          timeline: [],
-        }),
-      );
+    jest.spyOn(Dispute, 'findOne').mockReturnValue(
+      lean({
+        _id: disputeId,
+        buyerId,
+        sellerId,
+        groupId: 'g',
+        status: 'seller_missed',
+        timeline: [],
+      }),
+    );
     const update = jest
       .spyOn(Dispute, 'findOneAndUpdate')
       .mockReturnValue(lean({ _id: disputeId }));

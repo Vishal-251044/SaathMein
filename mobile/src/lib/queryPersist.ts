@@ -1,6 +1,6 @@
 /**
  * Offline cache for key screens (Day 13): successful queries for the home feed, my groups,
- * group pages (including deal codes for the showroom), payments, products, dealers,
+ * group pages and "My deal codes" (for the showroom), payments, products, dealers,
  * wallet, disputes, categories and cities are saved to a file in the app cache and
  * restored on the next start, so these screens open without a network.
  *
@@ -21,6 +21,7 @@ const PERSISTED_ROOTS = new Set([
   'groups',
   'group',
   'payments',
+  'purchases',
   'product',
   'products',
   'dealer',

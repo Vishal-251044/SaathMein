@@ -162,7 +162,9 @@
     "ownTarget": "You cannot report yourself or your own content.",
     "disputeOpen": "You already have an open dispute for this purchase.",
     "notDisputable": "This purchase can no longer be disputed.",
-    "tooManyFiles": "Add at most 6 photos."
+    "tooManyFiles": "Add at most 6 photos.",
+    "accountHasActiveToken": "You still have a token in a group. Leave the group (your token is refunded) or finish your purchase, then delete your account.",
+    "accountOwnsBusiness": "You own a dealer business on SaathMein. Contact support to close it before deleting your account."
   },
   "language": {
     "title": "Choose your language",
@@ -762,5 +764,14 @@
     "loadFailedBody": "Something went wrong on our side. Please try again.",
     "offlineNoDataTitle": "No saved copy yet",
     "offlineNoDataBody": "Connect to the internet once to see this screen. It will then open offline too."
+  },
+  "dealCodes": {
+    "title": "My deal codes",
+    "emptyTitle": "No deal codes yet",
+    "emptyBody": "When a group you joined gets its deal, your code to show at the showroom appears here. It also opens without internet.",
+    "openSection": "Ready to use",
+    "doneSection": "Bought",
+    "openGroup": "Open group for {{name}}",
+    "saved": "You saved {{amount}}"
   }
 }

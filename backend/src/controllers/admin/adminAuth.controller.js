@@ -101,8 +101,24 @@ const refresh = asyncHandler(async (req, res) => {
 /** POST /api/admin/auth/logout — end the staff session. */
 const logout = asyncHandler(async (req, res) => {
   const refreshToken = parseCookies(req)[REFRESH_COOKIE];
-  if (refreshToken) await staffAuthService.logoutStaff(refreshToken);
+  const signedOut = refreshToken ? await staffAuthService.logoutStaff(refreshToken) : null;
   clearSessionCookie(res);
+  // Staff sign-outs are audited too (ADL-5); /auth runs before the audit middleware
+  if (signedOut) {
+    await recordAudit({
+      actorId: signedOut.userId,
+      actorRole: signedOut.role,
+      action: 'staff.logout',
+      targetType: 'staff',
+      targetId: signedOut.userId,
+      method: req.method,
+      path: req.originalUrl.split('?')[0],
+      statusCode: 200,
+      ip: req.ip,
+      userAgent: req.get('user-agent')?.slice(0, 300),
+      requestId: req.id,
+    });
+  }
   return sendSuccess(res, { message: 'Logged out' });
 });
 

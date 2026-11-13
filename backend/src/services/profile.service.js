@@ -4,9 +4,11 @@
  */
 const User = require('../models/user.model');
 const Session = require('../models/session.model');
+const Payment = require('../models/payment.model');
+const SellerStaff = require('../models/sellerStaff.model');
 const ApiError = require('../utils/ApiError');
 const { createLogger } = require('../utils/logger');
-const { ACCOUNT_STATUS } = require('../constants/enums');
+const { ACCOUNT_STATUS, PAYMENT_STATUS } = require('../constants/enums');
 const { getFirebaseAuth } = require('../config/firebase');
 const { toAppUser, getUserById } = require('./user.service');
 const { getActiveCityAndArea } = require('./city.service');
@@ -132,12 +134,43 @@ const removeAvatar = async (userId) => {
  * Delete the account (ACC-5). Personal data is erased; the user record stays as an
  * anonymous "deleted" stub so payments and ledger history (required for accounting)
  * still point to something. The phone number becomes free to register again.
+ * Refused while money is still in play: a token with SaathMein (seat in a group) or held at
+ * a dealer for an open purchase — the person leaves the group (refund) or completes the
+ * purchase first. Owners of a dealer business close or hand over the business first.
  * @param {string} userId - User id
  * @returns {Promise<void>}
+ * @throws {ApiError} 409 ACCOUNT_HAS_ACTIVE_TOKEN / ACCOUNT_OWNS_BUSINESS
  */
 const deleteAccount = async (userId) => {
   const user = await getActiveUser(userId);
-  // TODO(Day 7): refuse while a token is held or a purchase is in progress (refund first)
+  const [activeToken, ownsBusiness] = await Promise.all([
+    Payment.exists({
+      userId: user._id,
+      $or: [
+        { status: PAYMENT_STATUS.PAID },
+        // On hold at the dealer (purchase not finished yet); released = bought, fine
+        {
+          status: PAYMENT_STATUS.TRANSFERRED,
+          'transfer.status': { $in: ['pending', 'processed'] },
+        },
+      ],
+    }),
+    SellerStaff.exists({ userId: user._id, role: 'owner', status: 'active' }),
+  ]);
+  if (activeToken) {
+    throw ApiError.conflict(
+      'You still have a token in a group. Leave the group (your token is refunded) or finish the purchase, then delete your account.',
+      { code: 'ACCOUNT_HAS_ACTIVE_TOKEN' },
+    );
+  }
+  if (ownsBusiness) {
+    throw ApiError.conflict(
+      'You own a dealer business on SaathMein. Contact support to close it first.',
+      {
+        code: 'ACCOUNT_OWNS_BUSINESS',
+      },
+    );
+  }
 
   const { firebaseUid } = user;
   const avatarPublicId = user.avatar?.publicId;

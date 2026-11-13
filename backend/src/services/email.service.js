@@ -168,6 +168,31 @@ const sendStaffInvite = ({ to, roleLabel, inviterName, url }) =>
     ),
   });
 
+/**
+ * Staff sign-in from a browser not used before on this account (ADL-4).
+ * @param {{ to: string, name?: string, when: Date, ip?: string, device?: string }} params
+ */
+const sendStaffNewDevice = ({ to, name, when, ip, device }) => {
+  const time = when.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+  const lines = [
+    `Hi ${name || 'there'}, your SaathMein console account was just signed in from a new device.`,
+    `Time: ${time} IST`,
+    `IP address: ${ip || 'unknown'}`,
+    `Device: ${(device || 'unknown').slice(0, 160)}`,
+    'If this was not you, ask the Owner to disable your account in Team right away and change your password.',
+  ];
+  return sendEmail({
+    to,
+    subject: 'New sign-in to the SaathMein console',
+    text: lines.join('\n'),
+    html: layout(lines),
+  });
+};
+
 /** @param {{ to: string[], businessName: string, adminUrl: string }} params */
 const sendKycReviewNeeded = ({ to, businessName, adminUrl }) =>
   sendEmail({
@@ -270,5 +295,6 @@ module.exports = {
   sendKycRejected,
   sendTeamInvite,
   sendStaffInvite,
+  sendStaffNewDevice,
   sendKycReviewNeeded,
 };

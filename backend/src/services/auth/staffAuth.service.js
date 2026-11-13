@@ -14,6 +14,8 @@ const ApiError = require('../../utils/ApiError');
 const { createLogger } = require('../../utils/logger');
 const { ACCOUNT_STATUS, TOKEN_AUDIENCE } = require('../../constants/enums');
 const { signAccessToken, signChallengeToken, verifyChallengeToken } = require('./token.service');
+const Session = require('../../models/session.model');
+const emailService = require('../email.service');
 const { startSession, rotateRefreshToken, revokeByRefreshToken } = require('./session.service');
 const twoFactor = require('./twoFactor.service');
 const { toStaffUser, getUserById } = require('../user.service');
@@ -178,6 +180,15 @@ const verifySecondFactor = async ({ challengeToken, code, context }) => {
   };
   await User.updateOne({ _id: user._id }, loginUpdates);
 
+  // New-device alert (ADL-4): this browser was never used to sign in to this account before
+  const userAgent = context.userAgent?.slice(0, 300);
+  const [hasHistory, knownDevice] = await Promise.all([
+    Session.exists({ userId: user._id, audience: TOKEN_AUDIENCE.STAFF }),
+    userAgent
+      ? Session.exists({ userId: user._id, audience: TOKEN_AUDIENCE.STAFF, userAgent })
+      : null,
+  ]);
+
   const tokens = await startSession({
     userId: user._id,
     audience: TOKEN_AUDIENCE.STAFF,
@@ -185,8 +196,19 @@ const verifySecondFactor = async ({ challengeToken, code, context }) => {
     context,
   });
 
-  // TODO(Day 5): write this login to the audit log; new-device email alert when email exists
+  // The login itself is written to the audit log by the controller (ADL-5)
   log.info({ userId: String(user._id), role: user.staffRole, ip: context.ip }, 'Staff logged in');
+  if (hasHistory && !knownDevice && user.email) {
+    emailService
+      .sendStaffNewDevice({
+        to: user.email,
+        name: user.name,
+        when: new Date(),
+        ip: context.ip,
+        device: userAgent,
+      })
+      .catch((err) => log.warn({ err: err.message }, 'New-device email failed'));
+  }
   return { staff: toStaffUser(user), tokens, backupCodes: check.backupCodes };
 };
 
@@ -233,7 +255,12 @@ const refreshStaffSession = async (refreshToken, context) => {
  * @param {string} refreshToken - Refresh token from the cookie
  * @returns {Promise<void>}
  */
-const logoutStaff = (refreshToken) => revokeByRefreshToken(refreshToken, TOKEN_AUDIENCE.STAFF);
+const logoutStaff = async (refreshToken) => {
+  const userId = await revokeByRefreshToken(refreshToken, TOKEN_AUDIENCE.STAFF);
+  if (!userId) return null;
+  const user = await User.findById(userId).select('staffRole').lean();
+  return { userId, role: user?.staffRole || null };
+};
 
 module.exports = {
   MAX_FAILED_ATTEMPTS,

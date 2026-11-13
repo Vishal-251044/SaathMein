@@ -154,10 +154,21 @@ const listMyDealCodes = async (userId) => {
     .limit(50)
     .lean();
   const groups = await Group.find({ _id: { $in: purchases.map((p) => p.groupId) } })
-    .select('auction.ceilingPricePaise basePricePaise')
+    .select('auction.ceilingPricePaise basePricePaise productId sellerId')
+    .populate('productId', 'brand model')
+    .populate('sellerId', 'businessName')
     .lean();
   const byId = new Map(groups.map((group) => [String(group._id), group]));
-  return purchases.map((purchase) => toBuyerPurchase(purchase, byId.get(String(purchase.groupId))));
+  return purchases.map((purchase) => {
+    const group = byId.get(String(purchase.groupId));
+    const product = group?.productId;
+    // The "My deal codes" list also needs what was bought and where (Day 14)
+    return {
+      ...toBuyerPurchase(purchase, group),
+      productName: product?.brand ? `${product.brand} ${product.model}` : null,
+      dealerName: group?.sellerId?.businessName || null,
+    };
+  });
 };
 
 /* ---------------------------- Group progression ----------------------------- */

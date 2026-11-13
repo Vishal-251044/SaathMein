@@ -369,4 +369,24 @@ describe('buyer view', () => {
       canReview: true,
     });
   });
+
+  it('lists my deal codes with what was bought and from which dealer', async () => {
+    jest.spyOn(Purchase, 'find').mockReturnValue({
+      sort: () => ({ limit: () => ({ lean: async () => [purchase()] }) }),
+    });
+    const populated = {
+      ...group,
+      _id: groupId,
+      productId: { brand: 'Honda', model: 'Activa 6G' },
+      sellerId: { businessName: 'Pune Motors' },
+    };
+    const chain = { select: () => chain, populate: () => chain, lean: async () => [populated] };
+    jest.spyOn(Group, 'find').mockReturnValue(chain);
+    const [item] = await purchases.listMyDealCodes(String(userId));
+    expect(item).toMatchObject({
+      dealCode: 'ABCDEFGH23',
+      productName: 'Honda Activa 6G',
+      dealerName: 'Pune Motors',
+    });
+  });
 });
