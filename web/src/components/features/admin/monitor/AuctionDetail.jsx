@@ -174,7 +174,7 @@ export default function AuctionDetail({ groupId }) {
                       <Button
                         variant="secondary"
                         onClick={() => open('cancel')}
-                        className="text-danger"
+                        className="text-danger-text"
                       >
                         <Ban className="size-4" strokeWidth={2} aria-hidden="true" />
                         Cancel group

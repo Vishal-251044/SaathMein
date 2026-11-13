@@ -29,6 +29,12 @@
   --sm-gradient-ai: linear-gradient(135deg, #7c5cff 0%, #b43cf5 100%);
   --sm-warning: #f59e0b;
   --sm-danger: #ef4444;
+  /* Text-only shades of the brand colours: WCAG AA (4.5:1) on white and the bands (Day 14) */
+  --sm-primary-text: #c7341a;
+  --sm-savings-text: #047857;
+  --sm-ai-text: #6d4ae8;
+  --sm-warning-text: #92400e;
+  --sm-danger-text: #b91c1c;
   --sm-shadow-card: 0 1px 2px rgb(18 19 31 / 0.04), 0 8px 24px rgb(18 19 31 / 0.06);
   --sm-shadow-pop: 0 12px 32px rgb(255 77 94 / 0.28);
 
@@ -51,6 +57,11 @@
     --sm-ai-soft: rgb(155 133 255 / 0.14);
     --sm-warning: #fbbf24;
     --sm-danger: #f87171;
+    --sm-primary-text: #ff7a5f;
+    --sm-savings-text: #34d399;
+    --sm-ai-text: #9b85ff;
+    --sm-warning-text: #fbbf24;
+    --sm-danger-text: #f87171;
     --sm-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
     color-scheme: dark;
   }
@@ -70,6 +81,11 @@
   --sm-ai-soft: rgb(155 133 255 / 0.14);
   --sm-warning: #fbbf24;
   --sm-danger: #f87171;
+  --sm-primary-text: #ff7a5f;
+  --sm-savings-text: #34d399;
+  --sm-ai-text: #9b85ff;
+  --sm-warning-text: #fbbf24;
+  --sm-danger-text: #f87171;
   --sm-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
   color-scheme: dark;
 }

@@ -61,7 +61,9 @@ export default function ProductRequestsList() {
               }}
               className={cn(
                 'min-h-11 rounded-button px-4 text-sm font-semibold',
-                status === tab.value ? 'bg-primary/10 text-primary' : 'text-ink hover:bg-bg-band',
+                status === tab.value
+                  ? 'bg-primary/10 text-primary-text'
+                  : 'text-ink hover:bg-bg-band',
               )}
             >
               {tab.label}

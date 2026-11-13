@@ -44,7 +44,7 @@ export default function RowListEditor({
             type="button"
             onClick={() => remove(index)}
             aria-label={`Remove row ${index + 1}`}
-            className="mt-7 grid size-11 shrink-0 place-items-center rounded-button text-muted hover:bg-surface hover:text-danger"
+            className="mt-7 grid size-11 shrink-0 place-items-center rounded-button text-muted hover:bg-surface hover:text-danger-text"
           >
             <X className="size-4" strokeWidth={2} aria-hidden="true" />
           </button>

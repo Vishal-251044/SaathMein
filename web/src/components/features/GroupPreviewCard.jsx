@@ -37,7 +37,9 @@ export default function GroupPreviewCard() {
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs font-semibold text-muted">You save</p>
-          <p className="text-xl font-extrabold text-savings">{formatINR(EXAMPLE.savingPaise)}</p>
+          <p className="text-xl font-extrabold text-savings-text">
+            {formatINR(EXAMPLE.savingPaise)}
+          </p>
         </div>
       </div>
 
@@ -46,11 +48,11 @@ export default function GroupPreviewCard() {
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-savings-soft px-3 py-1.5 text-xs font-semibold text-savings">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-savings-soft px-3 py-1.5 text-xs font-semibold text-savings-text">
           <BadgeCheck className="size-4" strokeWidth={2} aria-hidden="true" />
           {EXAMPLE.tierLabel}
         </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-ai-soft px-3 py-1.5 text-xs font-semibold text-ai">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-ai-soft px-3 py-1.5 text-xs font-semibold text-ai-text">
           <Sparkles className="size-4" strokeWidth={2} aria-hidden="true" />
           Saathi AI: {EXAMPLE.aiHint}
         </span>

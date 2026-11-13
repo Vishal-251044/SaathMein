@@ -5,7 +5,7 @@ import { CircleAlert, Info, TriangleAlert } from 'lucide-react';
 import { cn } from '@/utils/genericFunctions';
 
 const TONES = {
-  error: { icon: CircleAlert, classes: 'border-danger/30 bg-danger/10 text-danger' },
+  error: { icon: CircleAlert, classes: 'border-danger/30 bg-danger/10 text-danger-text' },
   warning: { icon: TriangleAlert, classes: 'border-warning/30 bg-warning/10 text-ink' },
   info: { icon: Info, classes: 'border-line bg-bg-band text-ink' },
 };

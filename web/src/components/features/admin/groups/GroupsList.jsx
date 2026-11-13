@@ -315,7 +315,7 @@ export default function GroupsList() {
                               aria-label={`Cancel ${group.productName || 'group'}`}
                             >
                               <Ban
-                                className="size-4 text-danger"
+                                className="size-4 text-danger-text"
                                 strokeWidth={2}
                                 aria-hidden="true"
                               />

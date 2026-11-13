@@ -50,7 +50,7 @@ export default function AdminSidebar({ role, onNavigate }) {
           );
           const classes = cn(
             'flex min-h-11 items-center gap-3 rounded-button px-3 text-sm font-semibold transition-colors duration-150',
-            isActive ? 'bg-primary/10 text-primary' : 'text-ink',
+            isActive ? 'bg-primary/10 text-primary-text' : 'text-ink',
             href ? 'hover:bg-bg-band' : 'cursor-not-allowed opacity-55',
           );
 

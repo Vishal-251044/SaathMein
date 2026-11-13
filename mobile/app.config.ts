@@ -22,6 +22,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     );
   }
 
+  const sentryOrg = process.env.SENTRY_ORG;
+  const sentryProject = process.env.SENTRY_PROJECT;
+
   // Android App Links: https://<host>/g/<code> opens the app (verified by the backend's
   // /.well-known/assetlinks.json on that host). Host from EXPO_PUBLIC_APP_LINK_HOST.
   const appLinkHost = process.env.EXPO_PUBLIC_APP_LINK_HOST;
@@ -53,6 +56,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // Push notifications (Expo + FCM); icon colour = Sunrise primary
       ['expo-notifications', { color: '#FF5A3C' }],
       ...(hasFirebaseConfig ? FIREBASE_PLUGINS : []),
+      // Native crash reporting + source maps upload, only when the EAS build has the Sentry
+      // org / project (and SENTRY_AUTH_TOKEN as an EAS secret); JS errors are reported anyway
+      ...(sentryOrg && sentryProject
+        ? [
+            ['@sentry/react-native', { organization: sentryOrg, project: sentryProject }] as [
+              string,
+              object,
+            ],
+          ]
+        : []),
     ],
   };
 };

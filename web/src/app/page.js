@@ -111,7 +111,7 @@ export default function HomePage() {
             <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
               {DEALER_POINTS.map(({ icon: Icon, title, body }, index) => (
                 <FadeIn as="li" key={title} delay={index * 0.06} className="flex gap-4">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-button bg-bg-band text-primary">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-button bg-bg-band text-primary-text">
                     <Icon className="size-5" strokeWidth={2} aria-hidden="true" />
                   </span>
                   <div>

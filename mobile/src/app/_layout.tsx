@@ -8,6 +8,7 @@
 import '../global.css';
 import '@/i18n';
 import '@/lib/nativewindInterop';
+import { withSentry } from '@/lib/sentry';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
@@ -31,7 +32,7 @@ SplashScreen.preventAutoHideAsync();
 /**
  * @returns The app navigator once everything needed for the first screen is loaded
  */
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
   const isSettingsHydrated = useSettingsStore((state) => state.isHydrated);
   const authStatus = useAuthStore((state) => state.status);
@@ -112,3 +113,6 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+// Render crashes are reported to Sentry when it is configured (Day 14)
+export default withSentry(RootLayout);

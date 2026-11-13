@@ -12,7 +12,9 @@ const BASE =
   'disabled:pointer-events-none disabled:opacity-50';
 
 const VARIANTS = {
-  primary: 'bg-sunrise text-white shadow-pop hover:opacity-95',
+  // Soft shadow keeps white labels readable on the gradient (WCAG, Day 14)
+  primary:
+    'bg-sunrise text-white shadow-pop hover:opacity-95 [text-shadow:0_1px_2px_rgb(18_19_31/0.35)]',
   secondary: 'border border-line bg-surface text-ink hover:bg-bg-band',
   ghost: 'text-ink hover:bg-bg-band',
 };

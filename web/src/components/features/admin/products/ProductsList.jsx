@@ -47,7 +47,7 @@ function StatusBadge({ product }) {
     );
   }
   return product.active ? (
-    <span className="rounded-full bg-savings-soft px-2 py-0.5 text-xs font-semibold text-savings">
+    <span className="rounded-full bg-savings-soft px-2 py-0.5 text-xs font-semibold text-savings-text">
       Live
     </span>
   ) : (

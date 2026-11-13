@@ -176,7 +176,10 @@ export default function AuctionRoom({ groupId }) {
           <Stat label="Time left">
             {isOpen ? (
               <span
-                className={cn('inline-flex items-center gap-1 font-mono', soon && 'text-danger')}
+                className={cn(
+                  'inline-flex items-center gap-1 font-mono',
+                  soon && 'text-danger-text',
+                )}
               >
                 <Clock className="size-4" strokeWidth={2} aria-hidden="true" />
                 {seconds > 0 ? formatCountdown(seconds) : 'Closing'}

@@ -135,7 +135,7 @@ export default function ProductImport() {
           aria-live="polite"
         >
           <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-savings" aria-hidden="true" />
+            <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-savings-text" aria-hidden="true" />
             <div>
               <p className="font-bold text-ink">
                 {report.dryRun ? 'Check finished — nothing was saved' : 'Import finished'}
@@ -151,7 +151,7 @@ export default function ProductImport() {
           {report.failedRows.length ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="font-semibold text-danger">
+                <p className="font-semibold text-danger-text">
                   {report.failedRows.length} rows need fixing
                 </p>
                 <Button variant="secondary" onClick={downloadErrors}>
@@ -190,7 +190,7 @@ export default function ProductImport() {
               <dt className="font-mono text-sm font-semibold text-ink">
                 {name}
                 {required ? (
-                  <span className="ml-2 text-xs font-sans text-danger">required</span>
+                  <span className="ml-2 text-xs font-sans text-danger-text">required</span>
                 ) : null}
               </dt>
               <dd className="text-sm text-muted">{help}</dd>

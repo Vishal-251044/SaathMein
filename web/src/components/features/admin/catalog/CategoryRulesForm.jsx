@@ -219,7 +219,7 @@ export default function CategoryRulesForm({ category, onSave }) {
       </fieldset>
 
       <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
-        {savedAt ? <p className="text-sm font-medium text-savings">Saved</p> : null}
+        {savedAt ? <p className="text-sm font-medium text-savings-text">Saved</p> : null}
         <Button type="submit" disabled={isSaving}>
           {isSaving ? (
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />

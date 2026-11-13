@@ -27,7 +27,7 @@ function Check({ label, ok, detail }) {
   return (
     <li className="flex min-h-11 items-center gap-3">
       <Icon
-        className={ok ? 'size-5 text-ink' : 'size-5 text-danger'}
+        className={ok ? 'size-5 text-ink' : 'size-5 text-danger-text'}
         strokeWidth={2}
         aria-hidden="true"
       />
@@ -122,7 +122,7 @@ export default function SystemHealth() {
                           })}
                         </span>
                         <span className="text-ink">{minute.requests} req</span>
-                        <span className={minute.errors ? 'text-danger' : 'text-muted'}>
+                        <span className={minute.errors ? 'text-danger-text' : 'text-muted'}>
                           {minute.errors} err
                         </span>
                       </li>
@@ -146,7 +146,11 @@ export default function SystemHealth() {
                           <td className="px-4 py-3 font-mono text-ink">{queue.active}</td>
                           <td className="px-4 py-3 font-mono text-ink">{queue.delayed}</td>
                           <td className="px-4 py-3 font-mono text-ink">
-                            {queue.failed ? <span className="text-danger">{queue.failed}</span> : 0}
+                            {queue.failed ? (
+                              <span className="text-danger-text">{queue.failed}</span>
+                            ) : (
+                              0
+                            )}
                           </td>
                           <td className="px-4 py-3">
                             {queue.failed ? (

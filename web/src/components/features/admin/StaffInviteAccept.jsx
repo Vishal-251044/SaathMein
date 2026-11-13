@@ -71,7 +71,11 @@ export default function StaffInviteAccept({ token }) {
             <Alert>{invite.error.message}</Alert>
           ) : done ? (
             <div className="flex flex-col items-center gap-3 text-center">
-              <CircleCheck className="size-10 text-primary" strokeWidth={1.75} aria-hidden="true" />
+              <CircleCheck
+                className="size-10 text-primary-text"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
               <p className="font-semibold text-ink">Your account is ready.</p>
               <p className="text-sm text-muted">
                 Sign in with {invite.data.email}. You will set up an authenticator app for 2-step

@@ -66,9 +66,9 @@ export function PageHeader({ title, description, actions, live = false }) {
 export function StatTile({ label, value, hint, icon: Icon, tone = 'default' }) {
   const valueTone = {
     default: 'text-ink',
-    savings: 'text-savings',
+    savings: 'text-savings-text',
     warning: 'text-ink',
-    danger: 'text-danger',
+    danger: 'text-danger-text',
   }[tone];
   return (
     <div

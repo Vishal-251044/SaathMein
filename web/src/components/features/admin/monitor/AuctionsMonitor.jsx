@@ -81,7 +81,7 @@ export default function AuctionsMonitor() {
             className={cn(
               'min-h-11 rounded-full px-4 text-sm font-semibold',
               tab === value
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/10 text-primary-text'
                 : 'border border-line text-ink hover:bg-bg-band',
             )}
           >
@@ -134,7 +134,7 @@ export default function AuctionsMonitor() {
                   <td className="px-4 py-3 font-mono font-semibold text-ink">
                     {row.lowestPricePaise != null ? formatINR(row.lowestPricePaise) : '—'}
                   </td>
-                  <td className="px-4 py-3 font-mono text-savings">
+                  <td className="px-4 py-3 font-mono text-savings-text">
                     {row.dropBps != null ? formatBps(row.dropBps) : '—'}
                   </td>
                   <td className="px-4 py-3 text-ink">

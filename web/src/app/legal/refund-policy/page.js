@@ -64,7 +64,7 @@ export default function RefundPolicyPage() {
         Write to {LEGAL.supportEmail} with your group and payment details, or contact our{' '}
         <Link
           href="/legal/grievance-officer"
-          className="font-semibold text-primary hover:underline"
+          className="font-semibold text-primary-text hover:underline"
         >
           grievance officer
         </Link>

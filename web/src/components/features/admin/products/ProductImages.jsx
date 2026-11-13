@@ -92,7 +92,7 @@ export default function ProductImages({ product }) {
                 onClick={() => remove.mutate({ productId: product.id, url: image.url })}
                 disabled={remove.isPending}
                 aria-label={`Remove image ${index + 1}`}
-                className="absolute right-1 top-1 grid size-11 place-items-center rounded-button bg-surface/90 text-danger shadow-card"
+                className="absolute right-1 top-1 grid size-11 place-items-center rounded-button bg-surface/90 text-danger-text shadow-card"
               >
                 <Trash2 className="size-4" strokeWidth={2} aria-hidden="true" />
               </button>

@@ -22,7 +22,7 @@ export default function SellerAuthCard({ title, subtitle, children, footer }) {
           <Link href={ROUTES.HOME} aria-label="SaathMein home" className="rounded-button">
             <LogoMark size={48} />
           </Link>
-          <p className="mt-3 text-xs font-bold uppercase tracking-wider text-primary">
+          <p className="mt-3 text-xs font-bold uppercase tracking-wider text-primary-text">
             SaathMein for dealers
           </p>
           <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-ink">{title}</h1>

@@ -51,7 +51,7 @@ export function SellerDisputesList() {
             className={cn(
               'inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold',
               tab.key === status
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/10 text-primary-text'
                 : 'bg-bg-band text-muted hover:text-ink',
             )}
           >
@@ -89,7 +89,7 @@ export function SellerDisputesList() {
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm text-muted">{dispute.description}</p>
                   {dispute.status === 'awaiting_seller' ? (
-                    <p className="mt-1 text-xs font-semibold text-danger">
+                    <p className="mt-1 text-xs font-semibold text-danger-text">
                       Answer by {formatDateTime(dispute.sellerDueAt)}
                     </p>
                   ) : null}
@@ -241,7 +241,7 @@ export function SellerDisputeDetail({ disputeId }) {
           <h2 className="text-lg font-bold text-ink">Support&apos;s decision</h2>
           <p className="mt-2 text-ink">{dispute.decision.note}</p>
           {dispute.decision.penalties?.length ? (
-            <p className="mt-1 text-sm text-danger">
+            <p className="mt-1 text-sm text-danger-text">
               Penalties: {dispute.decision.penalties.join(', ')}
             </p>
           ) : null}

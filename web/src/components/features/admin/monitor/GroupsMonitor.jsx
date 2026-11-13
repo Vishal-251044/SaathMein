@@ -79,7 +79,7 @@ function GroupRow({ group, canAct, onAction }) {
           <Button
             variant="secondary"
             onClick={() => onAction(group, 'cancel')}
-            className="text-danger"
+            className="text-danger-text"
             aria-label={`Cancel ${group.productName || 'group'}`}
           >
             <Ban className="size-4" strokeWidth={2} aria-hidden="true" />
@@ -181,7 +181,7 @@ export default function GroupsMonitor() {
       </div>
       <p className="text-sm text-muted">
         To act on any other group, open it from{' '}
-        <Link href="/admin/groups" className="font-semibold text-primary hover:underline">
+        <Link href="/admin/groups" className="font-semibold text-primary-text hover:underline">
           All groups
         </Link>{' '}
         or the auction monitor.

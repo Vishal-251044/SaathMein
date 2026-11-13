@@ -122,7 +122,11 @@ export default function DealersMonitor() {
                 <td className="px-4 py-3 text-ink">
                   {dealer.rating != null ? (
                     <span className="inline-flex items-center gap-1 font-mono">
-                      <Star className="size-3.5 text-warning" strokeWidth={2} aria-hidden="true" />
+                      <Star
+                        className="size-3.5 text-warning-text"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      />
                       {dealer.rating.toFixed(1)}
                     </span>
                   ) : (
@@ -164,7 +168,11 @@ export default function DealersMonitor() {
                         onClick={() => open(dealer, 'auction_suspension')}
                         aria-label={`Suspend ${dealer.businessName}`}
                       >
-                        <Ban className="size-4 text-danger" strokeWidth={2} aria-hidden="true" />
+                        <Ban
+                          className="size-4 text-danger-text"
+                          strokeWidth={2}
+                          aria-hidden="true"
+                        />
                       </Button>
                     </div>
                   ) : null}

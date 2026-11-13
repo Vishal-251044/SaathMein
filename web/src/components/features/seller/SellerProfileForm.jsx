@@ -34,7 +34,7 @@ function Chip({ selected, onToggle, disabled, children }) {
       className={cn(
         'inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed',
         selected
-          ? 'border-primary bg-primary/10 text-primary'
+          ? 'border-primary bg-primary/10 text-primary-text'
           : 'border-line bg-surface text-ink hover:bg-bg-band',
       )}
     >
@@ -284,9 +284,9 @@ export default function SellerProfileForm() {
         <div className="sticky bottom-0 -mx-4 flex flex-col gap-3 border-t border-line bg-bg-band/95 px-4 py-4 backdrop-blur-md sm:mx-0 sm:flex-row sm:items-center sm:rounded-card sm:border sm:px-5">
           <div className="min-w-0 flex-1 text-sm">
             {update.isError ? (
-              <p className="font-medium text-danger">{update.error.message}</p>
+              <p className="font-medium text-danger-text">{update.error.message}</p>
             ) : null}
-            {saved ? <p className="font-semibold text-primary">Profile saved</p> : null}
+            {saved ? <p className="font-semibold text-primary-text">Profile saved</p> : null}
             {!values.cities.length || !values.categories.length ? (
               <p className="text-muted">Choose at least one city and one category.</p>
             ) : null}

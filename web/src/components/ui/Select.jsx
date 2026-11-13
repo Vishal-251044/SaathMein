@@ -37,7 +37,7 @@ export default function Select({ label, error, hint, className, id, children, ..
         {children}
       </select>
       {error ? (
-        <p id={`${selectId}-error`} className="text-sm font-medium text-danger">
+        <p id={`${selectId}-error`} className="text-sm font-medium text-danger-text">
           {error}
         </p>
       ) : hint ? (

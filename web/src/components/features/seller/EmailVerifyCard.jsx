@@ -58,7 +58,7 @@ export default function EmailVerifyCard() {
   return (
     <section className="rounded-card border border-line bg-surface p-5 shadow-card sm:p-6">
       <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-button bg-primary/10 text-primary">
+        <span className="grid size-10 shrink-0 place-items-center rounded-button bg-primary/10 text-primary-text">
           <MailCheck className="size-5" strokeWidth={2} aria-hidden="true" />
         </span>
         <div className="min-w-0">

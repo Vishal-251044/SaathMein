@@ -24,6 +24,12 @@
   --color-ai-soft: var(--sm-ai-soft);
   --color-warning: var(--sm-warning);
   --color-danger: var(--sm-danger);
+  /* Text shades (WCAG AA) — use these for words, the brand colours for fills and icons */
+  --color-primary-text: var(--sm-primary-text);
+  --color-savings-text: var(--sm-savings-text);
+  --color-ai-text: var(--sm-ai-text);
+  --color-warning-text: var(--sm-warning-text);
+  --color-danger-text: var(--sm-danger-text);
 
   /* Shape: 20 px cards, 14 px buttons, pill chips */
   --radius-card: 20px;

@@ -236,7 +236,7 @@ export default function DealForm() {
                   aria-label={`Remove tier ${index + 1}`}
                   disabled={tiers.length <= 2}
                   onClick={() => setTiers((prev) => prev.filter((_, i) => i !== index))}
-                  className="grid size-11 place-items-center rounded-button text-muted hover:bg-bg-band hover:text-danger disabled:opacity-40"
+                  className="grid size-11 place-items-center rounded-button text-muted hover:bg-bg-band hover:text-danger-text disabled:opacity-40"
                 >
                   <Trash2 className="size-5" strokeWidth={2} aria-hidden="true" />
                 </button>

@@ -146,7 +146,7 @@ export default function SellerTeam() {
                     }}
                     disabled={remove.isPending}
                     aria-label={`Remove ${member.name || member.email}`}
-                    className="grid size-11 place-items-center rounded-button text-muted hover:bg-bg-band hover:text-danger"
+                    className="grid size-11 place-items-center rounded-button text-muted hover:bg-bg-band hover:text-danger-text"
                   >
                     <Trash2 className="size-4" strokeWidth={2} aria-hidden="true" />
                   </button>

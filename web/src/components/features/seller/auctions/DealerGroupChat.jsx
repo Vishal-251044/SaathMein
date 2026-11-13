@@ -70,7 +70,7 @@ export default function DealerGroupChat({ groupId }) {
   return (
     <section className="rounded-card border border-line bg-surface shadow-card">
       <div className="flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
-        <MessageCircle className="size-5 text-primary" strokeWidth={2} aria-hidden="true" />
+        <MessageCircle className="size-5 text-primary-text" strokeWidth={2} aria-hidden="true" />
         <div>
           <h2 className="text-base font-bold text-ink">Group chat</h2>
           <p className="text-xs text-muted">Buyers see your messages under your business name.</p>

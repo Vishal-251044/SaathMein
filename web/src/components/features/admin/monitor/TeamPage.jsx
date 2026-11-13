@@ -231,7 +231,7 @@ export default function TeamPage() {
                             >
                               {member.status === 'active' ? (
                                 <UserX
-                                  className="size-4 text-danger"
+                                  className="size-4 text-danger-text"
                                   strokeWidth={2}
                                   aria-hidden="true"
                                 />

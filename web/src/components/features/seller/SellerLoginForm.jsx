@@ -55,7 +55,7 @@ export default function SellerLoginForm() {
           New to SaathMein?{' '}
           <Link
             href={ROUTES.SELLER_REGISTER}
-            className="font-semibold text-primary hover:underline"
+            className="font-semibold text-primary-text hover:underline"
           >
             Register your business
           </Link>

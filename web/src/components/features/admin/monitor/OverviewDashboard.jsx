@@ -139,7 +139,7 @@ export default function OverviewDashboard() {
           actions={
             <Link
               href="/admin/alerts"
-              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-text hover:underline"
             >
               Alerts centre
             </Link>

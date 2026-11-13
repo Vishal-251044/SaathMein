@@ -53,7 +53,7 @@ function Tabs({ tabs, value, onChange, label }) {
           className={cn(
             'inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-sm font-semibold transition-colors duration-150',
             tab.key === value
-              ? 'bg-primary/10 text-primary'
+              ? 'bg-primary/10 text-primary-text'
               : 'bg-bg-band text-muted hover:text-ink',
           )}
         >

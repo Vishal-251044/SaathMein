@@ -21,10 +21,11 @@ const COLORS: Record<TextColor, string> = {
   muted: 'text-muted',
   white: 'text-white',
   whiteSoft: 'text-white/90',
-  primary: 'text-primary',
-  ai: 'text-ai',
-  savings: 'text-savings',
-  danger: 'text-danger',
+  // Text shades of the brand colours (WCAG AA, Day 14)
+  primary: 'text-primary-text',
+  ai: 'text-ai-text',
+  savings: 'text-savings-text',
+  danger: 'text-danger-text',
 };
 
 interface VariantStyle {

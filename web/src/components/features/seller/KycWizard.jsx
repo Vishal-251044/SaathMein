@@ -105,7 +105,7 @@ function KycStatusPanel({ seller }) {
     <section className="rounded-card border border-line bg-surface p-5 shadow-card sm:p-6">
       <div className="flex items-start gap-3">
         <Icon
-          className={cn('size-6 shrink-0', approved ? 'text-primary' : 'text-warning')}
+          className={cn('size-6 shrink-0', approved ? 'text-primary-text' : 'text-warning-text')}
           strokeWidth={2}
           aria-hidden="true"
         />

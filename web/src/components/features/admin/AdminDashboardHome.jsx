@@ -48,7 +48,7 @@ export default function AdminDashboardHome() {
             key={label}
             className="rounded-card border border-line bg-surface p-5 shadow-card"
           >
-            <Icon className="size-5 text-primary" strokeWidth={2} aria-hidden="true" />
+            <Icon className="size-5 text-primary-text" strokeWidth={2} aria-hidden="true" />
             <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted">
               {label}
             </p>

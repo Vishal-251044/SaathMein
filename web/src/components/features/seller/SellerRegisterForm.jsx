@@ -92,7 +92,10 @@ export default function SellerRegisterForm() {
       footer={
         <>
           Already registered?{' '}
-          <Link href={ROUTES.SELLER_LOGIN} className="font-semibold text-primary hover:underline">
+          <Link
+            href={ROUTES.SELLER_LOGIN}
+            className="font-semibold text-primary-text hover:underline"
+          >
             Log in
           </Link>
         </>

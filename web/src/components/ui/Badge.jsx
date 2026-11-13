@@ -6,9 +6,9 @@ import { cn } from '@/utils/genericFunctions';
 
 const TONES = {
   muted: 'bg-bg-band text-muted',
-  brand: 'bg-primary/10 text-primary',
+  brand: 'bg-primary/10 text-primary-text',
   warning: 'bg-warning/15 text-ink',
-  danger: 'bg-danger/10 text-danger',
+  danger: 'bg-danger/10 text-danger-text',
 };
 
 /**

@@ -7,7 +7,7 @@ import { LEGAL } from '@/utils/legal';
 
 export const metadata = { title: 'Terms of use' };
 
-const linkClass = 'font-semibold text-primary hover:underline';
+const linkClass = 'font-semibold text-primary-text hover:underline';
 
 /** @returns {JSX.Element} */
 export default function TermsPage() {

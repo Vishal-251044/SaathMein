@@ -47,7 +47,7 @@ function TimeLeft({ endsAt }) {
     <span
       className={cn(
         'inline-flex items-center gap-1 font-mono text-sm font-semibold',
-        soon ? 'text-danger' : 'text-ink',
+        soon ? 'text-danger-text' : 'text-ink',
       )}
     >
       <Clock className="size-4" strokeWidth={2} aria-hidden="true" />
@@ -199,7 +199,7 @@ export default function AuctionList({ tab }) {
               className={cn(
                 'inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-sm font-semibold transition-colors duration-150',
                 item.key === tab
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-primary/10 text-primary-text'
                   : 'bg-bg-band text-muted hover:text-ink',
               )}
             >

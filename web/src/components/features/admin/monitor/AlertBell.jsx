@@ -57,7 +57,7 @@ export default function AlertBell() {
             transition={{ duration: DURATION.base, ease: EASE.out }}
           >
             <Bell
-              className="mt-0.5 size-5 shrink-0 text-danger"
+              className="mt-0.5 size-5 shrink-0 text-danger-text"
               strokeWidth={2}
               aria-hidden="true"
             />
@@ -69,7 +69,7 @@ export default function AlertBell() {
               <Link
                 href={toast.link}
                 onClick={() => setToast(null)}
-                className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+                className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-primary-text hover:underline"
               >
                 Open
               </Link>

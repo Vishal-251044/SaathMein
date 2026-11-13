@@ -90,7 +90,7 @@ export function WonGroupPanel({ auction, isOwner }) {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="border-danger text-danger"
+                  className="border-danger text-danger-text"
                   disabled={reason.trim().length < 10 || backOut.isPending}
                   onClick={() =>
                     backOut.mutate({ groupId: auction.groupId, reason: reason.trim() })
@@ -104,7 +104,11 @@ export function WonGroupPanel({ auction, isOwner }) {
               </div>
             </div>
           ) : (
-            <Button variant="ghost" className="text-danger" onClick={() => setIsBackingOut(true)}>
+            <Button
+              variant="ghost"
+              className="text-danger-text"
+              onClick={() => setIsBackingOut(true)}
+            >
               <TriangleAlert className="size-4" strokeWidth={2} aria-hidden="true" />
               Cannot honour this price?
             </Button>

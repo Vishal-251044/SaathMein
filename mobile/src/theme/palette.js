@@ -4,6 +4,10 @@
  *
  * Colour meaning is strict: savings (mint) = money saved / refunds / tiers unlocked,
  * ai (violet) = anything Saathi or AI. Never use them for anything else.
+ *
+ * `*Text` keys are the same meanings, darkened only for WORDS so they pass WCAG AA (4.5:1)
+ * on white, the warm band and the soft tints (Day 14, decided 13 Nov 2026). Fills, rings,
+ * bars and icons keep the brand colours.
  */
 
 /** Brand colours, identical in light and dark mode. */
@@ -36,6 +40,12 @@ const light = {
   aiSoft: '#F1EDFF',
   warning: '#F59E0B',
   danger: '#EF4444',
+  // Text-only shades (AA on light backgrounds)
+  primaryText: '#C7341A',
+  savingsText: '#047857',
+  aiText: '#6D4AE8',
+  warningText: '#92400E',
+  dangerText: '#B91C1C',
 };
 
 /** Dark mode. Soft tints are pre-blended on the dark surface so they stay solid colours. */
@@ -53,6 +63,12 @@ const dark = {
   aiSoft: '#2E2C49',
   warning: '#FBBF24',
   danger: '#F87171',
+  // Dark mode: the brand colours already pass AA on the dark surfaces
+  primaryText: '#FF7A5F',
+  savingsText: '#34D399',
+  aiText: '#9B85FF',
+  warningText: '#FBBF24',
+  dangerText: '#F87171',
 };
 
 /**

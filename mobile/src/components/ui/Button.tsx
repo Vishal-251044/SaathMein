@@ -39,6 +39,14 @@ interface ButtonProps {
  * @param props.icon - Optional Lucide icon
  * @param props.loading - Shows a spinner and blocks presses
  */
+/** Primary button label: 17 px bold with a subtle dark shadow on the gradient. */
+const PRIMARY_LABEL_STYLE = {
+  fontSize: 17,
+  textShadowColor: 'rgba(18, 19, 31, 0.35)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 2,
+} as const;
+
 export function Button({
   label,
   onPress,
@@ -61,7 +69,14 @@ export function Button({
       ) : (
         <>
           {Icon ? <Icon size={18} color={contentColor} strokeWidth={2.2} /> : null}
-          <AppText variant="bodyStrong" weight="bold" color={isPrimary ? 'white' : 'ink'}>
+          <AppText
+            variant="bodyStrong"
+            weight="bold"
+            color={isPrimary ? 'white' : 'ink'}
+            // White on the Sunrise gradient: large bold text + a soft shadow keeps it
+            // readable (WCAG large-text contrast, Day 14)
+            style={isPrimary ? PRIMARY_LABEL_STYLE : undefined}
+          >
             {label}
           </AppText>
         </>

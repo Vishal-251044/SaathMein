@@ -145,7 +145,7 @@ export default function BidForm({ auction }) {
             {formatINR(Math.max(0, parsed.total))}
           </p>
           {tooHigh ? (
-            <p className="text-sm font-medium text-danger">
+            <p className="text-sm font-medium text-danger-text">
               Too high: beat the lowest price by the minimum step.
             </p>
           ) : null}

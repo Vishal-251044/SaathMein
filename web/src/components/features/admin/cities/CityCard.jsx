@@ -49,7 +49,7 @@ export default function CityCard({ city, defaultOpen = false }) {
           aria-expanded={isOpen}
           className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left"
         >
-          <span className="grid size-11 shrink-0 place-items-center rounded-button bg-bg-band text-primary">
+          <span className="grid size-11 shrink-0 place-items-center rounded-button bg-bg-band text-primary-text">
             <MapPin className="size-5" strokeWidth={2} aria-hidden="true" />
           </span>
           <span className="min-w-0">
@@ -73,7 +73,10 @@ export default function CityCard({ city, defaultOpen = false }) {
         </button>
         <div className="flex items-center gap-2">
           <span
-            className={cn('text-sm font-semibold', city.active ? 'text-savings' : 'text-muted')}
+            className={cn(
+              'text-sm font-semibold',
+              city.active ? 'text-savings-text' : 'text-muted',
+            )}
           >
             {city.active ? 'Live' : 'Off'}
           </span>

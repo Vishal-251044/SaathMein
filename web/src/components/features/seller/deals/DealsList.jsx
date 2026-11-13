@@ -53,7 +53,7 @@ function DealCard({ deal }) {
               key={tier.size}
               className={
                 reached
-                  ? 'rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary'
+                  ? 'rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary-text'
                   : 'rounded-full bg-bg-band px-3 py-1 text-xs font-semibold text-muted'
               }
             >

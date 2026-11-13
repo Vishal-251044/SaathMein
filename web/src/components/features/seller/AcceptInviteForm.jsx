@@ -82,7 +82,10 @@ export default function AcceptInviteForm() {
       title={`Join ${businessName}`}
       subtitle={`You were invited as ${email}`}
       footer={
-        <Link href={ROUTES.SELLER_LOGIN} className="font-semibold text-primary hover:underline">
+        <Link
+          href={ROUTES.SELLER_LOGIN}
+          className="font-semibold text-primary-text hover:underline"
+        >
           Back to login
         </Link>
       }

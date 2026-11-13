@@ -72,7 +72,7 @@ export default function SellersList() {
                 className={cn(
                   'min-h-11 whitespace-nowrap rounded-button px-4 text-sm font-semibold transition-colors duration-150',
                   kycStatus === tab.value
-                    ? 'bg-primary/10 text-primary'
+                    ? 'bg-primary/10 text-primary-text'
                     : 'text-ink hover:bg-bg-band',
                 )}
               >

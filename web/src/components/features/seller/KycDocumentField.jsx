@@ -65,7 +65,7 @@ export default function KycDocumentField({ docType, required = false, value, onU
           ) : null}
         </p>
         {value ? (
-          <p className="mt-0.5 flex items-center gap-1.5 truncate text-sm text-primary">
+          <p className="mt-0.5 flex items-center gap-1.5 truncate text-sm text-primary-text">
             <CircleCheck className="size-4 shrink-0" strokeWidth={2} aria-hidden="true" />
             {fileName || 'Uploaded'}
           </p>
@@ -73,7 +73,7 @@ export default function KycDocumentField({ docType, required = false, value, onU
           <p className="mt-0.5 text-sm text-muted">PDF, JPG or PNG, up to 10 MB</p>
         )}
         {error ? (
-          <p role="alert" className="mt-1 text-sm font-medium text-danger">
+          <p role="alert" className="mt-1 text-sm font-medium text-danger-text">
             {error}
           </p>
         ) : null}

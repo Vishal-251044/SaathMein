@@ -36,7 +36,7 @@ export default function Input({ label, error, hint, className, id, ...rest }) {
         {...rest}
       />
       {error ? (
-        <p id={`${inputId}-error`} className="text-sm font-medium text-danger">
+        <p id={`${inputId}-error`} className="text-sm font-medium text-danger-text">
           {error}
         </p>
       ) : hint ? (

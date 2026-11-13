@@ -181,7 +181,7 @@ export default function ProductForm({ product, categories, cities }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       {product?.needsPriceReview ? (
         <div className="flex items-start gap-3 rounded-card border border-warning/40 bg-warning/10 p-4">
-          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden="true" />
+          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-warning-text" aria-hidden="true" />
           <p className="text-sm text-ink">
             These prices came from an import and have not been checked. Verify every city price,
             then switch the product <strong>Live</strong> and save.
@@ -304,7 +304,7 @@ export default function ProductForm({ product, categories, cities }) {
       )}
 
       <div className="sticky bottom-0 -mx-4 flex flex-col-reverse items-stretch gap-3 border-t border-line bg-bg-band/95 px-4 py-3 backdrop-blur sm:mx-0 sm:flex-row sm:items-center sm:justify-end sm:rounded-card sm:border">
-        {savedAt ? <p className="text-sm font-medium text-savings">Saved</p> : null}
+        {savedAt ? <p className="text-sm font-medium text-savings-text">Saved</p> : null}
         <Button variant="ghost" href="/admin/products">
           Back to products
         </Button>

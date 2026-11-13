@@ -74,7 +74,7 @@ export default function TwoFactorStep({ mode, challengeToken, setup, onSuccess, 
         <div className="flex flex-col gap-4 rounded-card border border-line bg-bg-band p-4 sm:p-5">
           <div className="flex items-start gap-3">
             <Smartphone
-              className="mt-0.5 size-5 shrink-0 text-primary"
+              className="mt-0.5 size-5 shrink-0 text-primary-text"
               strokeWidth={2}
               aria-hidden="true"
             />
@@ -99,7 +99,7 @@ export default function TwoFactorStep({ mode, challengeToken, setup, onSuccess, 
           </div>
           <a
             href={setup.otpAuthUrl}
-            className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            className="text-sm font-semibold text-primary-text underline-offset-4 hover:underline"
           >
             On this phone? Open directly in your authenticator app
           </a>

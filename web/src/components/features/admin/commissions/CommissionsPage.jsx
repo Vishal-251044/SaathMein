@@ -144,7 +144,7 @@ function InvoicesSection() {
                   <td className="px-5 py-3">
                     <Link
                       href={`/admin/commissions/invoices/${invoice.id}`}
-                      className="font-mono font-semibold text-primary hover:underline"
+                      className="font-mono font-semibold text-primary-text hover:underline"
                     >
                       {invoice.invoiceNo}
                     </Link>

@@ -137,7 +137,11 @@ export default function BuyersMonitor() {
                     }
                   >
                     {buyer.status === 'active' ? (
-                      <UserX className="size-4 text-danger" strokeWidth={2} aria-hidden="true" />
+                      <UserX
+                        className="size-4 text-danger-text"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      />
                     ) : (
                       <UserCheck className="size-4" strokeWidth={2} aria-hidden="true" />
                     )}

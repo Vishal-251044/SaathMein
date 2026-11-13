@@ -76,7 +76,7 @@ export default function AlertsCentre() {
             className={cn(
               'min-h-11 rounded-full px-4 text-sm font-semibold',
               status === value
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/10 text-primary-text'
                 : 'border border-line text-ink hover:bg-bg-band',
             )}
           >

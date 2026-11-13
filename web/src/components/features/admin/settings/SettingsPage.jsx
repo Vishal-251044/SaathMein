@@ -310,7 +310,7 @@ export default function SettingsPage() {
         <p className="mt-1 text-muted">
           Platform rules. Token, back-out fee, auction duration, bid step and commission are set per
           category in{' '}
-          <Link href="/admin/catalog" className="font-semibold text-primary hover:underline">
+          <Link href="/admin/catalog" className="font-semibold text-primary-text hover:underline">
             Categories
           </Link>
           . Every change is recorded in the audit log.

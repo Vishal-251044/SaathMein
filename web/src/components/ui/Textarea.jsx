@@ -35,7 +35,7 @@ export default function Textarea({ label, error, hint, className, id, rows = 3, 
         {...rest}
       />
       {error ? (
-        <p id={`${fieldId}-error`} className="text-sm font-medium text-danger">
+        <p id={`${fieldId}-error`} className="text-sm font-medium text-danger-text">
           {error}
         </p>
       ) : hint ? (

@@ -227,7 +227,7 @@ export default function PaymentsMonitor() {
                       <dd
                         className={cn(
                           'font-mono font-bold text-ink',
-                          label === 'Failed' && value.count && 'text-danger',
+                          label === 'Failed' && value.count && 'text-danger-text',
                         )}
                       >
                         {value.count}
@@ -242,7 +242,7 @@ export default function PaymentsMonitor() {
                   <p className="flex items-start gap-2 text-sm text-ink">
                     {data.reconciliation.unresolved ? (
                       <TriangleAlert
-                        className="mt-0.5 size-4 shrink-0 text-danger"
+                        className="mt-0.5 size-4 shrink-0 text-danger-text"
                         strokeWidth={2}
                         aria-hidden="true"
                       />
@@ -320,7 +320,7 @@ export default function PaymentsMonitor() {
               className={cn(
                 'min-h-11 rounded-full px-4 text-sm font-semibold',
                 view === value
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-primary/10 text-primary-text'
                   : 'border border-line text-ink hover:bg-bg-band',
               )}
             >
@@ -368,7 +368,9 @@ export default function PaymentsMonitor() {
                         ? payment.refunds.map((refund, index) => (
                             <p
                               key={`${refund.reason}-${index}`}
-                              className={refund.status === 'failed' ? 'text-danger' : 'text-ink'}
+                              className={
+                                refund.status === 'failed' ? 'text-danger-text' : 'text-ink'
+                              }
                             >
                               <span className="font-mono">{formatINR(refund.amountPaise)}</span>{' '}
                               {refund.status} · {refund.reason.replace(/_/g, ' ')}

@@ -33,7 +33,7 @@ function ChecklistItem({ done, title, text, href, action }) {
     <li className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-start gap-3">
         <Icon
-          className={cn('mt-0.5 size-5 shrink-0', done ? 'text-primary' : 'text-muted')}
+          className={cn('mt-0.5 size-5 shrink-0', done ? 'text-primary-text' : 'text-muted')}
           strokeWidth={2}
           aria-hidden="true"
         />
@@ -82,7 +82,7 @@ export default function SellerHome() {
           {isOwner ? (
             <Link
               href={ROUTES.SELLER_KYC}
-              className="mt-2 inline-block font-semibold text-primary underline"
+              className="mt-2 inline-block font-semibold text-primary-text underline"
             >
               Update and resubmit
             </Link>
@@ -96,7 +96,7 @@ export default function SellerHome() {
         <FadeIn className="rounded-card border border-line bg-surface p-5 shadow-card sm:p-6">
           <div className="flex items-start gap-3">
             <BadgeCheck
-              className="size-6 shrink-0 text-primary"
+              className="size-6 shrink-0 text-primary-text"
               strokeWidth={2}
               aria-hidden="true"
             />
@@ -144,13 +144,17 @@ export default function SellerHome() {
           </ul>
           {kyc.status === 'pending' ? (
             <p className="flex items-center gap-2 border-t border-line py-4 text-sm font-semibold text-ink">
-              <Clock className="size-4 text-warning" strokeWidth={2} aria-hidden="true" />
+              <Clock className="size-4 text-warning-text" strokeWidth={2} aria-hidden="true" />
               Under review since {new Date(kyc.submittedAt).toLocaleDateString('en-IN')}
             </p>
           ) : null}
           {!isOwner && !checklist.kycSubmitted ? (
             <p className="flex items-center gap-2 border-t border-line py-4 text-sm text-muted">
-              <TriangleAlert className="size-4 text-warning" strokeWidth={2} aria-hidden="true" />
+              <TriangleAlert
+                className="size-4 text-warning-text"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
               Only the account owner can submit KYC.
             </p>
           ) : null}

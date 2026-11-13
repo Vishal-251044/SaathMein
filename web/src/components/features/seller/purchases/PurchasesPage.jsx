@@ -209,7 +209,7 @@ function InvoiceActions({ purchase }) {
           View invoice
         </Button>
         {canObject && !isObjecting ? (
-          <Button variant="ghost" className="text-danger" onClick={() => setIsObjecting(true)}>
+          <Button variant="ghost" className="text-danger-text" onClick={() => setIsObjecting(true)}>
             <Flag className="size-4" strokeWidth={2} aria-hidden="true" />
             Object
           </Button>
@@ -281,7 +281,7 @@ export default function PurchasesPage() {
             className={cn(
               'inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-sm font-semibold transition-colors duration-150',
               item.key === tab
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/10 text-primary-text'
                 : 'bg-bg-band text-muted hover:text-ink',
             )}
           >
