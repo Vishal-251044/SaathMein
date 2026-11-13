@@ -91,7 +91,7 @@ Notes:
 - Backend tests run with `node --experimental-vm-modules` (otplib / firebase-admin ship ESM-only dependencies).
 - PENDING (owner): Firebase project, Phone Auth, Android app `com.saathmein.app` with SHA-1/SHA-256 from `eas credentials`, `google-services.json` → `mobile/`, service-account key → `backend/.env`.
 - PENDING (owner): fill the Day 2 secrets in `backend/.env`, then `npm run create-owner`.
-- PENDING (Day 5): log staff logins to the audit log; new-device email alert (ADL-4) once the email service exists.
+- PENDING (Day 5): log staff logins to the audit log; new-device email alert (ADL-4) once the email service exists. → DONE (13 Nov 2026, Day 1–14 audit)
 - Not verified end-to-end yet: needs MongoDB + Firebase + a development build on a phone.
 
 ### Day 3 — Profile, City & Interest Onboarding (Wed 28 Oct)
@@ -117,7 +117,7 @@ Notes:
 - Added to the data model: `category.nameTranslations`, `category.featuredBrands` (brand choices until products exist on Day 4), `city/area.nameTranslations`, `user.interests.brands`, `user.onboardingCompletedAt`, `demandSignals` (TTL 180 days).
 - Onboarding: first login → city & area ("Use my location" or manual) → interests (skippable) → Home. Language picked on first launch is saved to the account.
 - Avatars: signed direct upload to Cloudinary (public id fixed to `saathmein/avatars/<userId>`, resized on upload), response signature verified by the API. No upload preset needed. Photos resized to 512 px on the phone first.
-- Account deletion erases personal data and keeps an anonymous stub (needed later for payment/ledger history); ends all sessions; removes demand signals, photo and the Firebase user. PENDING (Day 7): block deletion while a token is held.
+- Account deletion erases personal data and keeps an anonymous stub (needed later for payment/ledger history); ends all sessions; removes demand signals, photo and the Firebase user. PENDING (Day 7): block deletion while a token is held. → DONE (13 Nov 2026, Day 1–14 audit)
 - PRD ACC-5 also mentions "data export" — not in the roadmap; not built yet.
 - PENDING (Day 5): audit log for admin city/area changes.
 - PENDING (owner): Cloudinary account + `CLOUDINARY_*` in `backend/.env`; run `npm run seed` once MongoDB is set.
@@ -126,7 +126,7 @@ Notes:
 ### Day 4 — Catalog: Categories, Products & Search (Thu 29 Oct)
 **Done when:** admin imports products with a CSV; a user searches "activa" with a typo and opens the product page with its Pune price.
 
-- [ ] Mobile: category grid on Home
+- [x] Mobile: category grid on Home
 - [x] Mobile: product page (image carousel, variants, specs, city price)
 - [x] Mobile: "Start a group" CTA and open-groups section on product page
 - [x] Mobile: search screen with 300 ms debounce and recent searches
@@ -329,7 +329,7 @@ Notes:
 - Reviews: only completed buyers, once per purchase; dealer rating updated atomically (running average).
 - Seller web: Purchases (webcam QR scan or typed code → preview → confirm; view invoice, object within 48 h), Payouts (on hold / released / taken back, settlements, invoices), printable invoice page; Admin → Commissions (filters, totals, CSV, invoices, issue a month) for Owner / Admin / Finance.
 - New env: `DEAL_CODE_SECRET` in `backend/.env` + `.env.example` (production refuses a weak value).
-- MOVED to Day 12: winning dealer in the group chat (from Day 9) and objected invoices → disputes queue. Mobile "My deal codes" list screen uses `GET /users/me/deal-codes` — the ticket is on the group page for now.
+- MOVED to Day 12: winning dealer in the group chat (from Day 9) and objected invoices → disputes queue. Mobile "My deal codes" list screen uses `GET /users/me/deal-codes` — the ticket is on the group page for now. → DONE (13 Nov 2026, Day 1–14 audit)
 - Not verified end-to-end yet (needs MongoDB, Redis + worker, Razorpay test keys with Route, Cloudinary). "Done when" check: win a group in test mode → the dealer opens /seller/purchases and scans a member's QR (or types the code) → confirm → Payment.transfer.status = released and a hold_release ledger row; the buyer sees "You saved ₹X" and leaves a review.
 
 ### Day 11 — Discovery, Home Feed & Community Groups (Thu 5 Nov)
@@ -399,7 +399,7 @@ Notes:
 - Carry-overs done: the winning dealer's team chats with the group as the business (web dealer room + mobile "dealer" tag); staff lift penalties early (Sellers → dealer → Penalties) and suspend / reactivate buyers (Buyer monitor).
 - Mobile offline: connectivity is judged from API reachability (no new native module); key screens (home, my groups, group pages incl. deal codes, payments, products, dealers, wallet, disputes, categories, cities) are saved to the app cache and open offline; cache cleared on sign-out (previously the query cache was not cleared at all). Needs a new dev build only if `expo-file-system` was not already linked (it ships with Expo, so normally no rebuild).
 - MOVED to Day 16: wallet credit spending on tokens (decided 13 Nov 2026).
-- PENDING: `AdminDashboardHome.jsx` (old Day 2 home) is no longer used — delete with Vishal's OK. Staff logout / new-device alert still PENDING from Day 2.
+- PENDING: `AdminDashboardHome.jsx` (old Day 2 home) is no longer used — delete with Vishal's OK. Staff logout / new-device alert still PENDING from Day 2. → DONE (13 Nov 2026, Day 1–14 audit)
 
 ### Day 14 — QA, Hardening & Launch v1.0 (Sun 8 Nov · Power day)
 **Done when:** install from the Play testing track → OTP → join a group with a real UPI token → seller bids → auction won → purchase confirmed → payout; admin console live.
@@ -426,6 +426,8 @@ Notes:
 - Ready for you: `Doc/SaathMein_Launch_v1.0.md` (Render + Vercel + Atlas steps, EAS production build, Play listing text, Data safety answers, QA and bug-bash checklist, load test, live-key switch).
 - PENDING (owner): create Render / Vercel / Atlas production / Upstash / Sentry / Play Console accounts and fill the values (guide §2–§7); EAS production build (AAB 1.0.0) and internal-testing upload; Play graphics; real-device QA on 3 phones and the 5-person bug bash (fix P0s then); run `npm run load-test` against the deployed API; merge `dev` → `main` and tag `v1.0.0` (needs your "yes, push").
 - PENDING (legal): live Razorpay keys only after CA / lawyer sign-off and your instruction (guide §8); finish `web/src/utils/legal.js` before production.
+- Day 1–14 audit (13 Nov 2026): every code task of Days 1–14 is done. Closed in the audit: account deletion refused (409) while a token is with SaathMein / on hold at a dealer or the user owns a dealer business (ACC-5); staff sign-out audited and new-device sign-in email (ADL-4); refund.failed raises a Finance alert; mobile Profile → My deal codes (open tickets + bought, offline); Day 4 category grid was already on Home (tick missing); old `AdminDashboardHome.jsx` deleted (Vishal's OK); dealer email + password login confirmed. Backend 823 tests pass; web builds; mobile typecheck + lint + i18n parity pass.
+- Still open in Days 1–14 (all need your accounts, phones or legal — no code left): pre-Day-1 set-up list; Day 1 Atlas / Redis / EAS init; Day 2 Firebase; Day 3 Cloudinary; Day 5 Razorpay test + Route; Day 7 EAS development build + public webhook URL; Day 8 FCM in Expo + Play internal / closed testing; Day 14 deploy, AAB, Play listing graphics, 3-phone QA + bug bash (then P0 fixes), load-test run, tag v1.0.0, live keys after legal.
 
 ---
 
@@ -525,7 +527,7 @@ Notes:
 | 27 Oct 2026 | Theme is "Sunrise" (PRD §14.1), not "Saffron Night" | Day 1 |
 | 27 Oct 2026 | Auction bids stored in `bids` + `auctionDealers` (PRD §13); no separate `offers` collection | Days 1, 9, 18 |
 | 27 Oct 2026 | Build started 27 Oct (planned 26 Oct) — schedule is one day behind | All |
-| 30 Oct 2026 | Dealer login = email + password; business phone is a contact only (dealer phone OTP deferred) — pending Vishal's OK | Days 5, 9 |
+| 30 Oct 2026 | Dealer login = email + password; business phone is a contact only (dealer phone OTP deferred) — confirmed by Vishal 13 Nov 2026 | Days 5, 9 |
 | 30 Oct 2026 | Open question 5: early-start auction (≥70%) keeps the same rules and ceiling | Days 6, 9 |
 | 30 Oct 2026 | Membership = paid token; new groups start at 0 members, leader pays to take a seat | Days 6, 7 |
 | 30 Oct 2026 | Deadline at ≥70%: leader has 48 h to extend once (+7 days, capped at category max) or start early; else expired | Day 6 |
