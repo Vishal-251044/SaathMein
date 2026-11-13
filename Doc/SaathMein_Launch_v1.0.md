@@ -70,7 +70,6 @@ Decisions for v1.0 (13 Nov 2026):
    - `EXPO_PUBLIC_SOCKET_URL=https://<api>.onrender.com`
    - `EXPO_PUBLIC_APP_LINK_HOST=<web domain>` (no https://)
    - `EXPO_PUBLIC_WEB_URL=https://<web domain>`
-   - `EXPO_PUBLIC_RAZORPAY_KEY_ID=<rzp_test_…>` (public key id only — never the secret)
    - `EXPO_PUBLIC_SENTRY_DSN=<mobile DSN>`
    - `GOOGLE_SERVICES_JSON` as a **file** variable (Firebase Android config)
    - Optional native crash symbols: `SENTRY_ORG`, `SENTRY_PROJECT`, and secret `SENTRY_AUTH_TOKEN`
@@ -142,7 +141,7 @@ Razorpay, Firebase, Cloudinary and Sentry act as **service providers** (processi
 1. CA / lawyer confirm: token as part-payment, refund policy, back-out fee, grievance officer; legal pages updated and `isDraft: false`.
 2. Razorpay account activated for live payments **and Route**.
 3. Render: replace `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` with live keys; create the **live-mode** webhook (same URL and events) and set its secret as `RAZORPAY_WEBHOOK_SECRET`. Redeploy API + worker.
-4. EAS: `EXPO_PUBLIC_RAZORPAY_KEY_ID=rzp_live_…` → new production build (the key id is baked into the app).
+4. No new app build is needed: the app receives the Razorpay key id from the API with each payment order.
 5. Dealers: linked accounts must be re-created in live mode (Admin → Sellers → Retry payout setup for each).
 6. Smoke test with a ₹1 test product / small real token → refund it from Admin → Payments.
 
