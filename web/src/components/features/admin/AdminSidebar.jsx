@@ -20,7 +20,10 @@ export default function AdminSidebar({ role, onNavigate }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Admin console" className="flex h-full flex-col gap-6 px-3 py-5">
+    <nav
+      aria-label="Admin console"
+      className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-5"
+    >
       <div className="flex items-center gap-2 px-2">
         <LogoMark size={32} />
         <div className="leading-tight">

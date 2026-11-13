@@ -61,6 +61,33 @@ const SECTIONS = [
     ],
   },
   {
+    key: 'alerts',
+    title: 'Alerts',
+    description:
+      'Push alerts go to the buyer-app account with this phone number (install the app and sign in with it). The console bell and email work for all staff.',
+    fields: [
+      { key: 'ownerPushPhone', label: "Owner's phone for push alerts (10 digits)", kind: 'text' },
+      {
+        key: 'paymentSuccessMinBps',
+        label: 'Alert when payment success falls below (%)',
+        kind: 'percent',
+      },
+      {
+        key: 'paymentSuccessMinSample',
+        label: 'Only after this many payments in the hour',
+        kind: 'number',
+      },
+      { key: 'refundStuckHours', label: 'Refund stuck after (hours)', kind: 'number' },
+      {
+        key: 'transferPendingHours',
+        label: 'Dealer transfer pending after (hours)',
+        kind: 'number',
+      },
+      { key: 'queueBacklogMax', label: 'Job backlog alert above (jobs)', kind: 'number' },
+      { key: 'apiErrorsPerMinute', label: 'Server errors per minute alert', kind: 'number' },
+    ],
+  },
+  {
     key: 'groups',
     title: 'Groups',
     fields: [

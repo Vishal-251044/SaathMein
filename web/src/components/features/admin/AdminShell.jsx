@@ -2,12 +2,13 @@
 
 /**
  * AdminShell — console layout: fixed sidebar on desktop, slide-in drawer on phones,
- * and a top bar with the staff member, their role and sign out.
+ * and a top bar with the alert bell (live staff socket), the staff member, role and sign out.
  */
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { LogOut, Menu, X } from 'lucide-react';
 import AdminSidebar from '@/components/features/admin/AdminSidebar';
+import AlertBell from '@/components/features/admin/monitor/AlertBell';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { DURATION, EASE } from '@/utils/animations';
 import { STAFF_ROLE_LABELS } from '@/utils/constants';
@@ -82,6 +83,7 @@ export default function AdminShell({ children }) {
           </button>
 
           <div className="ml-auto flex min-w-0 items-center gap-3">
+            <AlertBell />
             <div className="min-w-0 text-right leading-tight">
               <p className="truncate text-sm font-bold text-ink">{staff.name || staff.email}</p>
               <p className="text-xs font-semibold text-muted">{roleLabel}</p>

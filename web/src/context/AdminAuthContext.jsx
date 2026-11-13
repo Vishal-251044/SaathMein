@@ -10,6 +10,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import useIdleTimer from '@/hooks/useIdleTimer';
 import { logout as logoutRequest, refreshSession } from '@/services/adminAuth.service';
 import { refreshAccessToken, setAccessToken, setRefreshHandler } from '@/lib/staffSession';
+import { closeStaffSocket } from '@/lib/staffSocket';
 import { ADMIN_IDLE_TIMEOUT_MS, ADMIN_TOKEN_REFRESH_MS } from '@/utils/constants';
 
 const AdminAuthContext = createContext(null);
@@ -36,6 +37,7 @@ export function AdminAuthProvider({ children }) {
 
   /** Forget the session locally (optionally with a message for the login page). */
   const clearSession = useCallback((notice = null) => {
+    closeStaffSocket();
     setAccessToken(null);
     setState({ status: 'signedOut', staff: null, notice });
   }, []);

@@ -82,7 +82,23 @@ const getSellerDetail = async (sellerId) => {
       email: member.userId.email,
       role: member.role,
     }));
-  return toAdminSeller(seller, { owner, documents, team });
+  return {
+    ...toAdminSeller(seller, { owner, documents, team }),
+    // Warnings, rating penalties and suspensions, newest first (lifted ones stay for history)
+    penalties: (seller.penalties || [])
+      .map((penalty) => ({
+        id: String(penalty._id),
+        type: penalty.type,
+        reason: penalty.reason,
+        until: penalty.until || null,
+        groupId: penalty.groupId ? String(penalty.groupId) : null,
+        disputeId: penalty.disputeId ? String(penalty.disputeId) : null,
+        createdAt: penalty.createdAt,
+        liftedAt: penalty.liftedAt || null,
+        liftReason: penalty.liftReason || null,
+      }))
+      .reverse(),
+  };
 };
 
 /**

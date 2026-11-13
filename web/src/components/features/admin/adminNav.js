@@ -1,6 +1,6 @@
 /**
  * Admin console navigation (PRD §10.11 console modules).
- * Modules show "Day N" until they are built; `roles` lists who can see each item
+ * `roles` lists who can see each item
  * (Owner sees everything). The API enforces the same rules — hiding is never the security.
  */
 import {
@@ -18,10 +18,43 @@ import {
   Shapes,
   Inbox,
   Receipt,
+  Bell,
+  Activity,
+  HeartPulse,
+  UserRound,
+  ScrollText,
+  Radar,
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: 'all' },
+  { label: 'Overview', href: '/admin', icon: LayoutDashboard, roles: 'all' },
+  { label: 'Alerts', href: '/admin/alerts', icon: Bell, roles: 'all' },
+  {
+    label: 'Live auctions',
+    href: '/admin/monitor/auctions',
+    icon: Gavel,
+    roles: ['admin', 'deal_manager', 'support'],
+  },
+  {
+    label: 'Group monitor',
+    href: '/admin/monitor/groups',
+    icon: Radar,
+    roles: ['admin', 'deal_manager', 'support'],
+  },
+  {
+    label: 'Payments',
+    href: '/admin/monitor/payments',
+    icon: CreditCard,
+    roles: ['admin', 'finance'],
+  },
+  {
+    label: 'Dealer monitor',
+    href: '/admin/monitor/dealers',
+    icon: Activity,
+    roles: ['admin', 'deal_manager', 'support'],
+  },
+  { label: 'Buyers', href: '/admin/monitor/buyers', icon: UserRound, roles: ['admin', 'support'] },
+  { label: 'System health', href: '/admin/monitor/system', icon: HeartPulse, roles: ['admin'] },
   { label: 'Cities', href: '/admin/cities', icon: MapPin, roles: ['admin', 'deal_manager'] },
   { label: 'Categories', href: '/admin/catalog', icon: Shapes, roles: ['admin', 'deal_manager'] },
   { label: 'Products', href: '/admin/products', icon: Package, roles: ['admin', 'deal_manager'] },
@@ -38,13 +71,12 @@ export const ADMIN_NAV_ITEMS = [
     icon: UsersRound,
     roles: ['admin', 'deal_manager', 'support'],
   },
-  { label: 'Auctions', icon: Gavel, availableOn: 'Day 9', roles: ['admin', 'deal_manager'] },
   { label: 'Commissions', href: '/admin/commissions', icon: Receipt, roles: ['admin', 'finance'] },
-  { label: 'Payments', icon: CreditCard, availableOn: 'Day 13', roles: ['admin', 'finance'] },
   { label: 'Disputes', href: '/admin/disputes', icon: Scale, roles: ['admin', 'support'] },
   { label: 'Curation', href: '/admin/curation', icon: Megaphone, roles: ['admin'] },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['admin'] },
-  { label: 'Team and audit', icon: ShieldCheck, availableOn: 'Day 13', roles: [] },
+  { label: 'Audit log', href: '/admin/audit', icon: ScrollText, roles: ['admin'] },
+  { label: 'Team', href: '/admin/team', icon: ShieldCheck, roles: [] },
 ];
 
 /**

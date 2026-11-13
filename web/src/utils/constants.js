@@ -21,6 +21,33 @@ export const SOCKET_EVENTS = Object.freeze({
   AUCTION_EXTENDED: 'auction:extended',
   AUCTION_WON: 'auction:won',
   AUCTION_RANK: 'auction:rank',
+  GROUP_JOIN: 'group:join',
+  GROUP_LEAVE: 'group:leave',
+  CHAT_MESSAGE: 'chat:message',
+});
+
+/** Live events the admin console listens to (staff room, backend sockets/emitter.js). */
+export const STAFF_SOCKET_EVENTS = Object.freeze({
+  MONITOR_CHANGED: 'monitor:changed',
+  ALERT_NEW: 'alert:new',
+  ALERT_UPDATED: 'alert:updated',
+});
+
+/** Console monitors poll this often while the staff socket is down (fallback). */
+export const MONITOR_POLL_MS = 30_000;
+
+/** Alert severity and type labels (MON-4). */
+export const ALERT_SEVERITY_META = Object.freeze({
+  critical: { label: 'Critical', tone: 'danger' },
+  warning: { label: 'Warning', tone: 'warning' },
+  info: { label: 'Info', tone: 'muted' },
+});
+export const ALERT_TYPE_LABELS = Object.freeze({
+  payment: 'Payments',
+  auction: 'Auctions',
+  suspicious_bidding: 'Suspicious bidding',
+  reconciliation: 'Reconciliation',
+  system: 'System',
 });
 
 /** Poll the auction this often while the live connection is down (fallback). */

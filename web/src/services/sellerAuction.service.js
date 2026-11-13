@@ -71,3 +71,19 @@ export const searchProducts = async ({ q, cityId }) =>
  */
 export const getProduct = async ({ productId, cityId }) =>
   (await sellerApi.get(`/products/${productId}`, { params: { cityId } })).data.product;
+
+/**
+ * Group chat with the buyers of a group the dealer won (Day 13).
+ * @param {{ groupId: string, before?: string }} params
+ * @returns {Promise<{ messages: Object[], hasMore: boolean }>}
+ */
+export const listGroupMessages = async ({ groupId, before }) =>
+  (await sellerApi.get(`/seller/groups/${groupId}/messages`, { params: { before } })).data;
+
+/**
+ * Post a message to the group as the business.
+ * @param {{ groupId: string, text: string }} input
+ * @returns {Promise<Object>} The message
+ */
+export const sendGroupMessage = async ({ groupId, text }) =>
+  (await sellerApi.post(`/seller/groups/${groupId}/messages`, { text })).data.message;

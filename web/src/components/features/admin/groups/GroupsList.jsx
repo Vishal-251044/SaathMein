@@ -1,8 +1,9 @@
 'use client';
 
 /**
- * GroupsList — Admin → Groups (read-only on Day 6): filter by city, category, status,
- * visibility and created date, search by product or invite code, CSV export (MON-1).
+ * GroupsList — Admin → Groups: filter by city, category, status, visibility and created
+ * date, search by product or invite code, CSV export (MON-1). Owner / Admin / Deal Manager
+ * can extend an open group's deadline or cancel a group (full refunds), with a reason.
  * The table scrolls inside its own container on phones.
  */
 import { useState } from 'react';
@@ -14,6 +15,8 @@ import {
   RefreshCw,
   Search,
   UsersRound,
+  Ban,
+  CalendarPlus,
 } from 'lucide-react';
 import Alert from '@/components/ui/Alert';
 import Badge from '@/components/ui/Badge';
@@ -22,11 +25,17 @@ import useDebouncedValue from '@/hooks/useDebouncedValue';
 import { useAdminCategories } from '@/hooks/useAdminCatalog';
 import { useAdminCities } from '@/hooks/useAdminCities';
 import { useAdminGroups } from '@/hooks/useAdminGroups';
+import { useMonitorAction } from '@/hooks/useAdminMonitor';
+import { useAdminAuth } from '@/context/AdminAuthContext';
+import { ReasonDialog } from '@/components/features/admin/monitor/MonitorParts';
+import { groupActions } from '@/components/features/admin/monitor/GroupsMonitor';
 import { downloadGroupsCsv } from '@/services/adminGroups.service';
 import { GROUP_STATUS_META } from '@/utils/constants';
 import { cn, formatINR } from '@/utils/genericFunctions';
 
 const PAGE_SIZE = 25;
+const OPS_ROLES = ['owner', 'admin', 'deal_manager'];
+const CANCELLABLE = ['open', 'full', 'auction_live', 'won', 'runner_up'];
 const selectClass =
   'min-h-11 w-full rounded-button border border-line bg-surface px-3 text-sm text-ink focus:border-primary focus:outline-none';
 
@@ -57,6 +66,25 @@ export default function GroupsList() {
   const [csvError, setCsvError] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const q = useDebouncedValue(search.trim(), 300);
+  const { staff } = useAdminAuth();
+  const canAct = OPS_ROLES.includes(staff.role);
+  const action = useMonitorAction();
+  const [dialog, setDialog] = useState(null);
+
+  /** Open the reason dialog for a group action. */
+  const openAction = (group, key) => {
+    const config = groupActions(group)[key];
+    setDialog({
+      ...config,
+      onConfirm: async (values) => {
+        await action.mutateAsync({
+          path: config.path,
+          body: { ...(config.body ? config.body(values) : {}), reason: values.reason },
+        });
+        refetch();
+      },
+    });
+  };
 
   // Empty values are left out of the request
   const params = Object.fromEntries(Object.entries({ ...filters, q }).filter(([, value]) => value));
@@ -94,7 +122,7 @@ export default function GroupsList() {
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-extrabold tracking-tight text-ink">Groups</h1>
           <p className="mt-1 text-muted">
-            Every buyer group. Read-only for now; actions arrive with the full console.
+            Every buyer group. Live numbers are on the Group monitor.
           </p>
         </div>
         <Button variant="secondary" onClick={exportCsv} disabled={isExporting}>
@@ -194,7 +222,7 @@ export default function GroupsList() {
             isFetching && 'opacity-70',
           )}
         >
-          <table className="w-full min-w-[860px] text-left text-sm">
+          <table className="w-full min-w-[960px] text-left text-sm">
             <thead className="border-b border-line text-xs font-semibold uppercase tracking-wider text-muted">
               <tr>
                 <th scope="col" className="px-4 py-3">
@@ -221,6 +249,11 @@ export default function GroupsList() {
                 <th scope="col" className="px-4 py-3">
                   Code
                 </th>
+                {canAct ? (
+                  <th scope="col" className="px-4 py-3">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -263,6 +296,34 @@ export default function GroupsList() {
                     </td>
                     <td className="px-4 py-3 text-ink">{group.leaderName || '—'}</td>
                     <td className="px-4 py-3 font-mono text-xs text-muted">{group.inviteCode}</td>
+                    {canAct ? (
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          {group.status === 'open' ? (
+                            <Button
+                              variant="secondary"
+                              onClick={() => openAction(group, 'extend')}
+                              aria-label={`Extend ${group.productName || 'group'}`}
+                            >
+                              <CalendarPlus className="size-4" strokeWidth={2} aria-hidden="true" />
+                            </Button>
+                          ) : null}
+                          {CANCELLABLE.includes(group.status) ? (
+                            <Button
+                              variant="secondary"
+                              onClick={() => openAction(group, 'cancel')}
+                              aria-label={`Cancel ${group.productName || 'group'}`}
+                            >
+                              <Ban
+                                className="size-4 text-danger"
+                                strokeWidth={2}
+                                aria-hidden="true"
+                              />
+                            </Button>
+                          ) : null}
+                        </div>
+                      </td>
+                    ) : null}
                   </tr>
                 );
               })}
@@ -296,6 +357,11 @@ export default function GroupsList() {
           </div>
         </div>
       ) : null}
+      <ReasonDialog
+        action={dialog}
+        onConfirm={(values) => dialog.onConfirm(values)}
+        onClose={() => setDialog(null)}
+      />
     </div>
   );
 }

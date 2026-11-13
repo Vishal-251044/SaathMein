@@ -1,14 +1,14 @@
 /**
- * /admin — console dashboard. Day 2: welcome and session overview.
- * Live monitors (groups, auctions, Razorpay payments, alerts) arrive on Day 13.
+ * /admin — console Overview (PRD §10.11): live platform numbers, 7-day chart, alerts and
+ * disputes SLA. Every staff role.
  */
-import AdminDashboardHome from '@/components/features/admin/AdminDashboardHome';
+import OverviewDashboard from '@/components/features/admin/monitor/OverviewDashboard';
 
-export const metadata = { title: 'Dashboard' };
+export const metadata = { title: 'Overview' };
 
 /**
  * @returns {JSX.Element}
  */
 export default function AdminDashboardPage() {
-  return <AdminDashboardHome />;
+  return <OverviewDashboard />;
 }

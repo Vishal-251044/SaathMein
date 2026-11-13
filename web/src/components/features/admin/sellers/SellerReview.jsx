@@ -35,6 +35,7 @@ import {
   KYC_STATUS_META,
   PAYOUT_STATUS_LABELS,
 } from '@/utils/constants';
+import SellerPenalties from '@/components/features/admin/sellers/SellerPenalties';
 
 const ACTION_LABELS = {
   'seller.kyc.approve': 'Approved KYC',
@@ -255,6 +256,12 @@ export default function SellerReview({ sellerId }) {
               Links work for 10 minutes. Reload the page for new ones.
             </p>
           </Card>
+
+          {seller.kyc.status === 'approved' || seller.penalties?.length ? (
+            <Card title="Penalties">
+              <SellerPenalties sellerId={sellerId} penalties={seller.penalties} />
+            </Card>
+          ) : null}
 
           {canSeeAudit ? (
             <Card title="Activity">

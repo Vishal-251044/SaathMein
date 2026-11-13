@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button';
 import FadeIn from '@/components/animations/FadeIn';
 import JoinCommitmentForm from '@/components/features/seller/auctions/JoinCommitmentForm';
 import BidForm from '@/components/features/seller/auctions/BidForm';
+import DealerGroupChat from '@/components/features/seller/auctions/DealerGroupChat';
 import { RunnerUpOffer, WonGroupPanel } from '@/components/features/seller/auctions/WonGroupPanel';
 import { useSellerMe } from '@/hooks/useSeller';
 import { useAuctionLive, useCountdown, useSellerAuction } from '@/hooks/useSellerAuctions';
@@ -204,7 +205,12 @@ export default function AuctionRoom({ groupId }) {
       </section>
 
       {auction.isWinner ? (
-        <WonGroupPanel auction={auction} isOwner={me.data?.role === 'owner'} />
+        <>
+          <WonGroupPanel auction={auction} isOwner={me.data?.role === 'owner'} />
+          {['won', 'purchasing', 'completed'].includes(auction.status) ? (
+            <DealerGroupChat groupId={groupId} />
+          ) : null}
+        </>
       ) : auction.runnerUpOffer ? (
         <RunnerUpOffer auction={auction} />
       ) : isOpen ? (
