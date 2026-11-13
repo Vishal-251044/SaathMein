@@ -405,20 +405,27 @@ Notes:
 **Done when:** install from the Play testing track → OTP → join a group with a real UPI token → seller bids → auction won → purchase confirmed → payout; admin console live.
 
 - [ ] Mobile: real-device QA on 3 Android phones, 360 px layouts
-- [ ] Mobile: accessibility (labels, 48 dp targets, contrast)
-- [ ] Mobile: Sentry for React Native
+- [x] Mobile: accessibility (labels, 48 dp targets, contrast)
+- [x] Mobile: Sentry for React Native
 - [ ] Mobile: EAS production build (AAB) version 1.0.0
-- [ ] Backend: security review (validation, rate limits, webhook signatures, CORS)
+- [x] Backend: security review (validation, rate limits, webhook signatures, CORS)
 - [ ] Backend: load test (500 socket clients, 50 joins / min)
 - [ ] Backend: fix all P0 bugs
 - [ ] DevOps: deploy API + workers (Render / Railway), web (Vercel); Atlas production rules and backups
-- [ ] DevOps: GitHub Actions lint + tests on every PR
+- [x] DevOps: GitHub Actions lint + tests on every PR
 - [ ] Play listing: screenshots, feature graphic, privacy policy URL, data safety form
 - [ ] Upload AAB to internal / closed testing; tag v1.0.0
 - [ ] Sunday extra: end-to-end bug bash with 5 real users; live Razorpay keys after activation; socket load test
 
 Notes:
 - Roadmap "Done when" says "seller bids → accept"; the auction picks the winner automatically (PRD §10.5), so "accept" = auction won.
+- Decisions (13 Nov 2026): Sentry SDKs approved for all three apps; API + worker on Render (`render.yaml`), web on Vercel; open question 8 → Organisation Play Console account; open question 9 → v1.0 on the testing track runs Razorpay in **test mode** until the CA / lawyer confirm (so the "real UPI token" step of Done-when waits for that); contrast fix = darker text-only shades (brand colours kept for fills/icons).
+- Security review: Zod validation on every route with input (route coverage test), express rate limits now shared through Redis, production refuses to start without Razorpay / Redis / Firebase values, a real MongoDB URI or with localhost CORS (tests), socket frames capped at 16 KB, web security headers, non-breaking `npm audit fix`. Remaining audit findings: backend 6 moderate (Firebase Admin's Google Cloud build deps), mobile @grpc/grpc-js via Firebase JS SDK (fix needs a breaking Firebase downgrade) — not on request paths.
+- Accessibility: every pressable has a label or visible text; shared Button / Chip are 48 dp; text shades pass 4.5:1 on light backgrounds (mobile + web); primary button labels 17 px bold with a soft shadow.
+- Also fixed: web `/r/:code` referral links were not proxied to the API (404 on the web domain).
+- Ready for you: `Doc/SaathMein_Launch_v1.0.md` (Render + Vercel + Atlas steps, EAS production build, Play listing text, Data safety answers, QA and bug-bash checklist, load test, live-key switch).
+- PENDING (owner): create Render / Vercel / Atlas production / Upstash / Sentry / Play Console accounts and fill the values (guide §2–§7); EAS production build (AAB 1.0.0) and internal-testing upload; Play graphics; real-device QA on 3 phones and the 5-person bug bash (fix P0s then); run `npm run load-test` against the deployed API; merge `dev` → `main` and tag `v1.0.0` (needs your "yes, push").
+- PENDING (legal): live Razorpay keys only after CA / lawyer sign-off and your instruction (guide §8); finish `web/src/utils/legal.js` before production.
 
 ---
 
@@ -539,3 +546,7 @@ Notes:
 | 12 Nov 2026 | Legal pages drafted, marked pending legal review; details in web/src/utils/legal.js | Day 12 |
 | 13 Nov 2026 | Wallet credit spending on tokens moved again, to Day 16 (after v1.0) | Days 13, 16 |
 | 13 Nov 2026 | Owner push alerts go to the buyer-app account whose phone is set in Admin → Settings → Alerts; bell + email for all staff | Day 13 |
+| 13 Nov 2026 | Sentry SDKs approved (backend, web, mobile); hosting = Render (API + worker) + Vercel (web) | Day 14 |
+| 13 Nov 2026 | Open question 8: Organisation Play Console account | Days 14, 20 |
+| 13 Nov 2026 | Open question 9: Razorpay stays in test mode on the testing track until CA / lawyer sign-off | Days 14, 20 |
+| 13 Nov 2026 | WCAG contrast: darker text-only shades of the brand colours; brand colours kept for fills and icons | Day 14 |
