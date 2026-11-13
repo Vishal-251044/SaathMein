@@ -384,17 +384,22 @@ Notes:
 ### Day 13 — Full Owner Console & Live Monitoring (Sat 7 Nov)
 **Done when:** the Owner watches a test auction live with dealer names, sees payments, holds and refunds on the Payment monitor, receives an alert when a webhook fails, cancels a test group (everyone refunded) and every action appears in the audit log.
 
-- [ ] Mobile: loading skeletons, empty and error states on all screens
-- [ ] Mobile: offline cached screens and retry banners
-- [ ] Backend: `/admin/monitor` (overview, groups, auctions, payments, dealers, buyers, system health — live via sockets)
-- [ ] Backend: auction actions (pause, extend, cancel, force runner-up — reason required)
-- [ ] Backend: Razorpay monitor data (success rate by method, refunds pending / failed, holds, webhook failures, reconciliation)
-- [ ] Backend: alert rules (payment, auction, suspicious bidding, reconciliation, system) → console + email + push
-- [ ] Backend: permission matrix per route + tests (Support gets 403 on Payments, Settings, Team)
-- [ ] Web: Admin Overview dashboard with live charts
-- [ ] Web: Auction monitor with full bid timeline
-- [ ] Web: Payment, Dealer, Buyer monitors, System health
-- [ ] Web: Alerts centre; Team invites and roles; Audit log viewer; CSV export
+- [x] Mobile: loading skeletons, empty and error states on all screens
+- [x] Mobile: offline cached screens and retry banners
+- [x] Backend: `/admin/monitor` (overview, groups, auctions, payments, dealers, buyers, system health — live via sockets)
+- [x] Backend: auction actions (pause, extend, cancel, force runner-up — reason required)
+- [x] Backend: Razorpay monitor data (success rate by method, refunds pending / failed, holds, webhook failures, reconciliation)
+- [x] Backend: alert rules (payment, auction, suspicious bidding, reconciliation, system) → console + email + push
+- [x] Backend: permission matrix per route + tests (Support gets 403 on Payments, Settings, Team)
+- [x] Web: Admin Overview dashboard with live charts
+- [x] Web: Auction monitor with full bid timeline
+- [x] Web: Payment, Dealer, Buyer monitors, System health
+- [x] Web: Alerts centre; Team invites and roles; Audit log viewer; CSV export
+- Notes: Staff sockets join a `staff` room only (staff token); monitors refresh live on `monitor:changed` / `alert:new`, 30 s polling fallback. Every staff action needs a reason (10+ chars) and writes before/after to the audit log; cancel goes through the state machine (refunds after held transfers are reversed); manual refunds are refused while a token is on hold at the dealer (reverse first). Alerts are deduplicated (repeats count up), emailed to the Owner + the handling role, pushed (warning/critical) to the buyer-app account in `settings.alerts.ownerPushPhone`; thresholds editable in Admin → Settings → Alerts. Team: Owner-only invites (72 h link, account + password on the invite page, 2FA at first sign-in), role change / disable end sessions; the Owner cannot be changed. Permission matrix test covers every monitor, action, alert, Team, Settings and audit route for all 5 roles (172 cases). Backend tests: 811 passing.
+- Carry-overs done: the winning dealer's team chats with the group as the business (web dealer room + mobile "dealer" tag); staff lift penalties early (Sellers → dealer → Penalties) and suspend / reactivate buyers (Buyer monitor).
+- Mobile offline: connectivity is judged from API reachability (no new native module); key screens (home, my groups, group pages incl. deal codes, payments, products, dealers, wallet, disputes, categories, cities) are saved to the app cache and open offline; cache cleared on sign-out (previously the query cache was not cleared at all). Needs a new dev build only if `expo-file-system` was not already linked (it ships with Expo, so normally no rebuild).
+- MOVED to Day 16: wallet credit spending on tokens (decided 13 Nov 2026).
+- PENDING: `AdminDashboardHome.jsx` (old Day 2 home) is no longer used — delete with Vishal's OK. Staff logout / new-device alert still PENDING from Day 2.
 
 ### Day 14 — QA, Hardening & Launch v1.0 (Sun 8 Nov · Power day)
 **Done when:** install from the Play testing track → OTP → join a group with a real UPI token → seller bids → auction won → purchase confirmed → payout; admin console live.
@@ -446,6 +451,7 @@ Notes:
 - [ ] Data: Atlas Vector Search index on products.embedding
 - [ ] Data: nightly re-embed of changed products
 - [ ] Feature flag: AI feed vs rule feed; track click-through
+- [ ] Carry-over (from Day 13): wallet credits can pay part of a token; refunds of that part go back to the wallet
 
 ### Day 17 — Deal Predictor & Price Insights (Wed 11 Nov)
 **Done when:** an open group shows "Now ~4% · at 20 members ~7% · 78% likely to fill by Friday"; price chart and best-time hint show on product pages.
@@ -531,3 +537,5 @@ Notes:
 | 12 Nov 2026 | Rating penalty = one 1-star rating in the dealer average | Day 12 |
 | 12 Nov 2026 | Winning dealer sees member phones only after the 24 h exit window (masked before) | Day 12 |
 | 12 Nov 2026 | Legal pages drafted, marked pending legal review; details in web/src/utils/legal.js | Day 12 |
+| 13 Nov 2026 | Wallet credit spending on tokens moved again, to Day 16 (after v1.0) | Days 13, 16 |
+| 13 Nov 2026 | Owner push alerts go to the buyer-app account whose phone is set in Admin → Settings → Alerts; bell + email for all staff | Day 13 |
