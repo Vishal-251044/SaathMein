@@ -208,22 +208,49 @@ const backOut = async (groupId, { sellerId, userId }, reason) => {
   if (group.status !== GROUP_STATUS.WON) {
     throw ApiError.conflict('This group can no longer be handed back', { code: 'CANNOT_BACK_OUT' });
   }
+  return handOverToRunnerUp(group, { sellerId, actorId: userId, reason, penalise: true });
+};
+
+/**
+ * Take a won group away from the winner and offer it to the runner-up for 24 h (or cancel
+ * with full refunds when there is none). Used when the winner backs out (with penalties)
+ * and by staff "force runner-up" from the Auction monitor (penalties optional).
+ * @param {import('mongoose').Document} group - Group in `won`
+ * @param {{ sellerId: string, actorId: string, reason: string, penalise: boolean, actorType?: 'user'|'staff' }} options
+ * @returns {Promise<Object>} Updated group
+ */
+const handOverToRunnerUp = async (
+  group,
+  { sellerId, actorId, reason, penalise, actorType = 'user' },
+) => {
+  const groupId = String(group._id);
   const settings = await getAuctionSettings();
   const now = new Date();
 
-  // Penalty: rating penalty (one 1-star) + suspension from auctions (TRU-5)
-  await applyPenalties(sellerId, ['rating_penalty', 'auction_suspension'], {
-    reason,
-    groupId,
-    staffId: userId,
-    suspensionDays: settings.backOutSuspensionDays,
-    now,
-  });
+  if (penalise) {
+    // Penalty: rating penalty (one 1-star) + suspension from auctions (TRU-5)
+    await applyPenalties(sellerId, ['rating_penalty', 'auction_suspension'], {
+      reason,
+      groupId,
+      staffId: actorId,
+      suspensionDays: settings.backOutSuspensionDays,
+      now,
+    });
+  }
   await AuctionDealer.updateOne({ groupId, sellerId }, { $set: { status: 'backed_out' } });
   await clearDealCodes(groupId);
   // Take the held tokens back before they go to the runner-up or are refunded (PAY-4)
   await reverseGroupTransfers(groupId, 'dealer_backed_out');
   log.warn({ groupId, sellerId, reason }, 'Winning dealer backed out');
+  await require('../alerts/alert.service').raiseAlert({
+    type: 'auction',
+    severity: 'warning',
+    title: 'Winning dealer backed out',
+    message: reason,
+    subjectType: 'group',
+    subjectId: String(groupId),
+    dedupeKey: `auction:backout:${groupId}`,
+  });
 
   const runnerUpBid = group.auction?.runnerUpBidId
     ? await Bid.findById(group.auction.runnerUpBidId).lean()
@@ -231,13 +258,13 @@ const backOut = async (groupId, { sellerId, userId }, reason) => {
   if (!runnerUpBid) {
     return transition(group, GROUP_STATUS.CANCELLED, {
       reason: 'winner_backed_out',
-      actor: { type: 'user', id: userId },
+      actor: { type: actorType, id: actorId },
     });
   }
 
   const updated = await transition(group, GROUP_STATUS.RUNNER_UP, {
     reason: 'winner_backed_out',
-    actor: { type: 'user', id: userId },
+    actor: { type: actorType, id: actorId },
     ctx: { runnerUpBidId: runnerUpBid._id },
     set: {
       'auction.runnerUpOfferDueAt': new Date(now.getTime() + settings.runnerUpOfferHours * HOUR_MS),
@@ -351,6 +378,7 @@ const processAuctionTimeouts = async (now = new Date()) => {
 };
 
 module.exports = {
+  handOverToRunnerUp,
   declareWinner,
   announceWinner,
   backOut,

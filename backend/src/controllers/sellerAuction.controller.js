@@ -8,6 +8,7 @@ const auctionService = require('../services/auction/auction.service');
 const bidService = require('../services/auction/bid.service');
 const winnerService = require('../services/auction/winner.service');
 const dealService = require('../services/deals/deal.service');
+const chatService = require('../services/chat/chat.service');
 
 /** @param {import('express').Request} req @returns {{ sellerId: string, userId: string }} */
 const dealer = (req) => ({ sellerId: req.seller.sellerId, userId: req.auth.userId });
@@ -76,7 +77,25 @@ const createDeal = asyncHandler(async (req, res) => {
   return sendSuccess(res, { statusCode: 201, message: 'Deal published', data: { deal } });
 });
 
+/** GET /api/seller/groups/:groupId/messages — chat with the group the dealer won */
+const listGroupMessages = asyncHandler(async (req, res) => {
+  const data = await chatService.listDealerMessages(
+    req.params.groupId,
+    dealer(req),
+    req.validatedQuery,
+  );
+  return sendSuccess(res, { message: 'Messages fetched', data });
+});
+
+/** POST /api/seller/groups/:groupId/messages */
+const sendGroupMessage = asyncHandler(async (req, res) => {
+  const message = await chatService.sendDealerMessage(req.params.groupId, dealer(req), req.body);
+  return sendSuccess(res, { statusCode: 201, message: 'Message sent', data: { message } });
+});
+
 module.exports = {
+  listGroupMessages,
+  sendGroupMessage,
   listAuctions,
   getAuction,
   joinAuction,

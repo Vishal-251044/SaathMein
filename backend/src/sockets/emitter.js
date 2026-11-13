@@ -21,6 +21,8 @@ const rooms = {
   // Dealers: one room per dealer business (rank updates) and one per auction they watch
   seller: (sellerId) => `seller:${sellerId}`,
   auction: (groupId) => `auction:${groupId}`,
+  // Admin console (staff sessions): alerts and monitor refresh nudges (MON-1, MON-2)
+  staff: () => 'staff',
 };
 
 /** @param {import('socket.io').Server|null} server - Set by the gateway in the API process */
@@ -94,8 +96,19 @@ const subscribeToWorkerEmits = async (server) => {
   });
 };
 
+/** @param {string} event @param {Object} payload Staff console (never sent to buyers or dealers) */
+const emitToStaff = (event, payload) => emitToRoom(rooms.staff(), event, payload);
+
+/**
+ * Connections on this API process (System health / Active buyers now).
+ * @returns {{ connections: number|null }} null in the worker process
+ */
+const getSocketStats = () => ({ connections: io ? io.engine.clientsCount : null });
+
 module.exports = {
   EMIT_CHANNEL,
+  getSocketStats,
+  emitToStaff,
   rooms,
   setIo,
   emitToRoom,

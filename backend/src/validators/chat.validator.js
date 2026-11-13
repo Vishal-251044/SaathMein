@@ -12,6 +12,12 @@ const listMessagesSchema = {
   query: z.object({ before: objectId.optional(), limit: z.string().regex(/^\d+$/).optional() }),
 };
 
+/** Dealer posts text only (as the business). */
+const dealerMessageSchema = {
+  params: groupParams,
+  body: z.object({ text: z.string().trim().min(1).max(1000) }).strict(),
+};
+
 const sendMessageSchema = {
   params: groupParams,
   body: z
@@ -83,6 +89,7 @@ const removePushTokenSchema = {
 };
 
 module.exports = {
+  dealerMessageSchema,
   groupParams,
   listMessagesSchema,
   sendMessageSchema,

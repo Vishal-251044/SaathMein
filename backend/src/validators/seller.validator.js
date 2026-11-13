@@ -230,7 +230,15 @@ const auditLogsSchema = {
     targetType: z.string().trim().max(40).optional(),
     targetId: z.string().trim().max(40).optional(),
     actorId: objectId.optional(),
-    action: z.string().trim().max(80).optional(),
+    // Prefix of an action name, e.g. "auction." (letters, digits, dot, underscore only)
+    action: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9._]{1,80}$/i, 'Invalid action')
+      .optional(),
+    from: z.iso.date().optional(),
+    to: z.iso.date().optional(),
+    format: z.enum(['json', 'csv']).optional(),
     page: z.string().regex(/^\d+$/).optional(),
     limit: z.string().regex(/^\d+$/).optional(),
   }),

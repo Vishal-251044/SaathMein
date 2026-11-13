@@ -153,6 +153,21 @@ const sendTeamInvite = ({ to, businessName, inviterName, url }) =>
     ),
   });
 
+/** @param {{ to: string, roleLabel: string, inviterName: string, url: string }} params */
+const sendStaffInvite = ({ to, roleLabel, inviterName, url }) =>
+  sendEmail({
+    to,
+    subject: 'You are invited to the SaathMein Admin Console',
+    text: `${inviterName} invited you to the SaathMein Admin Console as ${roleLabel}. Accept within 72 hours: ${url}. You will need an authenticator app for 2-step verification.`,
+    html: layout(
+      [
+        `${inviterName} invited you to the SaathMein Admin Console as ${roleLabel}.`,
+        'The invitation is valid for 72 hours. You will need an authenticator app for 2-step verification.',
+      ],
+      { label: 'Accept invitation', url },
+    ),
+  });
+
 /** @param {{ to: string[], businessName: string, adminUrl: string }} params */
 const sendKycReviewNeeded = ({ to, businessName, adminUrl }) =>
   sendEmail({
@@ -254,5 +269,6 @@ module.exports = {
   sendKycApproved,
   sendKycRejected,
   sendTeamInvite,
+  sendStaffInvite,
   sendKycReviewNeeded,
 };

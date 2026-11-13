@@ -25,6 +25,7 @@ jest.mock('../../../src/models/payment.model', () => ({
   findOneAndUpdate: jest.fn(),
 }));
 jest.mock('../../../src/models/seller.model', () => ({ findById: jest.fn() }));
+jest.mock('../../../src/services/alerts/alert.service', () => ({ raiseAlert: jest.fn() }));
 jest.mock('../../../src/utils/transaction', () => ({
   withTransaction: jest.fn(async (work) => work({ id: 'session' })),
 }));

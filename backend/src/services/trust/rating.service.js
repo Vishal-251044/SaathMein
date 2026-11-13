@@ -35,10 +35,10 @@ const recomputeSellerRating = async (sellerId) => {
       { $match: { sellerId: id, status: 'published' } },
       { $group: { _id: null, sum: { $sum: '$rating' }, count: { $sum: 1 } } },
     ]),
-    Seller.findById(id).select('penalties.type').lean(),
+    Seller.findById(id).select('penalties.type penalties.liftedAt').lean(),
   ]);
   const penalties = (seller?.penalties || []).filter(
-    (penalty) => penalty.type === 'rating_penalty',
+    (penalty) => penalty.type === 'rating_penalty' && !penalty.liftedAt, // lifted by staff: no longer counts
   ).length;
   const result = computeRating({ sum: rows[0]?.sum || 0, count: rows[0]?.count || 0, penalties });
   await Seller.updateOne({ _id: id }, { $set: result });

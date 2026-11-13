@@ -56,6 +56,10 @@ const penaltySchema = new Schema(
     groupId: { type: Schema.Types.ObjectId, ref: 'Group' },
     disputeId: { type: Schema.Types.ObjectId, ref: 'Dispute' },
     until: Date,
+    // Staff can lift a suspension early (Day 13); the penalty row stays for history
+    liftedAt: Date,
+    liftedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    liftReason: { type: String, trim: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     createdAt: { type: Date, default: Date.now },
   },

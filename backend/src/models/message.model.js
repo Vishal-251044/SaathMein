@@ -18,6 +18,8 @@ const messageSchema = new Schema(
     groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
     senderId: { type: Schema.Types.ObjectId, ref: 'User' }, // null for system messages
     senderType: { type: String, enum: ['buyer', 'seller', 'saathi', 'system'], default: 'buyer' },
+    // Dealer messages show the business name (never the staff member's own name)
+    senderLabel: { type: String, trim: true, maxlength: 120 },
     text: { type: String, trim: true, maxlength: 1000 },
     images: [
       {

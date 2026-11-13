@@ -82,6 +82,16 @@ const DEFAULTS = Object.freeze({
     suspensionDays: 30, // default auction suspension for a penalty
     maxEvidenceFiles: 6,
   }),
+  // Day 13: alert rules (PRD §10.11 Alerts) and the Owner's phone for push alerts
+  alerts: Object.freeze({
+    ownerPushPhone: '', // E.164 number of the Owner's own SaathMein app account
+    paymentSuccessMinBps: 9000, // alert when the hourly success rate drops below 90%
+    paymentSuccessMinSample: 10, // ... with at least this many payments in the hour
+    refundStuckHours: 24,
+    transferPendingHours: 24,
+    queueBacklogMax: 200,
+    apiErrorsPerMinute: 20,
+  }),
   // Day 11: feature flags (F35)
   flags: Object.freeze({
     referrals: true,

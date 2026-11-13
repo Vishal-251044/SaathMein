@@ -15,6 +15,7 @@ const razorpay = require('./razorpay.service');
 const { recordLedger } = require('./ledger.service');
 const { committedRefundPaise } = require('./refund.service');
 const { splitToken } = require('./commission');
+const { raiseAlert } = require('../alerts/alert.service');
 const { LEDGER_TYPE, PAYMENT_STATUS } = require('../../constants/enums');
 
 const log = createLogger('RouteService');
@@ -259,7 +260,18 @@ const handleTransferEvent = async (entity, failed) => {
       ],
       session,
     );
-    // TODO(Day 13): alert Finance on the Payment monitor
+    // Finance sees it on the Payment monitor (after the transaction)
+    setImmediate(() =>
+      raiseAlert({
+        type: 'payment',
+        severity: 'critical',
+        title: 'Route transfer to a dealer failed',
+        message: entity.error?.description || 'Razorpay reported the transfer failed.',
+        subjectType: 'payment',
+        subjectId: String(payment._id),
+        dedupeKey: `transfer:failed:${entity.id}`,
+      }),
+    );
     log.error(
       { paymentId: String(payment._id), transferId: entity.id },
       '[RouteService] transfer failed',

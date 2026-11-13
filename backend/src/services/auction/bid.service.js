@@ -19,12 +19,13 @@ const { formatINR, percentOfPaise } = require('../../utils/money');
 const { assertWithinLimit } = require('../rateLimit.service');
 const { getAuctionSettings } = require('../settings.service');
 const { scheduleAuctionClose } = require('../../jobs/queues');
-const { emitToAuction, emitToSeller } = require('../../sockets/emitter');
+const { emitToAuction, emitToSeller, emitToStaff } = require('../../sockets/emitter');
 const { notifyGroupMembers } = require('../groups/groupLive');
 const emailService = require('../email.service');
 const { ineligibilityReason } = require('./eligibility');
 const { auctionRulesFor, auctionNumbers, rankOf } = require('./auction.service');
 const { notifyDealer, dealerAuctionUrl, productNameOf } = require('./winner.service');
+const { raiseAlert } = require('../alerts/alert.service');
 const {
   BID_STATUS,
   GROUP_STATUS,
@@ -229,7 +230,7 @@ const placeBid = async (groupId, { sellerId, userId }, input, { ip, now = new Da
     return { bid, group: updated };
   });
 
-  await afterBid(result.group, { sellerId, previousLeaderBid, extended, now, settings });
+  await afterBid(result.group, { sellerId, previousLeaderBid, extended, now, settings, ip });
   log.info({ groupId, sellerId, price, extended }, 'Bid placed');
   return {
     bid: { id: String(result.bid._id), pricePerUnitPaise: price, createdAt: result.bid.createdAt },
@@ -244,8 +245,26 @@ const placeBid = async (groupId, { sellerId, userId }, input, { ip, now = new Da
  * After a bid is saved: live updates, ranks, outbid notice, buyer price alert (throttled),
  * re-schedule the close when extended. Never throws.
  */
-const afterBid = async (group, { sellerId, previousLeaderBid, extended, now, settings }) => {
+const afterBid = async (group, { sellerId, previousLeaderBid, extended, now, settings, ip }) => {
   try {
+    // Suspicious bidding (PRD Alerts): two dealers bidding from the same IP in one auction
+    if (ip) {
+      const sameIp = await Bid.exists({ groupId: group._id, ip, sellerId: { $ne: sellerId } });
+      if (sameIp) {
+        await raiseAlert({
+          type: 'suspicious_bidding',
+          severity: 'critical',
+          title: 'Two dealers bid from the same network',
+          message:
+            'Bids from different dealers in this auction came from the same IP address. Check for collusion before the auction closes.',
+          subjectType: 'group',
+          subjectId: String(group._id),
+          dedupeKey: `bids:same-ip:${group._id}`,
+        });
+      }
+    }
+    // Staff dashboards refresh live (MON-1)
+    emitToStaff('monitor:changed', { scope: 'auction', groupId: String(group._id) });
     const numbers = auctionNumbers(group);
     emitToAuction(group._id, SOCKET_EVENTS.AUCTION_LOWEST, numbers);
     if (extended) {

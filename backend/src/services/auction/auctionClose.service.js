@@ -21,6 +21,7 @@ const { getAuctionSettings } = require('../settings.service');
 const { scheduleAuctionClose } = require('../../jobs/queues');
 const { emitToAuction } = require('../../sockets/emitter');
 const { declareWinner } = require('./winner.service');
+const { raiseAlert } = require('../alerts/alert.service');
 const { auctionRulesFor, notifyEligibleDealers } = require('./auction.service');
 const {
   BID_STATUS,
@@ -106,6 +107,15 @@ const closeAuction = async (groupId, now = new Date()) => {
 
     if (!bids.length) {
       await transition(group, GROUP_STATUS.NO_DEAL, { reason: 'no_valid_bid', ctx: { now } });
+      await raiseAlert({
+        type: 'auction',
+        severity: 'warning',
+        title: 'Auction ended with no dealer price',
+        message: 'Tokens are being refunded. Check dealer coverage for this city and category.',
+        subjectType: 'group',
+        subjectId: String(groupId),
+        dedupeKey: `auction:no-bids:${groupId}`,
+      });
       return { outcome: 'no_deal' };
     }
 
@@ -123,6 +133,15 @@ const closeAuction = async (groupId, now = new Date()) => {
         endsAt: group.auction.endsAt,
         closedAt: now,
         reason: 'single_dealer',
+      });
+      await raiseAlert({
+        type: 'auction',
+        severity: 'info',
+        title: 'Auction ended with only one dealer',
+        message: 'The leader has 24 hours to accept that price or cancel.',
+        subjectType: 'group',
+        subjectId: String(groupId),
+        dedupeKey: `auction:one-dealer:${groupId}`,
       });
       return { outcome: 'awaiting_leader' };
     }

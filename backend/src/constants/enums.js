@@ -188,6 +188,8 @@ const NOTIFICATION_TYPE = Object.freeze({
   // Day 12: disputes
   DISPUTE_UPDATE: 'dispute_update',
   DEALER_DISPUTE_OPENED: 'dealer_dispute_opened',
+  // Day 13: console alert pushed to the Owner's own app account
+  STAFF_ALERT: 'staff_alert',
 });
 
 /** What can be reported (TRU-3). */

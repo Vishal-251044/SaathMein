@@ -6,6 +6,12 @@ const { NOTIFICATION_TYPE: T } = require('../../constants/enums');
 
 /** @type {Record<string, Record<string, (data: Object) => { title: string, body: string }>>} */
 const TEMPLATES = {
+  // Day 13: console alert to the Owner's phone (English for staff)
+  [T.STAFF_ALERT]: {
+    en: (d) => ({ title: 'SaathMein alert', body: d.title }),
+    hi: (d) => ({ title: 'SaathMein अलर्ट', body: d.title }),
+    mr: (d) => ({ title: 'SaathMein अलर्ट', body: d.title }),
+  },
   // Day 12: disputes (TRU-4)
   [T.DEALER_DISPUTE_OPENED]: {
     en: (d) => ({

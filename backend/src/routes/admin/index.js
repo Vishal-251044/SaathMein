@@ -14,6 +14,8 @@ const adminGroupsRoutes = require('./admin.groups.routes');
 const adminCommissionsRoutes = require('./admin.commissions.routes');
 const adminDiscoveryRoutes = require('./admin.discovery.routes');
 const adminTrustRoutes = require('./admin.trust.routes');
+const adminMonitorRoutes = require('./admin.monitor.routes');
+const adminTeamRoutes = require('./admin.team.routes');
 
 const router = Router();
 
@@ -28,5 +30,7 @@ router.use(adminGroupsRoutes); // /groups
 router.use(adminCommissionsRoutes); // /commissions, /commission-invoices
 router.use(adminDiscoveryRoutes); // /curation, /settings
 router.use(adminTrustRoutes); // /disputes, /reports
+router.use(adminMonitorRoutes); // /monitor/*, /alerts
+router.use(adminTeamRoutes); // /team (Owner only)
 
 module.exports = router;

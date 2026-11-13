@@ -73,6 +73,20 @@ const revokeSession = async (sessionId, reason) => {
 };
 
 /**
+ * Revoke every open session of a user (account suspended, staff removed).
+ * @param {string} userId - User id
+ * @param {string} reason - suspended | admin | staff_removed
+ * @returns {Promise<number>} Sessions revoked
+ */
+const revokeUserSessions = async (userId, reason) => {
+  const result = await Session.updateMany(
+    { userId, revokedAt: null },
+    { $set: { revokedAt: new Date(), revokedReason: reason } },
+  );
+  return result.modifiedCount;
+};
+
+/**
  * Exchange a refresh token for a new one (single use).
  * @param {string} refreshToken - Current refresh token from the client
  * @param {string} audience - Expected audience
@@ -205,6 +219,7 @@ module.exports = {
   createSession,
   rotateRefreshToken,
   revokeSession,
+  revokeUserSessions,
   revokeByRefreshToken,
   assertStaffSessionActive,
   startSession,

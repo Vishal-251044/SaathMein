@@ -117,6 +117,15 @@ const entityIdOf = (body) => {
 const processWebhook = async ({ rawBody, signature, eventId }) => {
   if (!razorpay.verifyWebhookSignature(rawBody, signature)) {
     log.warn({ eventId }, '[WebhookService] invalid webhook signature');
+    await require('../alerts/alert.service').raiseAlert({
+      type: 'payment',
+      severity: 'warning',
+      title: 'Webhook with an invalid signature',
+      message:
+        'A request to the Razorpay webhook had a wrong signature. Check the webhook secret, or someone is probing the endpoint.',
+      subjectType: 'payment',
+      dedupeKey: 'webhook:invalid-signature',
+    });
     throw ApiError.badRequest('Invalid webhook signature', { code: 'INVALID_SIGNATURE' });
   }
   let body;
@@ -147,6 +156,14 @@ const processWebhook = async ({ rawBody, signature, eventId }) => {
       { eventId: id, event: body.event, err: err.message },
       '[WebhookService] handler failed',
     );
+    await require('../alerts/alert.service').raiseAlert({
+      type: 'payment',
+      severity: 'critical',
+      title: `Webhook failed: ${body.event}`,
+      message: `${err.message}. Razorpay will retry; check the Payment monitor.`,
+      subjectType: 'payment',
+      dedupeKey: `webhook:failed:${body.event}`,
+    });
     throw err;
   }
 };

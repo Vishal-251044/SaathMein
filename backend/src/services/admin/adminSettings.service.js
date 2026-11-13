@@ -95,6 +95,30 @@ const SECTION_SCHEMAS = Object.freeze({
     })
     .partial()
     .strict(),
+  // Alert rules (MON-4). Push alerts go to the buyer-app account with ownerPushPhone
+  // (decided 13 Nov 2026); console bell and email work for all staff.
+  alerts: z
+    .object({
+      ownerPushPhone: z.union([
+        z.literal(''),
+        z
+          .string()
+          .trim()
+          .transform((value) => value.replace(/[\s-]/g, ''))
+          .transform((value) => (/^[6-9]\d{9}$/.test(value) ? `+91${value}` : value))
+          .pipe(
+            z.string().regex(/^\+91[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number'),
+          ),
+      ]),
+      paymentSuccessMinBps: bps.min(5000),
+      paymentSuccessMinSample: z.number().int().min(1).max(10_000),
+      refundStuckHours: hours,
+      transferPendingHours: hours,
+      queueBacklogMax: z.number().int().min(10).max(100_000),
+      apiErrorsPerMinute: z.number().int().min(1).max(10_000),
+    })
+    .partial()
+    .strict(),
   flags: z
     .object({
       referrals: z.boolean(),

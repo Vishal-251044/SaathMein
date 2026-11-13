@@ -56,6 +56,7 @@ it('lists every editable section with defaults', async () => {
     'purchases',
     'billing',
     'referrals',
+    'alerts',
     'flags',
   ]);
   expect(all.flags.defaults.maintenanceMode).toBe(false);

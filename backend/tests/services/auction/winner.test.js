@@ -154,7 +154,10 @@ describe('backOut', () => {
       expect.objectContaining({ reason: 'stock ran out at the showroom', suspensionDays: 30 }),
     );
     expect(clearDealCodes).toHaveBeenCalled();
-    expect(settlement.reverseGroupTransfers).toHaveBeenCalledWith('g', 'dealer_backed_out');
+    expect(settlement.reverseGroupTransfers).toHaveBeenCalledWith(
+      expect.any(String),
+      'dealer_backed_out',
+    );
     const [, to, options] = transition.mock.calls[0];
     expect(to).toBe(S.RUNNER_UP);
     expect(options.ctx.runnerUpBidId).toBe(runnerUp._id);

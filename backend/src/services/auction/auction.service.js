@@ -200,6 +200,27 @@ const joinAuction = async (groupId, { sellerId, userId }, { deliveryBy, priceVal
   if (result.upsertedCount) {
     await Group.updateOne({ _id: groupId }, { $inc: { 'auction.joinedDealerCount': 1 } });
     log.info({ groupId, sellerId }, 'Dealer joined auction');
+    // Suspicious: someone on this dealer's team is also a buyer in the group
+    const team = await SellerStaff.find({ sellerId, status: 'active' }).distinct('userId');
+    if (
+      await GroupMember.exists({
+        groupId,
+        userId: { $in: team },
+        status: { $in: [MEMBER_STATUS.ACTIVE, MEMBER_STATUS.ACCEPTED] },
+      })
+    ) {
+      const { raiseAlert } = require('../alerts/alert.service');
+      await raiseAlert({
+        type: 'suspicious_bidding',
+        severity: 'warning',
+        title: 'Dealer team member is also a buyer in the group',
+        message:
+          'A user on the dealer team joined this group as a buyer. Check before the auction closes.',
+        subjectType: 'group',
+        subjectId: String(groupId),
+        dedupeKey: `bids:linked:${groupId}:${sellerId}`,
+      });
+    }
   }
   return getSellerAuction(groupId, sellerId);
 };

@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require('./middlewares/error.middleware');
 const apiRoutes = require('./routes');
 const { requireDatabase } = require('./middlewares/database.middleware');
 const paymentController = require('./controllers/payment.controller');
+const { recordMetrics } = require('./middlewares/metrics.middleware');
 const deepLinkController = require('./controllers/deepLink.controller');
 
 const app = express();
@@ -23,6 +24,7 @@ if (config.isProduction) app.set('trust proxy', 1);
 app.disable('x-powered-by');
 
 app.use(requestLogger);
+app.use(recordMetrics); // System health monitor: requests, errors, response times
 app.use(helmet());
 
 /**

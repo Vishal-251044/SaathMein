@@ -12,6 +12,7 @@ const { createRateLimiter } = require('../middlewares/rateLimit.middleware');
 const controller = require('../controllers/seller.controller');
 const schemas = require('../validators/seller.validator');
 const auctionSchemas = require('../validators/auction.validator');
+const chatSchemas = require('../validators/chat.validator');
 const auctionController = require('../controllers/sellerAuction.controller');
 const purchaseSchemas = require('../validators/purchase.validator');
 const purchaseController = require('../controllers/sellerPurchase.controller');
@@ -87,6 +88,17 @@ router.post(
   auctionController.respondRunnerUp,
 );
 router.get('/deals', validate(auctionSchemas.listDealsSchema), auctionController.listDeals);
+// Group chat with the buyers of a won group (Day 13 carry-over) — any team member
+router.get(
+  '/groups/:groupId/messages',
+  validate(chatSchemas.listMessagesSchema),
+  auctionController.listGroupMessages,
+);
+router.post(
+  '/groups/:groupId/messages',
+  validate(chatSchemas.dealerMessageSchema),
+  auctionController.sendGroupMessage,
+);
 router.post('/deals', validate(auctionSchemas.createDealSchema), auctionController.createDeal);
 
 // Purchases (PUR-2, scan or type deal codes), payouts and commission invoices — team members

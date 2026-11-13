@@ -8,7 +8,9 @@ jest.mock('../../../src/jobs/queues', () => ({ scheduleAuctionClose: jest.fn() }
 jest.mock('../../../src/sockets/emitter', () => ({
   emitToAuction: jest.fn(),
   emitToSeller: jest.fn(),
+  emitToStaff: jest.fn(),
 }));
+jest.mock('../../../src/services/alerts/alert.service', () => ({ raiseAlert: jest.fn() }));
 jest.mock('../../../src/services/groups/groupLive', () => ({ notifyGroupMembers: jest.fn() }));
 jest.mock('../../../src/services/email.service', () => ({ sendOutbid: jest.fn() }));
 jest.mock('../../../src/services/rateLimit.service', () => ({ assertWithinLimit: jest.fn() }));

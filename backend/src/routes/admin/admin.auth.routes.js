@@ -6,6 +6,8 @@ const validate = require('../../middlewares/validate.middleware');
 const { requireStaff, requireXhrHeader } = require('../../middlewares/staffAuth.middleware');
 const { createRateLimiter } = require('../../middlewares/rateLimit.middleware');
 const controller = require('../../controllers/admin/adminAuth.controller');
+const teamController = require('../../controllers/admin/adminTeam.controller');
+const monitorSchemas = require('../../validators/monitor.validator');
 const schemas = require('../../validators/auth.validator');
 
 const router = Router();
@@ -27,5 +29,19 @@ router.post(
 router.post('/refresh', requireXhrHeader, controller.refresh);
 router.post('/logout', requireXhrHeader, controller.logout);
 router.get('/me', requireStaff(), controller.getMe);
+
+// Staff invitation page (public; the token is the credential, ADL-1)
+router.get(
+  '/invites/:token',
+  staffLoginLimiter,
+  validate(monitorSchemas.inviteTokenSchema),
+  teamController.previewInvite,
+);
+router.post(
+  '/invites/:token/accept',
+  staffLoginLimiter,
+  validate(monitorSchemas.acceptInviteSchema),
+  teamController.acceptInvite,
+);
 
 module.exports = router;

@@ -22,7 +22,9 @@ const businessIneligibility = (seller, settings, now = new Date()) => {
   if (seller.status !== ACCOUNT_STATUS.ACTIVE) return 'SELLER_SUSPENDED';
   const suspended = (seller.penalties || []).some(
     (penalty) =>
-      penalty.type === 'auction_suspension' && (!penalty.until || new Date(penalty.until) > now),
+      penalty.type === 'auction_suspension' &&
+      !penalty.liftedAt && // lifted early by staff (Day 13)
+      (!penalty.until || new Date(penalty.until) > now),
   );
   if (suspended) return 'AUCTIONS_SUSPENDED';
   const isRated = (seller.ratingCount || 0) >= settings.minReviewsForRating;
@@ -61,7 +63,11 @@ const eligibleSellerFilter = (group, settings, now = new Date()) => ({
   categories: group.categoryId,
   penalties: {
     $not: {
-      $elemMatch: { type: 'auction_suspension', $or: [{ until: null }, { until: { $gt: now } }] },
+      $elemMatch: {
+        type: 'auction_suspension',
+        liftedAt: { $exists: false },
+        $or: [{ until: null }, { until: { $gt: now } }],
+      },
     },
   },
   $or: [

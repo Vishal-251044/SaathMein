@@ -194,9 +194,27 @@ const runReconciliation = async ({ day = yesterdayIst() } = {}) => {
       { day, status: report.status, mismatches: mismatches.length, totals },
       'Reconciliation finished',
     );
+    if (unresolved.length) {
+      await require('../alerts/alert.service').raiseAlert({
+        type: 'reconciliation',
+        severity: 'warning',
+        title: `Reconciliation: ${unresolved.length} differences on ${day}`,
+        message: 'Our ledger and Razorpay do not match. Open the Payment monitor.',
+        subjectType: 'payment',
+        dedupeKey: `reconciliation:${day}`,
+      });
+    }
     return report;
   } catch (err) {
     log.error({ day, err: err.message }, '[Reconciliation] run failed');
+    await require('../alerts/alert.service').raiseAlert({
+      type: 'reconciliation',
+      severity: 'critical',
+      title: `Reconciliation failed for ${day}`,
+      message: err.message,
+      subjectType: 'system',
+      dedupeKey: `reconciliation:failed:${day}`,
+    });
     return ReconciliationReport.create({ day, status: 'failed', error: err.message, mismatches });
   }
 };

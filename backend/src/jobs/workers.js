@@ -17,6 +17,8 @@ const { processAuctionTimeouts } = require('../services/auction/winner.service')
 const { retryMissingHolds } = require('../services/auction/settlement.service');
 const { processPurchaseTimers } = require('../services/purchases/purchase.service');
 const { processDisputeDeadlines } = require('../services/trust/dispute.service');
+const { runAlertRules } = require('../services/alerts/alertRules.service');
+const { raiseAlert } = require('../services/alerts/alert.service');
 const { generateMonthlyInvoices } = require('../services/payments/commission.service');
 const { expireSeatOffers } = require('../services/groups/membership.service');
 const { refundPayment, retryFailedRefunds } = require('../services/payments/refund.service');
@@ -37,6 +39,7 @@ const PROCESSORS = {
     const holdsCreated = await retryMissingHolds();
     const purchases = await processPurchaseTimers();
     const disputesEscalated = await processDisputeDeadlines();
+    const alertsFired = await runAlertRules();
     return {
       ...deadlines,
       auctionsClosed,
@@ -48,6 +51,7 @@ const PROCESSORS = {
       holdsCreated,
       purchases,
       disputesEscalated,
+      alertsFired,
     };
   },
   [QUEUE_NAMES.AUCTION_CLOSE]: async (job) => closeAuction(job.data.groupId),
@@ -74,12 +78,24 @@ const startWorkers = async () => {
 
   const workers = Object.entries(PROCESSORS).map(([name, processor]) => {
     const worker = new Worker(name, processor, { connection, concurrency: 4 });
-    worker.on('failed', (job, err) =>
+    worker.on('failed', (job, err) => {
       log.error(
         { queue: name, jobId: job?.id, attempts: job?.attemptsMade, err: err.message },
         'Job failed',
-      ),
-    );
+      );
+      // PRD Alerts: "auction job failed to close" goes to the Owner and Deal Manager
+      if (name === QUEUE_NAMES.AUCTION_CLOSE) {
+        raiseAlert({
+          type: 'auction',
+          severity: 'critical',
+          title: 'Auction close job failed',
+          message: `${err.message}. The minute sweep retries overdue auctions.`,
+          subjectType: 'group',
+          subjectId: job?.data?.groupId,
+          dedupeKey: `auction:close-failed:${job?.data?.groupId}`,
+        });
+      }
+    });
     worker.on('error', (err) => log.error({ queue: name, err: err.message }, 'Worker error'));
     return worker;
   });

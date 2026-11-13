@@ -6,6 +6,10 @@
 const AuditLog = require('../models/auditLog.model');
 const { createLogger } = require('../utils/logger');
 const { getPagination, buildPaginationMeta } = require('../helpers/genericFunctions');
+const { toCsv } = require('../utils/csv');
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const CSV_LIMIT = 10_000;
 
 const log = createLogger('AuditService');
 
@@ -77,17 +81,33 @@ const recordAudit = async (entry) => {
 };
 
 /**
- * Audit history, newest first.
- * @param {{ targetType?: string, targetId?: string, actorId?: string, action?: string, page?: string, limit?: string }} query
- * @returns {Promise<{ entries: Object[], meta: Object }>}
+ * Mongo filter for the audit viewer. `action` matches a prefix ("auction." finds every
+ * auction action); `to` includes that whole day.
  */
-const listAuditLogs = async ({ targetType, targetId, actorId, action, page, limit }) => {
-  const pagination = getPagination({ page, limit });
+const buildAuditFilter = ({ targetType, targetId, actorId, action, from, to }) => {
   const filter = {};
   if (targetType) filter.targetType = targetType;
   if (targetId) filter.targetId = targetId;
   if (actorId) filter.actorId = actorId;
-  if (action) filter.action = action;
+  // Prefix match on the escaped action text (validator already limits it to [a-z0-9._])
+  if (action) filter.action = new RegExp(`^${action.replace(/\./g, '\\.')}`);
+  if (from || to) {
+    filter.createdAt = {};
+    if (from) filter.createdAt.$gte = new Date(from);
+    if (to) filter.createdAt.$lt = new Date(new Date(to).getTime() + DAY_MS);
+  }
+  return filter;
+};
+
+/**
+ * Audit history, newest first.
+ * @param {{ targetType?: string, targetId?: string, actorId?: string, action?: string,
+ *   from?: string, to?: string, page?: string, limit?: string }} query
+ * @returns {Promise<{ entries: Object[], meta: Object }>}
+ */
+const listAuditLogs = async ({ page, limit, ...query }) => {
+  const pagination = getPagination({ page, limit });
+  const filter = buildAuditFilter(query);
 
   const [entries, total] = await Promise.all([
     AuditLog.find(filter)
@@ -122,4 +142,50 @@ const listAuditLogs = async ({ targetType, targetId, actorId, action, page, limi
   };
 };
 
-module.exports = { sanitize, diffSnapshots, setAudit, recordAudit, listAuditLogs };
+/**
+ * Audit log as CSV (MON-1), newest first, up to 10,000 rows.
+ * @param {Object} query - Same filters as listAuditLogs
+ * @returns {Promise<string>} CSV text
+ */
+const exportAuditLogsCsv = async (query) => {
+  const entries = await AuditLog.find(buildAuditFilter(query))
+    .sort({ createdAt: -1 })
+    .limit(CSV_LIMIT)
+    .populate('actorId', 'name email')
+    .lean();
+  return toCsv([
+    [
+      'Time',
+      'Actor',
+      'Role',
+      'Action',
+      'Target type',
+      'Target ID',
+      'Reason',
+      'Before',
+      'After',
+      'IP',
+    ],
+    ...entries.map((entry) => [
+      new Date(entry.createdAt).toISOString(),
+      entry.actorId ? entry.actorId.name || entry.actorId.email : '',
+      entry.actorRole || '',
+      entry.action,
+      entry.targetType || '',
+      entry.targetId || '',
+      entry.reason || '',
+      entry.before == null ? '' : JSON.stringify(entry.before),
+      entry.after == null ? '' : JSON.stringify(entry.after),
+      entry.ip || '',
+    ]),
+  ]);
+};
+
+module.exports = {
+  sanitize,
+  diffSnapshots,
+  setAudit,
+  recordAudit,
+  listAuditLogs,
+  exportAuditLogsCsv,
+};

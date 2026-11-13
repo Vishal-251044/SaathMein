@@ -4,7 +4,7 @@
  */
 const asyncHandler = require('../../utils/asyncHandler');
 const { sendSuccess } = require('../../utils/ApiResponse');
-const { setAudit, listAuditLogs } = require('../../services/audit.service');
+const { setAudit, listAuditLogs, exportAuditLogsCsv } = require('../../services/audit.service');
 const sellerAdmin = require('../../services/seller/sellerAdmin.service');
 const productRequests = require('../../services/productRequest.service');
 
@@ -89,7 +89,14 @@ const updateProductRequest = asyncHandler(async (req, res) => {
 
 /** GET /api/admin/audit-logs?targetType=&targetId=&actorId=&action=&page=&limit= */
 const getAuditLogs = asyncHandler(async (req, res) => {
-  const { entries, meta } = await listAuditLogs(req.validatedQuery);
+  const { format, ...query } = req.validatedQuery;
+  if (format === 'csv') {
+    const csv = await exportAuditLogsCsv(query);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="saathmein-audit-log.csv"');
+    return res.send(csv);
+  }
+  const { entries, meta } = await listAuditLogs(query);
   return sendSuccess(res, { message: 'Audit log fetched', data: { entries }, meta });
 });
 
