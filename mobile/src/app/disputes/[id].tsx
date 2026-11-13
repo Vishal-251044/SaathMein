@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/Button';
 import { useMyDispute } from '@/hooks/useTrust';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 /** Short date and time. */
 const when = (value: string) =>
@@ -38,8 +40,8 @@ export default function DisputeScreen() {
       <View className="flex-1 bg-bg">
         <StackHeader title={t('dispute.title')} />
         <View className="gap-3 p-4">
-          <View className="h-32 rounded-card bg-bg-band" />
-          <View className="h-40 rounded-card bg-bg-band" />
+          <Skeleton className="h-32 rounded-card" />
+          <Skeleton className="h-40 rounded-card" />
         </View>
       </View>
     );
@@ -75,6 +77,8 @@ export default function DisputeScreen() {
         contentContainerStyle={{ gap: 16, padding: 16, paddingBottom: 32 + insets.bottom }}
         refreshControl={
           <RefreshControl
+            colors={[brand.primary]}
+            tintColor={brand.primary}
             refreshing={query.isRefetching}
             onRefresh={() => {
               query.refetch();

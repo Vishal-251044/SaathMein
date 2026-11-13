@@ -10,6 +10,7 @@ import { AppText } from '@/components/ui/AppText';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { enterUp } from '@/utils/animations';
 import { cx } from '@/utils/genericFunctions';
+import { Float } from '@/components/animations/Effects';
 
 interface EmptyStateProps {
   icon: ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
@@ -46,14 +47,17 @@ export function EmptyState({
         className,
       )}
     >
-      <View
-        className={cx(
-          'h-16 w-16 items-center justify-center rounded-card',
-          isAi ? 'bg-ai-soft' : 'bg-bg-band',
-        )}
-      >
-        <Icon size={28} color={isAi ? colors.ai : colors.muted} strokeWidth={1.8} />
-      </View>
+      {/* The icon drifts slowly so empty screens feel alive (off with reduce motion) */}
+      <Float distance={5}>
+        <View
+          className={cx(
+            'h-16 w-16 items-center justify-center rounded-card',
+            isAi ? 'bg-ai-soft' : 'bg-bg-band',
+          )}
+        >
+          <Icon size={28} color={isAi ? colors.ai : colors.muted} strokeWidth={1.8} />
+        </View>
+      </Float>
       <AppText variant="heading" className="mt-5 text-center">
         {title}
       </AppText>

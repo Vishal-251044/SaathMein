@@ -23,6 +23,7 @@ import { enterFade } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { cx } from '@/utils/genericFunctions';
 import { localizedName } from '@/utils/localize';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 export interface CityAreaValue {
   cityId: string;
@@ -116,8 +117,8 @@ export function CityAreaForm({
   if (isPending) {
     return (
       <View className="gap-3">
-        <View className="h-12 rounded-button bg-bg-band" />
-        <View className="h-40 rounded-card bg-bg-band" />
+        <Skeleton className="h-12 rounded-button" />
+        <Skeleton className="h-40 rounded-card" />
       </View>
     );
   }

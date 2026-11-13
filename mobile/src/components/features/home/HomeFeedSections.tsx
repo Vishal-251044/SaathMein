@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { useHomeFeed } from '@/hooks/useDiscovery';
 import type { HomeSectionKey } from '@/types/feed';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /** "See all" destination per section (browse screen presets). */
 const SEE_ALL: Partial<Record<HomeSectionKey, Href>> = {
@@ -32,9 +33,9 @@ export function HomeFeedSections() {
   if (feed.isPending) {
     return (
       <View className="mt-8 gap-4" accessibilityLabel={t('common.loading')}>
-        <View className="h-36 rounded-card bg-bg-band" />
-        <View className="h-6 w-40 rounded-full bg-bg-band" />
-        <View className="h-40 rounded-card bg-bg-band" />
+        <Skeleton className="h-36 rounded-card" />
+        <Skeleton className="h-6 w-40 rounded-full" />
+        <Skeleton className="h-40 rounded-card" />
       </View>
     );
   }

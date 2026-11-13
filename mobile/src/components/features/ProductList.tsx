@@ -11,10 +11,10 @@ import { EmptyState } from '@/components/features/EmptyState';
 import { ProductListItem } from '@/components/features/ProductListItem';
 import { Button } from '@/components/ui/Button';
 import { useProductList } from '@/hooks/useProducts';
-import { useThemeColors } from '@/hooks/useThemeColors';
 import { ApiClientError } from '@/services/api';
 import type { ProductCard } from '@/types/catalog';
 import { brand } from '@/theme/tokens';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 interface ProductListProps {
   q?: string;
@@ -33,7 +33,7 @@ function ListSkeleton() {
   return (
     <View className="gap-3" accessibilityLabel="Loading">
       {[0, 1, 2, 3, 4].map((key) => (
-        <View key={key} className="h-20 rounded-card bg-bg-band" />
+        <Skeleton key={key} className="h-20 rounded-card" />
       ))}
     </View>
   );
@@ -55,7 +55,6 @@ export function ProductList({
   onOpenProduct,
 }: ProductListProps) {
   const { t } = useTranslation();
-  const { colors } = useThemeColors();
   const query = useProductList({ q, categoryId, enabled });
   const products = query.data?.pages.flatMap((page) => page.products) ?? [];
   const isOffline = query.error instanceof ApiClientError && query.error.code === 'NETWORK_ERROR';
@@ -99,12 +98,12 @@ export function ProductList({
       onEndReachedThreshold={0.4}
       refreshControl={
         <RefreshControl
+          colors={[brand.primary]}
+          tintColor={brand.primary}
           refreshing={query.isRefetching && !query.isFetchingNextPage}
           onRefresh={() => {
             query.refetch();
           }}
-          tintColor={colors.muted}
-          colors={[brand.primary]}
         />
       }
       keyboardShouldPersistTaps="handled"

@@ -22,6 +22,8 @@ import { getItem, removeItem, STORAGE_KEYS } from '@/lib/secureStorage';
 import { shareToWhatsApp } from '@/lib/share';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 /** @returns Wallet screen */
 export default function WalletScreen() {
@@ -61,6 +63,8 @@ export default function WalletScreen() {
         contentContainerStyle={{ gap: 20, padding: 16, paddingBottom: 32 + insets.bottom }}
         refreshControl={
           <RefreshControl
+            colors={[brand.primary]}
+            tintColor={brand.primary}
             refreshing={wallet.isRefetching}
             onRefresh={() => {
               wallet.refetch();
@@ -75,7 +79,7 @@ export default function WalletScreen() {
             <AppText variant="caption">{t('wallet.balance')}</AppText>
           </View>
           {wallet.isPending ? (
-            <View className="h-10 w-40 rounded-button bg-bg-band" />
+            <Skeleton className="h-10 w-40 rounded-button" />
           ) : (
             <AppText variant="display" mono>
               {formatINR(wallet.data?.balancePaise ?? 0)}

@@ -20,6 +20,7 @@ import { useJoinByCode, useMyGroups } from '@/hooks/useGroups';
 import { ApiClientError } from '@/services/api';
 import { brand } from '@/theme/tokens';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 type Tab = 'joined' | 'leading';
 
@@ -100,7 +101,7 @@ export default function GroupsScreen() {
       return (
         <View className="gap-3" accessibilityLabel={t('common.loading')}>
           {[0, 1, 2].map((key) => (
-            <View key={key} className="h-36 rounded-card bg-bg-band" />
+            <Skeleton key={key} className="h-36 rounded-card" />
           ))}
         </View>
       );

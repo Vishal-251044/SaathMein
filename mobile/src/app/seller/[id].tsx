@@ -19,6 +19,7 @@ import { useDealer, useDealerReviews } from '@/hooks/useTrust';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { ReportTarget } from '@/types/trust';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /** @returns Dealer profile screen */
 export default function DealerScreen() {
@@ -45,8 +46,8 @@ export default function DealerScreen() {
       <StackHeader title={t('dealer.title')} />
       {dealer.isPending ? (
         <View className="gap-3 p-4">
-          <View className="h-32 rounded-card bg-bg-band" />
-          <View className="h-24 rounded-card bg-bg-band" />
+          <Skeleton className="h-32 rounded-card" />
+          <Skeleton className="h-24 rounded-card" />
         </View>
       ) : dealer.isError && !dealer.data ? (
         <View className="p-4">

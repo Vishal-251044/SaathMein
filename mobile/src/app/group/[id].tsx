@@ -8,6 +8,7 @@
  * winner card with my deal code and the 24 h exit window. Day 10: deal-code ticket (QR),
  * invoice upload, "You saved ₹X" card and the dealer review.
  */
+import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -29,6 +30,7 @@ import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Pulse } from '@/components/animations/Effects';
 import { PressableScale } from '@/components/animations/PressableScale';
 import { EmptyState } from '@/components/features/EmptyState';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
@@ -58,18 +60,21 @@ import { shareToWhatsApp } from '@/lib/share';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimeLeft } from '@/hooks/useTimeLeft';
 import { ApiClientError } from '@/services/api';
-import { enterUp } from '@/utils/animations';
+import { enterFade, enterUp } from '@/utils/animations';
+import { sizedImageUrl } from '@/utils/imageUrl';
 import type { ReportTarget } from '@/types/trust';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 /** Skeleton while the group loads. */
 function GroupSkeleton() {
   return (
     <View className="gap-4 px-4 pt-4">
-      <View className="h-24 rounded-card bg-bg-band" />
-      <View className="h-28 rounded-card bg-bg-band" />
-      <View className="h-48 rounded-card bg-bg-band" />
+      <Skeleton className="h-24 rounded-card" />
+      <Skeleton className="h-28 rounded-card" />
+      <Skeleton className="h-48 rounded-card" />
     </View>
   );
 }
@@ -156,6 +161,8 @@ export default function GroupScreen() {
           contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
           refreshControl={
             <RefreshControl
+              colors={[brand.primary]}
+              tintColor={brand.primary}
               refreshing={isRefetching}
               onRefresh={() => {
                 refetch();
@@ -171,15 +178,39 @@ export default function GroupScreen() {
                 }
                 accessibilityRole="button"
                 accessibilityLabel={group.product.name}
-                className="gap-1"
+                className="flex-row items-center gap-3"
               >
-                <AppText variant="title">{group.product.name}</AppText>
-                <AppText variant="body" color="muted">
-                  {group.variantName ?? t('group.anyVariant')}
-                </AppText>
+                {group.product.imageUrl ? (
+                  <View className="h-16 w-16 overflow-hidden rounded-button bg-bg-band">
+                    <Image
+                      source={{ uri: sizedImageUrl(group.product.imageUrl, 64) ?? undefined }}
+                      style={{ width: 64, height: 64 }}
+                      contentFit="cover"
+                      transition={250}
+                    />
+                  </View>
+                ) : null}
+                <View className="flex-1 gap-1">
+                  <AppText variant="title">{group.product.name}</AppText>
+                  <AppText variant="body" color="muted">
+                    {group.variantName ?? t('group.anyVariant')}
+                  </AppText>
+                </View>
               </PressableScale>
               <View className="mt-3 flex-row flex-wrap items-center gap-2">
                 <GroupStatusBadge status={group.status} />
+                {/* Real-time connection up: counter and auction update by themselves */}
+                {connected && ['open', 'full', 'auction_live'].includes(group.status) ? (
+                  <Animated.View
+                    entering={enterFade}
+                    className="flex-row items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1"
+                  >
+                    <Pulse color={colors.primaryText} size={6} />
+                    <AppText variant="label" color="primary">
+                      {t('group.live')}
+                    </AppText>
+                  </Animated.View>
+                ) : null}
                 {group.visibility === 'community' ? (
                   <View className="flex-row items-center gap-1">
                     <Lock size={13} color={colors.muted} strokeWidth={2} />

@@ -14,6 +14,7 @@ import { StackHeader } from '@/components/layout/StackHeader';
 import { Button } from '@/components/ui/Button';
 import { useJoinByCode } from '@/hooks/useGroups';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /**
  * @returns Invite link screen
@@ -51,8 +52,8 @@ export default function InviteLinkScreen() {
           />
         ) : (
           <View className="gap-4" accessibilityLabel={t('common.loading')}>
-            <View className="h-24 rounded-card bg-bg-band" />
-            <View className="h-40 rounded-card bg-bg-band" />
+            <Skeleton className="h-24 rounded-card" />
+            <Skeleton className="h-40 rounded-card" />
           </View>
         )}
       </View>

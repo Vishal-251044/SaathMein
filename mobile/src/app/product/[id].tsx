@@ -26,14 +26,15 @@ import { ApiClientError } from '@/services/api';
 import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { localizedName } from '@/utils/localize';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /** Skeleton while the product loads. */
 function ProductSkeleton() {
   return (
     <View className="gap-4 px-4 pt-4">
-      <View className="h-64 rounded-card bg-bg-band" />
-      <View className="h-6 w-2/3 rounded-button bg-bg-band" />
-      <View className="h-32 rounded-card bg-bg-band" />
+      <Skeleton className="h-64 rounded-card" />
+      <Skeleton className="h-6 w-2/3 rounded-button" />
+      <Skeleton className="h-32 rounded-card" />
     </View>
   );
 }

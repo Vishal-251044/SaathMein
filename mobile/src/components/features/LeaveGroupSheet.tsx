@@ -13,6 +13,7 @@ import { Notice } from '@/components/ui/Notice';
 import { useLeaveGroup, useLeavePreview } from '@/hooks/usePayments';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 interface LeaveGroupSheetProps {
   groupId: string;
@@ -54,7 +55,7 @@ export function LeaveGroupSheet({ groupId, visible, onClose }: LeaveGroupSheetPr
         <View className="h-1.5 w-12 self-center rounded-full bg-line" />
         <AppText variant="heading">{t('leave.title')}</AppText>
 
-        {preview.isPending ? <View className="h-24 rounded-card bg-bg-band" /> : null}
+        {preview.isPending ? <Skeleton className="h-24 rounded-card" /> : null}
         {preview.error ? <Notice message={t(getErrorMessageKey(preview.error))} /> : null}
 
         {terms && !terms.canLeave ? (

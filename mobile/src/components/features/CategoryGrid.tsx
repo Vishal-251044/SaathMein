@@ -15,6 +15,7 @@ import { enterUp } from '@/utils/animations';
 import { categoryIcon } from '@/utils/categoryIcons';
 import { localizedName } from '@/utils/localize';
 import { QueryErrorState } from '@/components/features/QueryErrorState';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /**
  * @returns Category grid (skeleton while loading, error with retry, hidden when empty)
@@ -28,7 +29,7 @@ export function CategoryGrid() {
     return (
       <View className="flex-row flex-wrap gap-3">
         {[0, 1, 2, 3].map((key) => (
-          <View key={key} className="h-24 grow basis-[45%] rounded-card bg-bg-band" />
+          <Skeleton key={key} className="h-24 grow basis-[45%] rounded-card" />
         ))}
       </View>
     );

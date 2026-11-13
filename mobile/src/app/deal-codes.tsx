@@ -18,6 +18,8 @@ import { AppText } from '@/components/ui/AppText';
 import { useMyDealCodes } from '@/hooks/usePurchase';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 const OPEN = ['pending', 'invoice_uploaded', 'objected'];
 
@@ -38,6 +40,8 @@ export default function DealCodesScreen() {
         contentContainerStyle={{ gap: 16, padding: 16, paddingBottom: 32 + insets.bottom }}
         refreshControl={
           <RefreshControl
+            colors={[brand.primary]}
+            tintColor={brand.primary}
             refreshing={query.isRefetching}
             onRefresh={() => {
               query.refetch();
@@ -47,8 +51,8 @@ export default function DealCodesScreen() {
       >
         {query.isPending ? (
           <View className="gap-4" accessibilityLabel={t('common.loading')}>
-            <View className="h-64 rounded-card bg-bg-band" />
-            <View className="h-20 rounded-card bg-bg-band" />
+            <Skeleton className="h-64 rounded-card" />
+            <Skeleton className="h-20 rounded-card" />
           </View>
         ) : query.isError && !query.data ? (
           <QueryErrorState error={query.error} onRetry={() => query.refetch()} />

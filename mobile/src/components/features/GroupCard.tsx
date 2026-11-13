@@ -1,7 +1,8 @@
 /**
  * GroupCard — one group in lists (product page, My Groups, similar groups): product,
- * variant, people counter with Sunrise bar, time left and status. Tapping opens the
- * group page unless `onPress` is given.
+ * variant, people counter with Sunrise bar, time left and status. Open groups at 80%+
+ * show a pulsing "Almost full" tag; images fade in. Tapping opens the group page unless
+ * `onPress` is given.
  */
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -9,6 +10,7 @@ import { Clock, Crown, Lock, Package } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
+import { Pulse } from '@/components/animations/Effects';
 import { PressableScale } from '@/components/animations/PressableScale';
 import { GroupStatusBadge } from '@/components/features/GroupStatusBadge';
 import { PeopleCounter } from '@/components/features/PeopleCounter';
@@ -36,6 +38,7 @@ export function GroupCard({ group, hideProduct = false, onPress }: GroupCardProp
   const timeLeft = useTimeLeft(group.deadline);
   const imageUrl = sizedImageUrl(group.product.imageUrl ?? null, THUMB);
   const isOpen = group.status === 'open';
+  const almostFull = isOpen && group.targetSize > 0 && group.memberCount / group.targetSize >= 0.8;
 
   return (
     <PressableScale
@@ -61,6 +64,7 @@ export function GroupCard({ group, hideProduct = false, onPress }: GroupCardProp
                 source={{ uri: imageUrl }}
                 style={{ width: THUMB, height: THUMB }}
                 contentFit="cover"
+                transition={250}
               />
             ) : (
               <Package size={24} color={colors.muted} strokeWidth={1.8} />
@@ -79,6 +83,14 @@ export function GroupCard({ group, hideProduct = false, onPress }: GroupCardProp
 
       <View className="flex-row flex-wrap items-center gap-2">
         <GroupStatusBadge status={group.status} />
+        {almostFull ? (
+          <View className="flex-row items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1">
+            <Pulse color={colors.primaryText} size={6} />
+            <AppText variant="label" color="primary">
+              {t('group.almostFull')}
+            </AppText>
+          </View>
+        ) : null}
         {group.isLeader ? (
           <View className="flex-row items-center gap-1">
             <Crown size={13} color={colors.ink} strokeWidth={2} />

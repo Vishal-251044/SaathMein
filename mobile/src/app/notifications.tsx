@@ -19,6 +19,7 @@ import { brand } from '@/theme/tokens';
 import type { AppNotification } from '@/types/live';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { cx } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 /** One notification row. */
 function NotificationRow({ item, onOpen }: { item: AppNotification; onOpen: () => void }) {
@@ -108,7 +109,7 @@ export default function NotificationsScreen() {
           query.isPending ? (
             <View className="gap-3" accessibilityLabel={t('common.loading')}>
               {[0, 1, 2].map((key) => (
-                <View key={key} className="h-20 rounded-card bg-bg-band" />
+                <Skeleton key={key} className="h-20 rounded-card" />
               ))}
             </View>
           ) : query.isError && !query.data ? (

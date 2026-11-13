@@ -20,6 +20,7 @@ import type { BuyingTimeline, UserInterests } from '@/types/auth';
 import { enterUp } from '@/utils/animations';
 import { BUDGET_MAX_PAISE, BUDGET_MIN_PAISE, formatBudgetShort, snapBudget } from '@/utils/budget';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 export interface InterestsValue {
   categories: string[];
@@ -128,7 +129,7 @@ export function InterestsForm({
     return (
       <View className="gap-3" accessibilityLabel={t('common.loading')}>
         {[0, 1, 2].map((key) => (
-          <View key={key} className="h-12 w-3/4 rounded-full bg-bg-band" />
+          <Skeleton key={key} className="h-12 w-3/4 rounded-full" />
         ))}
       </View>
     );

@@ -47,7 +47,11 @@
       "almost_full": "Almost full",
       "seller_deals": "Seller deals",
       "trending": "Trending in your city"
-    }
+    },
+    "heroCta": "Find a group",
+    "heroStep1": "Join with a token",
+    "heroStep2": "Dealers bid",
+    "heroStep3": "Everyone saves"
   },
   "search": {
     "title": "Search",
@@ -362,7 +366,9 @@
     "qrHint": "Print it for your society notice board or show it to neighbours. Any phone camera can scan it.",
     "reportGroup": "Report this group",
     "reportMemberHint": "Long press to report this member",
-    "problemWithDealer": "Problem with the dealer?"
+    "problemWithDealer": "Problem with the dealer?",
+    "almostFull": "Almost full",
+    "live": "Live"
   },
   "createGroup": {
     "title": "Start a group",

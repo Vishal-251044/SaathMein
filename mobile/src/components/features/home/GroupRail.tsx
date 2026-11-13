@@ -12,7 +12,7 @@ import { GroupCard } from '@/components/features/GroupCard';
 import { AppText } from '@/components/ui/AppText';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { GroupCard as GroupCardData } from '@/types/group';
-import { enterUp } from '@/utils/animations';
+import { enterRight, enterUp } from '@/utils/animations';
 
 interface GroupRailProps {
   title: string;
@@ -56,10 +56,10 @@ export function GroupRail({ title, groups, seeAllHref, index }: GroupRailProps) 
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 12, paddingRight: 16 }}
         className="-mx-4 px-4"
-        renderItem={({ item }) => (
-          <View style={{ width: cardWidth }}>
+        renderItem={({ item, index: position }) => (
+          <Animated.View entering={enterRight(position)} style={{ width: cardWidth }}>
             <GroupCard group={item} />
-          </View>
+          </Animated.View>
         )}
       />
     </Animated.View>

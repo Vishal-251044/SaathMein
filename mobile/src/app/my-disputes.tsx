@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/Button';
 import { useMyDisputes } from '@/hooks/useTrust';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 /** @returns My disputes screen */
 export default function MyDisputesScreen() {
@@ -34,8 +36,8 @@ export default function MyDisputesScreen() {
       <StackHeader title={t('dispute.listTitle')} />
       {query.isPending ? (
         <View className="gap-3 p-4">
-          <View className="h-24 rounded-card bg-bg-band" />
-          <View className="h-24 rounded-card bg-bg-band" />
+          <Skeleton className="h-24 rounded-card" />
+          <Skeleton className="h-24 rounded-card" />
         </View>
       ) : query.isError && !query.data ? (
         <View className="p-4">
@@ -59,6 +61,8 @@ export default function MyDisputesScreen() {
           contentContainerStyle={{ gap: 12, padding: 16, paddingBottom: 32 + insets.bottom }}
           refreshControl={
             <RefreshControl
+              colors={[brand.primary]}
+              tintColor={brand.primary}
               refreshing={query.isRefetching}
               onRefresh={() => {
                 query.refetch();

@@ -29,6 +29,7 @@ import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
 import { QueryErrorState } from '@/components/features/QueryErrorState';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 type Step = 'similar' | 'details' | 'review';
 const DEADLINE_OPTIONS = [3, 7, 10, 14, 21, 30];
@@ -151,8 +152,8 @@ export default function CreateGroupScreen() {
     return (
       <StackScreen title={t('createGroup.title')}>
         <View className="gap-4" accessibilityLabel={t('common.loading')}>
-          <View className="h-8 w-2/3 rounded-button bg-bg-band" />
-          <View className="h-40 rounded-card bg-bg-band" />
+          <Skeleton className="h-8 w-2/3 rounded-button" />
+          <Skeleton className="h-40 rounded-card" />
         </View>
       </StackScreen>
     );

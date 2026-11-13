@@ -31,6 +31,7 @@ import { brand } from '@/theme/tokens';
 import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { Skeleton } from '@/components/animations/Skeleton';
 
 type IconType = ComponentType<{ size?: number; color?: ColorValue; strokeWidth?: number }>;
 
@@ -74,8 +75,8 @@ export default function PayScreen() {
           <Notice message={t(getErrorMessageKey(groupError))} />
         ) : (
           <View className="gap-4" accessibilityLabel={t('common.loading')}>
-            <View className="h-28 rounded-card bg-bg-band" />
-            <View className="h-40 rounded-card bg-bg-band" />
+            <Skeleton className="h-28 rounded-card" />
+            <Skeleton className="h-40 rounded-card" />
           </View>
         )}
       </StackScreen>

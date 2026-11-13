@@ -12,6 +12,8 @@ import { AppText } from '@/components/ui/AppText';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { brand, gradients, radius } from '@/theme/tokens';
 import { cx } from '@/utils/genericFunctions';
+import { Sheen } from '@/components/animations/Effects';
+import { tapLight } from '@/lib/haptics';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
@@ -86,7 +88,10 @@ export function Button({
 
   return (
     <PressableScale
-      onPress={onPress}
+      onPress={() => {
+        if (isPrimary) tapLight(); // light tap for main actions
+        onPress?.();
+      }}
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={label}
@@ -107,6 +112,7 @@ export function Button({
           style={{ borderRadius: radius.button }}
         >
           {content}
+          {!isDisabled ? <Sheen delay={4200} /> : null}
         </LinearGradient>
       ) : (
         content

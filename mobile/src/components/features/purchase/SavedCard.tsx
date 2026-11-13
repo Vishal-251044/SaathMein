@@ -17,6 +17,7 @@ import { shareToWhatsApp } from '@/lib/share';
 import type { GroupPurchase } from '@/types/group';
 import { enterPop, enterUp } from '@/utils/animations';
 import { formatINR } from '@/utils/genericFunctions';
+import { Confetti } from '@/components/animations/Confetti';
 
 interface Props {
   purchase: GroupPurchase;
@@ -46,7 +47,8 @@ export function SavedCard({ purchase, productName, dealerName, shareUrl }: Props
       entering={enterUp(1)}
       className="gap-4 rounded-card border border-line bg-surface p-4"
     >
-      <View className="items-center gap-2 rounded-card bg-savings/10 px-4 py-5">
+      <View className="items-center gap-2 overflow-hidden rounded-card bg-savings/10 px-4 py-5">
+        {saved > 0 ? <Confetti /> : null}
         <Animated.View entering={enterPop}>
           <BadgeCheck size={32} color={colors.savings} strokeWidth={2} />
         </Animated.View>

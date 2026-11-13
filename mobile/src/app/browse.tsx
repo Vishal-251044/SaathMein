@@ -21,6 +21,8 @@ import { useBrowseGroups } from '@/hooks/useDiscovery';
 import { useAuthStore } from '@/stores/auth.store';
 import type { GroupFilters } from '@/types/feed';
 import { getErrorMessageKey } from '@/utils/errorMessages';
+import { Skeleton } from '@/components/animations/Skeleton';
+import { brand } from '@/theme/tokens';
 
 type Preset = 'near_you' | 'ending_soon' | 'almost_full' | 'seller_deals';
 
@@ -78,7 +80,7 @@ export default function BrowseScreen() {
       {query.isPending ? (
         <View className="gap-3 px-4 pt-2" accessibilityLabel={t('common.loading')}>
           {[0, 1, 2].map((key) => (
-            <View key={key} className="h-32 rounded-card bg-bg-band" />
+            <Skeleton key={key} className="h-32 rounded-card" />
           ))}
         </View>
       ) : query.isError && !query.data ? (
@@ -108,6 +110,8 @@ export default function BrowseScreen() {
           }}
           refreshControl={
             <RefreshControl
+              colors={[brand.primary]}
+              tintColor={brand.primary}
               refreshing={query.isRefetching}
               onRefresh={() => {
                 query.refetch();

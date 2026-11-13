@@ -1,7 +1,8 @@
 /**
  * PeopleCounter — signature SaathMein element: overlapping member avatars, "14 of 20" and a
- * Sunrise progress bar that fills as people join (CLAUDE.md §11). The bar animates with
- * transform only and respects reduced motion.
+ * Sunrise progress bar that fills as people join (CLAUDE.md §11). The count rolls up when
+ * someone joins, avatars pop in, and an almost-full bar (80%+) gets a light sheen. All
+ * transform / opacity only, respecting reduced motion.
  */
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect } from 'react';
@@ -14,11 +15,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { Sheen, TickerText } from '@/components/animations/Effects';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar } from '@/components/ui/Avatar';
 import { gradients } from '@/theme/tokens';
 import type { GroupMemberPreview } from '@/types/group';
-import { DURATION, EASE_OUT } from '@/utils/animations';
+import { DURATION, EASE_OUT, enterPopAt } from '@/utils/animations';
 
 const MAX_AVATARS = 5;
 
@@ -72,13 +74,14 @@ export function PeopleCounter({
         {shown.length ? (
           <View className="flex-row">
             {shown.map((member, index) => (
-              <View
+              <Animated.View
                 key={`${member.firstName}-${index}`}
+                entering={enterPopAt(index)}
                 className="rounded-full border-2 border-surface"
                 style={{ marginLeft: index === 0 ? 0 : -avatarSize / 3 }}
               >
                 <Avatar url={member.avatarUrl} name={member.firstName} size={avatarSize} />
-              </View>
+              </Animated.View>
             ))}
             {extra > 0 ? (
               <View
@@ -96,9 +99,11 @@ export function PeopleCounter({
             ) : null}
           </View>
         ) : null}
-        <AppText variant={size === 'lg' ? 'heading' : 'bodyStrong'} mono>
-          {t('group.counter', { count: memberCount, target: targetSize })}
-        </AppText>
+        <TickerText
+          value={t('group.counter', { count: memberCount, target: targetSize })}
+          variant={size === 'lg' ? 'heading' : 'bodyStrong'}
+          mono
+        />
       </View>
 
       <View className={`overflow-hidden rounded-full bg-bg-band ${size === 'lg' ? 'h-3' : 'h-2'}`}>
@@ -109,6 +114,7 @@ export function PeopleCounter({
             end={{ x: 1, y: 0 }}
             style={{ flex: 1 }}
           />
+          {ratio >= 0.8 && ratio < 1 ? <Sheen delay={1800} /> : null}
         </Animated.View>
       </View>
     </View>
