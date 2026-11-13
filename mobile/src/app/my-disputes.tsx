@@ -37,7 +37,7 @@ export default function MyDisputesScreen() {
           <View className="h-24 rounded-card bg-bg-band" />
           <View className="h-24 rounded-card bg-bg-band" />
         </View>
-      ) : query.isError ? (
+      ) : query.isError && !query.data ? (
         <View className="p-4">
           <EmptyState
             icon={Scale}

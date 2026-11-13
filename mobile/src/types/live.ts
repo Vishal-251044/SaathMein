@@ -48,7 +48,12 @@ export interface ChatPoll {
 export interface ChatMessage {
   id: string;
   senderType: 'buyer' | 'seller' | 'saathi' | 'system';
-  sender: { firstName: string | null; avatarUrl: string | null; isLeader: boolean } | null;
+  sender: {
+    firstName: string | null;
+    avatarUrl: string | null;
+    isLeader: boolean;
+    isDealer?: boolean;
+  } | null;
   isMine: boolean;
   text: string | null;
   images: { publicId: string; url: string }[];

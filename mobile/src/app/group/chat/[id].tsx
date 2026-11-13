@@ -135,7 +135,7 @@ export default function GroupChatScreen() {
           ListEmptyComponent={
             messages.isPending ? (
               <ActivityIndicator color={brand.primary} className="py-10" />
-            ) : messages.isError ? (
+            ) : messages.isError && !messages.data ? (
               <EmptyState
                 icon={MessagesSquare}
                 title={t('errors.generic')}

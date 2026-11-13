@@ -38,7 +38,7 @@ export function HomeFeedSections() {
       </View>
     );
   }
-  if (feed.isError) {
+  if (feed.isError && !feed.data) {
     return (
       <EmptyState
         icon={RefreshCw}

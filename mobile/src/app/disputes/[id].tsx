@@ -44,7 +44,7 @@ export default function DisputeScreen() {
       </View>
     );
   }
-  if (query.isError) {
+  if (query.isError && !query.data) {
     return (
       <View className="flex-1 bg-bg">
         <StackHeader title={t('dispute.title')} />

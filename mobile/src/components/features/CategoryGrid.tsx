@@ -14,13 +14,14 @@ import { brand } from '@/theme/tokens';
 import { enterUp } from '@/utils/animations';
 import { categoryIcon } from '@/utils/categoryIcons';
 import { localizedName } from '@/utils/localize';
+import { QueryErrorState } from '@/components/features/QueryErrorState';
 
 /**
- * @returns Category grid (skeleton while loading; hidden when categories cannot load)
+ * @returns Category grid (skeleton while loading, error with retry, hidden when empty)
  */
 export function CategoryGrid() {
   const { t, i18n } = useTranslation();
-  const { data: groups, isPending } = useCategories();
+  const { data: groups, isPending, isError, error, refetch } = useCategories();
   const categories = (groups ?? []).flatMap((group) => group.children);
 
   if (isPending) {
@@ -31,6 +32,9 @@ export function CategoryGrid() {
         ))}
       </View>
     );
+  }
+  if (isError && !categories.length) {
+    return <QueryErrorState error={error} onRetry={() => refetch()} />;
   }
   if (!categories.length) return null;
 

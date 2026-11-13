@@ -111,7 +111,7 @@ export default function NotificationsScreen() {
                 <View key={key} className="h-20 rounded-card bg-bg-band" />
               ))}
             </View>
-          ) : query.isError ? (
+          ) : query.isError && !query.data ? (
             <EmptyState
               icon={Bell}
               title={t('errors.generic')}

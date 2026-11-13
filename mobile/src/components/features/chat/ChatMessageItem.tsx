@@ -87,6 +87,7 @@ export function ChatMessageItem({
           <AppText variant="label" color="primary">
             {message.sender.firstName ?? t('group.someone')}
             {message.sender.isLeader ? ` · ${t('group.leaderTag')}` : ''}
+            {message.sender.isDealer ? ` · ${t('group.dealerTag')}` : ''}
           </AppText>
         ) : null}
 

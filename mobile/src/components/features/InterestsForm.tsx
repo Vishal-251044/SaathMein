@@ -134,7 +134,7 @@ export function InterestsForm({
     );
   }
 
-  if (isError) {
+  if (isError && !groups) {
     return (
       <View className="gap-4">
         <Notice message={t(getErrorMessageKey(error))} />

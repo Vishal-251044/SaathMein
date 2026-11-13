@@ -63,7 +63,7 @@ export function ProductList({
   const renderEmpty = () => {
     if (!enabled) return null;
     if (query.isPending) return <ListSkeleton />;
-    if (query.isError) {
+    if (query.isError && !query.data) {
       return (
         <EmptyState
           icon={isOffline ? WifiOff : PackageSearch}

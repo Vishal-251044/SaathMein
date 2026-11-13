@@ -122,7 +122,7 @@ export function CityAreaForm({
     );
   }
 
-  if (isError) {
+  if (isError && !cities) {
     return (
       <View className="gap-4">
         <Notice message={t(getErrorMessageKey(error))} />

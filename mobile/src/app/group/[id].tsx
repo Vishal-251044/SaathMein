@@ -136,7 +136,7 @@ export default function GroupScreen() {
 
       {isPending ? <GroupSkeleton /> : null}
 
-      {isError ? (
+      {isError && !group ? (
         <View className="px-4 pt-6">
           <EmptyState
             icon={PackageX}

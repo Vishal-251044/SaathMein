@@ -147,7 +147,7 @@ export default function WalletScreen() {
 
         <View className="gap-3">
           <AppText variant="heading">{t('wallet.historyTitle')}</AppText>
-          {wallet.isError ? (
+          {wallet.isError && !wallet.data ? (
             <Notice message={t(getErrorMessageKey(wallet.error))} />
           ) : wallet.data?.transactions.length ? (
             wallet.data.transactions.map((txn) => (

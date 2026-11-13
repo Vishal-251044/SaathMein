@@ -66,7 +66,7 @@ export default function ProductScreen() {
 
       {isPending ? <ProductSkeleton /> : null}
 
-      {isError ? (
+      {isError && !product ? (
         <View className="px-4 pt-6">
           <EmptyState
             icon={PackageX}

@@ -105,7 +105,7 @@ export default function GroupsScreen() {
         </View>
       );
     }
-    if (query.isError) {
+    if (query.isError && !query.data) {
       return (
         <EmptyState
           icon={isOffline ? WifiOff : UsersRound}

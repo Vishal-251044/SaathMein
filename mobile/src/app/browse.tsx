@@ -81,7 +81,7 @@ export default function BrowseScreen() {
             <View key={key} className="h-32 rounded-card bg-bg-band" />
           ))}
         </View>
-      ) : query.isError ? (
+      ) : query.isError && !query.data ? (
         <View className="px-4 pt-6">
           <EmptyState
             icon={SearchX}

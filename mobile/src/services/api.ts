@@ -5,9 +5,10 @@
  * - On 401 TOKEN_EXPIRED, refreshes once (single-flight) and retries the request.
  * - Normalises every failure to ApiClientError with the backend's message and code.
  */
-import { AxiosError, create, type InternalAxiosRequestConfig } from 'axios';
+import { AxiosError, create, type InternalAxiosRequestConfig, isCancel } from 'axios';
 
 import { getAccessToken, refreshAccessToken } from '@/lib/authSession';
+import { markOffline, markOnline } from '@/lib/connectivity';
 import { API_TIMEOUT_MS, API_URL } from '@/utils/constants';
 
 /** Standard backend response envelope. */
@@ -72,8 +73,14 @@ function toClientError(error: AxiosError<ErrorBody>): ApiClientError {
 }
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    markOnline();
+    return response;
+  },
   async (error: AxiosError<ErrorBody>) => {
+    // No answer at all (not a cancelled request): the API is unreachable right now
+    if (error.response) markOnline();
+    else if (!isCancel(error)) markOffline();
     const original = error.config as RetriableConfig | undefined;
     const isExpired =
       error.response?.status === 401 && error.response.data?.error?.code === 'TOKEN_EXPIRED';

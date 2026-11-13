@@ -331,6 +331,7 @@
     "shareMessage": "Join my SaathMein group for {{name}}. {{count}} of {{target}} have joined: when the group fills up, dealers compete and the lowest price wins for all of us. {{link}} (invite code {{code}})",
     "membersTitle": "Members",
     "leaderTag": "leader",
+    "dealerTag": "dealer",
     "someone": "Someone",
     "noMembersTitle": "No members yet",
     "noMembersBody": "Members appear here by first name after they pay the token.",
@@ -750,5 +751,16 @@
     "privacy": "Privacy policy",
     "refunds": "Refund and cancellation policy",
     "grievance": "Grievance officer"
+  },
+  "offline": {
+    "title": "You are offline",
+    "body": "Showing saved information. Joining, paying and chat need a connection.",
+    "backOnline": "Back online"
+  },
+  "states": {
+    "loadFailedTitle": "Could not load this",
+    "loadFailedBody": "Something went wrong on our side. Please try again.",
+    "offlineNoDataTitle": "No saved copy yet",
+    "offlineNoDataBody": "Connect to the internet once to see this screen. It will then open offline too."
   }
 }

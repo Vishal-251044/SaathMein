@@ -48,7 +48,7 @@ export default function DealerScreen() {
           <View className="h-32 rounded-card bg-bg-band" />
           <View className="h-24 rounded-card bg-bg-band" />
         </View>
-      ) : dealer.isError ? (
+      ) : dealer.isError && !dealer.data ? (
         <View className="p-4">
           <EmptyState
             icon={Store}

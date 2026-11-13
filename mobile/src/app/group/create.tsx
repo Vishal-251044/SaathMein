@@ -28,6 +28,7 @@ import type { GroupVisibility } from '@/types/group';
 import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
+import { QueryErrorState } from '@/components/features/QueryErrorState';
 
 type Step = 'similar' | 'details' | 'review';
 const DEADLINE_OPTIONS = [3, 7, 10, 14, 21, 30];
@@ -81,7 +82,11 @@ function Stepper({
 export default function CreateGroupScreen() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ productId: string; variantKey?: string }>();
-  const { data: product, error: productError } = useProduct(params.productId);
+  const {
+    data: product,
+    error: productError,
+    refetch: refetchProduct,
+  } = useProduct(params.productId);
   const { data: groups } = useCategories();
   const create = useCreateGroup();
 
@@ -135,10 +140,10 @@ export default function CreateGroupScreen() {
     );
   };
 
-  if (productError) {
+  if (productError && !product) {
     return (
       <StackScreen title={t('createGroup.title')}>
-        <Notice message={t(getErrorMessageKey(productError))} />
+        <QueryErrorState error={productError} onRetry={() => refetchProduct()} />
       </StackScreen>
     );
   }

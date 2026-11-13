@@ -47,7 +47,7 @@ export function VerifiedDealersSection({ categoryId, cityName }: VerifiedDealers
         </View>
       ) : null}
 
-      {isError ? (
+      {isError && !data ? (
         <EmptyState
           icon={Store}
           title={t('errors.generic')}

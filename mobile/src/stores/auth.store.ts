@@ -10,6 +10,8 @@ import { create } from 'zustand';
 
 import { setAccessToken, setRefreshHandler } from '@/lib/authSession';
 import { unregisterPush } from '@/lib/notifications';
+import { queryClient } from '@/lib/queryClient';
+import { clearPersistedQueries } from '@/lib/queryPersist';
 import { disconnectSocket } from '@/lib/socket';
 import { signOutOfFirebase } from '@/lib/phoneAuth';
 import { getItem, removeItem, setItem, STORAGE_KEYS } from '@/lib/secureStorage';
@@ -57,6 +59,9 @@ async function storeTokens(tokens: AuthTokens): Promise<void> {
 async function clearLocalSession(): Promise<void> {
   setAccessToken(null);
   await removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+  // The next person signing in on this phone must never see this account's data
+  queryClient.clear();
+  clearPersistedQueries();
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {

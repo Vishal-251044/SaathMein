@@ -97,7 +97,7 @@ export function PopularProductsRail({ cityName }: PopularProductsRailProps) {
         </View>
       ) : null}
 
-      {isError ? (
+      {isError && !data ? (
         <View className="items-start gap-3 rounded-card border border-line bg-surface p-4">
           <AppText variant="body" color="muted">
             {t('home.popularError')}

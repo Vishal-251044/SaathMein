@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppEffects } from '@/components/layout/AppEffects';
+import { OfflineBanner } from '@/components/layout/OfflineBanner';
 import { ThemeRoot } from '@/components/layout/ThemeRoot';
 import { queryClient } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/auth.store';
@@ -104,6 +105,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(auth)" />
               </Stack.Protected>
             </Stack>
+            {isSignedIn ? <OfflineBanner /> : null}
           </ThemeRoot>
         </QueryClientProvider>
       </SafeAreaProvider>
