@@ -24,6 +24,14 @@ const otpVerifySchema = {
   body: z.object({ idToken: z.string().trim().min(100).max(4096), deviceId }),
 };
 
+/** Google sign-in (F4): Firebase ID token from the Google credential. */
+const googleLoginSchema = {
+  body: z.object({ idToken: z.string().trim().min(100).max(4096), deviceId }),
+};
+
+/** Add a verified phone to the signed-in account: Firebase phone ID token. */
+const linkPhoneSchema = { body: z.object({ idToken: z.string().trim().min(100).max(4096) }) };
+
 const refreshSchema = { body: z.object({ refreshToken }) };
 
 const staffLoginSchema = {
@@ -47,6 +55,8 @@ const staffTwoFactorSchema = {
 module.exports = {
   otpRequestSchema,
   otpVerifySchema,
+  googleLoginSchema,
+  linkPhoneSchema,
   refreshSchema,
   staffLoginSchema,
   staffTwoFactorSchema,

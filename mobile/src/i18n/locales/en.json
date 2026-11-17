@@ -168,7 +168,15 @@
     "notDisputable": "This purchase can no longer be disputed.",
     "tooManyFiles": "Add at most 6 photos.",
     "accountHasActiveToken": "You still have a token in a group. Leave the group (your token is refunded) or finish your purchase, then delete your account.",
-    "accountOwnsBusiness": "You own a dealer business on SaathMein. Contact support to close it before deleting your account."
+    "accountOwnsBusiness": "You own a dealer business on SaathMein. Contact support to close it before deleting your account.",
+    "googleUnavailable": "Google sign-in is not available in this version of the app.",
+    "googlePlayServices": "Update Google Play services on this phone, then try again.",
+    "googleFailed": "Google sign-in did not work. Please try again or use your mobile number.",
+    "googleEmailUnverified": "Your Google email is not verified. Verify it with Google or use your mobile number.",
+    "googleEmailTaken": "This email is on another SaathMein account. Sign in with your mobile number instead.",
+    "googleStaffAccount": "This email belongs to a SaathMein staff account. Use another Google account.",
+    "phoneInUse": "This number already has a SaathMein account. Sign out and sign in with this number instead.",
+    "phoneRequired": "Add your mobile number before paying the token."
   },
   "language": {
     "title": "Choose your language",
@@ -190,7 +198,9 @@
     "resend": "Resend code",
     "codeResent": "A new code is on its way.",
     "unavailableTitle": "Phone login needs the SaathMein app build",
-    "unavailableBody": "Expo Go cannot send OTP SMS. Install the SaathMein development build to log in."
+    "unavailableBody": "Expo Go cannot send OTP SMS. Install the SaathMein development build to log in.",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or"
   },
   "city": {
     "title": "Where do you live?",
@@ -779,5 +789,13 @@
     "doneSection": "Bought",
     "openGroup": "Open group for {{name}}",
     "saved": "You saved {{amount}}"
+  },
+  "phoneLink": {
+    "title": "Add your mobile number",
+    "subtitle": "We will send a 6-digit code by SMS. You need a verified number to pay a token.",
+    "addNumber": "Add mobile number",
+    "payTitle": "One more step before paying",
+    "payBody": "Add and verify your mobile number once. The dealer uses it to reach you after the deal, and it keeps payments safe.",
+    "privacy": "Your number is never shown to other members. The winning dealer sees it only after the exit window."
   }
 }

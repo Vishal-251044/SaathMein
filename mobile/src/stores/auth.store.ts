@@ -18,6 +18,7 @@ import { getItem, removeItem, setItem, STORAGE_KEYS } from '@/lib/secureStorage'
 import { ApiClientError } from '@/services/api';
 import * as authService from '@/services/auth.service';
 import type { AppUser, AuthTokens, LoginResult } from '@/types/auth';
+import { signOutOfGoogle } from '@/lib/googleAuth';
 
 export type AuthStatus = 'loading' | 'signedOut' | 'signedIn';
 
@@ -146,6 +147,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
       await clearLocalSession();
       await signOutOfFirebase();
+      await signOutOfGoogle(); // next sign-in shows the Google account picker again
       set({ status: 'signedOut', user: null });
     },
   };

@@ -172,7 +172,7 @@ const deleteAccount = async (userId) => {
     );
   }
 
-  const { firebaseUid } = user;
+  const { firebaseUid, googleUid } = user;
   const avatarPublicId = user.avatar?.publicId;
 
   await User.updateOne(
@@ -184,6 +184,7 @@ const deleteAccount = async (userId) => {
         phone: 1,
         email: 1,
         firebaseUid: 1,
+        googleUid: 1,
         avatar: 1,
         cityId: 1,
         area: 1,
@@ -200,12 +201,14 @@ const deleteAccount = async (userId) => {
   await deleteUserSignals(user._id);
   await uploadService.deleteImage(avatarPublicId);
 
-  // Remove the Firebase phone identity too (best effort)
+  // Remove the Firebase phone and Google identities too (best effort)
   const firebaseAuth = getFirebaseAuth();
-  if (firebaseAuth && firebaseUid) {
-    await firebaseAuth.deleteUser(firebaseUid).catch((err) => {
-      log.error({ err: err.message, userId }, 'Firebase user delete failed');
-    });
+  if (firebaseAuth) {
+    for (const uid of [firebaseUid, googleUid].filter(Boolean)) {
+      await firebaseAuth.deleteUser(uid).catch((err) => {
+        log.error({ err: err.message, userId }, 'Firebase user delete failed');
+      });
+    }
   }
 
   log.info({ userId }, 'Account deleted');

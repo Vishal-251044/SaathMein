@@ -13,7 +13,7 @@ const { createLogger } = require('../../utils/logger');
 const { maskPhone } = require('../../helpers/genericFunctions');
 const { ACCOUNT_STATUS, TOKEN_AUDIENCE } = require('../../constants/enums');
 const { assertWithinLimit } = require('../rateLimit.service');
-const { verifyPhoneIdToken } = require('./firebase.service');
+const { verifyPhoneIdToken, verifyGoogleIdToken } = require('./firebase.service');
 const { startSession, rotateRefreshToken, revokeByRefreshToken } = require('./session.service');
 const { signAccessToken } = require('./token.service');
 const { toAppUser, getAppRoles, getUserById } = require('../user.service');
@@ -157,6 +157,131 @@ const verifyOtpLogin = async ({ idToken, context }) => {
 };
 
 /**
+ * Find the account for a verified Google identity (F4), link it to an existing account
+ * with the same verified email, or create a new one.
+ * Never signs into a staff account; never links to an account whose email was not
+ * verified (someone could have typed another person's email there).
+ * @param {{ uid: string, email: string, name: string|null }} identity
+ * @param {string} [deviceId]
+ * @returns {Promise<{ user: Object, isNewUser: boolean }>}
+ * @throws {ApiError} 409 EMAIL_TAKEN / STAFF_ACCOUNT
+ */
+const findOrCreateGoogleUser = async ({ uid, email, name }, deviceId) => {
+  const byGoogle = await User.findOne({ googleUid: uid });
+  if (byGoogle) return { user: byGoogle, isNewUser: false };
+
+  const byEmail = await User.findOne({ email }).select('+passwordHash');
+  if (byEmail) {
+    if (byEmail.staffRole) {
+      throw ApiError.conflict('This email belongs to a staff account. Use the admin console.', {
+        code: 'STAFF_ACCOUNT',
+      });
+    }
+    if (!byEmail.emailVerifiedAt) {
+      throw ApiError.conflict(
+        'This email is on another SaathMein account. Sign in with your phone number instead.',
+        { code: 'EMAIL_TAKEN' },
+      );
+    }
+    await User.updateOne(
+      { _id: byEmail._id, googleUid: { $exists: false } },
+      { $set: { googleUid: uid } },
+    );
+    byEmail.googleUid = uid;
+    return { user: byEmail, isNewUser: false };
+  }
+
+  try {
+    const user = await User.create({
+      name: name || undefined,
+      email,
+      emailVerifiedAt: new Date(), // Google verified it
+      googleUid: uid,
+      deviceIds: deviceId ? [deviceId] : [],
+    });
+    return { user, isNewUser: true };
+  } catch (err) {
+    // Two sign-ins for a brand-new Google account at the same moment
+    if (err?.code === 11000)
+      return { user: await User.findOne({ googleUid: uid }), isNewUser: false };
+    throw err;
+  }
+};
+
+/**
+ * Log in with a Firebase ID token from Google sign-in (F4) and issue SaathMein tokens.
+ * The account may have no phone yet: it is verified once before paying a token.
+ * @param {{ idToken: string, context: Object }} params
+ * @returns {Promise<{ user: Object, isNewUser: boolean, tokens: Object }>}
+ */
+const verifyGoogleLogin = async ({ idToken, context }) => {
+  const identity = await verifyGoogleIdToken(idToken);
+  const { user, isNewUser } = await findOrCreateGoogleUser(identity, context.deviceId);
+  assertCanLogin(user);
+
+  await User.updateOne(
+    { _id: user._id },
+    {
+      $set: { lastLoginAt: new Date() },
+      ...(context.deviceId ? { $addToSet: { deviceIds: context.deviceId } } : {}),
+    },
+  );
+
+  const tokens = await startSession({
+    userId: user._id,
+    audience: TOKEN_AUDIENCE.APP,
+    claims: { roles: await getAppRoles(user) },
+    context,
+  });
+  log.info({ userId: String(user._id), isNewUser }, 'User logged in with Google');
+  return { user: toAppUser(user), isNewUser, tokens };
+};
+
+/**
+ * Add a verified phone to the signed-in account (Google users before their first token,
+ * F4). The app verifies the number with Firebase phone OTP and sends that ID token.
+ * @param {string} userId
+ * @param {string} idToken - Firebase ID token from phone sign-in
+ * @returns {Promise<Object>} Updated app user
+ * @throws {ApiError} 409 PHONE_IN_USE when another account has this number
+ */
+const linkPhone = async (userId, idToken) => {
+  const identity = await verifyPhoneIdToken(idToken);
+  if (!INDIAN_MOBILE_REGEX.test(identity.phone)) {
+    throw new ApiError(422, 'Only Indian mobile numbers are supported right now', {
+      code: 'INVALID_PHONE',
+    });
+  }
+  const user = await User.findById(userId);
+  if (!user) throw ApiError.notFound('User not found');
+  if (user.phone === identity.phone) return toAppUser(user);
+  const other = await User.exists({ phone: identity.phone, _id: { $ne: user._id } });
+  if (other) {
+    throw ApiError.conflict(
+      'This number already has a SaathMein account. Sign out and sign in with this number instead.',
+      { code: 'PHONE_IN_USE' },
+    );
+  }
+  try {
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: { phone: identity.phone, ...(user.firebaseUid ? {} : { firebaseUid: identity.uid }) },
+      },
+    );
+  } catch (err) {
+    if (err?.code === 11000) {
+      throw ApiError.conflict('This number already has a SaathMein account.', {
+        code: 'PHONE_IN_USE',
+      });
+    }
+    throw err;
+  }
+  log.info({ userId: String(user._id), phone: maskPhone(identity.phone) }, 'Phone linked');
+  return toAppUser(await User.findById(userId));
+};
+
+/**
  * Rotate an app refresh token and issue a new access token.
  * @param {string} refreshToken - Current refresh token
  * @param {Object} context - `{ ip }`
@@ -207,6 +332,9 @@ const getCurrentUser = async (userId) => {
 };
 
 module.exports = {
+  verifyGoogleLogin,
+  linkPhone,
+  findOrCreateGoogleUser,
   OTP_LIMITS,
   INDIAN_MOBILE_REGEX,
   requestOtp,

@@ -83,6 +83,16 @@ beforeEach(() => {
 });
 
 describe('createTokenOrder', () => {
+  it('asks a Google account without a phone to add one before paying (PHONE_REQUIRED)', async () => {
+    Group.findById.mockReturnValue(lean(group()));
+    User.findById.mockReturnValue(lean({ name: 'Asha', phone: null }));
+    await expect(payments.createTokenOrder(userId, { groupId })).rejects.toMatchObject({
+      statusCode: 403,
+      code: 'PHONE_REQUIRED',
+    });
+    expect(razorpay.createOrder).not.toHaveBeenCalled();
+  });
+
   it('creates the order with the group token amount and holds a seat for 15 minutes', async () => {
     Group.findById.mockReturnValue(lean(group()));
     razorpay.createOrder.mockResolvedValue({ id: 'order_ABC', amount: 100_000 });

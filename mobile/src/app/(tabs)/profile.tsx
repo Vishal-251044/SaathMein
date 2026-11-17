@@ -13,6 +13,7 @@ import {
   MessageSquarePlus,
   Pencil,
   Scale,
+  Smartphone,
   Ticket,
   Trash2,
 } from 'lucide-react-native';
@@ -143,7 +144,7 @@ export default function ProfileScreen() {
             {user?.name || t('profile.addName')}
           </AppText>
           <AppText variant="caption" mono className="mt-0.5">
-            {formatIndianPhone(user?.phone)}
+            {user?.phone ? formatIndianPhone(user.phone) : user?.email}
           </AppText>
         </View>
         <Pressable
@@ -178,6 +179,12 @@ export default function ProfileScreen() {
           href="/edit-interests"
         />
         <View className="border-t border-line" />
+        {!user?.phone ? (
+          <>
+            <ProfileRow icon={Smartphone} label={t('phoneLink.addNumber')} href="/verify-phone" />
+            <View className="border-t border-line" />
+          </>
+        ) : null}
         <ProfileRow icon={Ticket} label={t('dealCodes.title')} href="/deal-codes" />
         <View className="border-t border-line" />
         <ProfileRow icon={Scale} label={t('dispute.listTitle')} href="/my-disputes" />

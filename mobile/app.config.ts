@@ -55,6 +55,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...(config.plugins ?? []),
       // Push notifications (Expo + FCM); icon colour = Sunrise primary
       ['expo-notifications', { color: '#FF5A3C' }],
+      // Google sign-in (F4): Android reads the OAuth client from google-services.json
+      '@react-native-google-signin/google-signin',
       ...(hasFirebaseConfig ? FIREBASE_PLUGINS : []),
       // Native crash reporting + source maps upload, only when the EAS build has the Sentry
       // org / project (and SENTRY_AUTH_TOKEN as an EAS secret); JS errors are reported anyway

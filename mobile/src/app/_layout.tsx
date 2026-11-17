@@ -99,6 +99,7 @@ function RootLayout() {
                 <Stack.Screen name="group/chat/[id]" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="deal-codes" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="verify-phone" options={{ animation: 'slide_from_bottom' }} />
               </Stack.Protected>
               <Stack.Protected guard={isSignedIn && needsOnboarding} redirectTo={startRoute}>
                 <Stack.Screen name="onboarding" />

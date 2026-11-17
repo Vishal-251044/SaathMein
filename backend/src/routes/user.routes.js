@@ -9,6 +9,17 @@ const purchaseController = require('../controllers/purchase.controller');
 const discoveryController = require('../controllers/discovery.controller');
 const discoverySchemas = require('../validators/discovery.validator');
 const schemas = require('../validators/user.validator');
+const authController = require('../controllers/auth.controller');
+const authSchemas = require('../validators/auth.validator');
+const { createRateLimiter } = require('../middlewares/rateLimit.middleware');
+
+// Adding a phone verifies an OTP: same per-IP guard as login
+const phoneLinkLimiter = createRateLimiter({
+  name: 'phone-link',
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  message: 'Too many attempts. Please try again in a few minutes.',
+});
 
 const router = Router();
 
@@ -26,6 +37,13 @@ router.post(
   discoveryController.applyReferral,
 );
 router.patch('/me', validate(schemas.updateProfileSchema), controller.updateMe);
+// Google accounts add a verified phone once, before their first token (F4)
+router.post(
+  '/me/phone',
+  phoneLinkLimiter,
+  validate(authSchemas.linkPhoneSchema),
+  authController.linkPhone,
+);
 router.delete('/me', controller.deleteMe);
 router.post('/me/interests', validate(schemas.saveInterestsSchema), controller.saveInterests);
 router.post('/me/avatar/upload-params', controller.getAvatarUploadParams);

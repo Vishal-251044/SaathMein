@@ -21,6 +21,8 @@ export interface AppUser {
   name: string | null;
   phone: string | null;
   email: string | null;
+  /** Signed in with Google (F4); a phone is still added before the first token. */
+  hasGoogle?: boolean;
   avatar: { url: string } | null;
   cityId: string | null;
   area: string | null;

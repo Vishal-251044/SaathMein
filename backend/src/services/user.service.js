@@ -19,6 +19,8 @@ const toAppUser = (user) => {
     name: user.name || null,
     phone: user.phone || null,
     email: user.email || null,
+    // Signed in with Google (F4); a phone is still needed before paying a token
+    hasGoogle: Boolean(user.googleUid),
     avatar: user.avatar?.url ? { url: user.avatar.url } : null,
     cityId: user.cityId ? String(user.cityId) : null,
     area: user.area || null,

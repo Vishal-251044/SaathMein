@@ -1,5 +1,6 @@
 /**
- * Auth service — calls /api/auth/* for phone OTP login (ACC-1, ACC-4).
+ * Auth service — calls /api/auth/* for phone OTP login (ACC-1, ACC-4) and Google sign-in
+ * (F4), and adds a verified phone to a Google account.
  */
 import type { AppUser, AuthTokens, LoginResult } from '@/types/auth';
 
@@ -22,6 +23,25 @@ export async function requestOtp(phone: string, deviceId: string): Promise<void>
  */
 export function verifyOtp(idToken: string, deviceId: string): Promise<LoginResult> {
   return unwrap(api.post('/auth/otp/verify', { idToken, deviceId }));
+}
+
+/**
+ * Exchange a Firebase ID token from Google sign-in for SaathMein tokens (F4).
+ * @param idToken - Firebase ID token after the Google account picker
+ * @param deviceId - App install id
+ * @returns User, new-user flag and tokens
+ */
+export function googleLogin(idToken: string, deviceId: string): Promise<LoginResult> {
+  return unwrap(api.post('/auth/google', { idToken, deviceId }));
+}
+
+/**
+ * Add a verified phone to the signed-in account (Firebase phone ID token).
+ * @param idToken - Firebase ID token after the OTP
+ * @returns The updated user
+ */
+export async function linkPhone(idToken: string): Promise<AppUser> {
+  return (await unwrap<{ user: AppUser }>(api.post('/users/me/phone', { idToken }))).user;
 }
 
 /**

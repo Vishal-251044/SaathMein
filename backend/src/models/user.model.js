@@ -33,6 +33,8 @@ const userSchema = new Schema(
     phone: { type: String, trim: true, match: /^\+[1-9]\d{7,14}$/ },
     email: { type: String, trim: true, lowercase: true, maxlength: 254 },
     firebaseUid: { type: String, trim: true },
+    // Firebase uid of the Google sign-in identity (F4); separate from the phone identity
+    googleUid: { type: String, trim: true },
     avatar: imageSchema,
 
     cityId: { type: Schema.Types.ObjectId, ref: 'City' },
@@ -109,6 +111,10 @@ userSchema.index(
 userSchema.index(
   { firebaseUid: 1 },
   { unique: true, partialFilterExpression: { firebaseUid: { $type: 'string' } } },
+);
+userSchema.index(
+  { googleUid: 1 },
+  { unique: true, partialFilterExpression: { googleUid: { $type: 'string' } } },
 );
 userSchema.index(
   { referralCode: 1 },

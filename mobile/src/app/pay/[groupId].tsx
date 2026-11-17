@@ -32,6 +32,7 @@ import { enterUp } from '@/utils/animations';
 import { getErrorMessageKey } from '@/utils/errorMessages';
 import { formatINR } from '@/utils/genericFunctions';
 import { Skeleton } from '@/components/animations/Skeleton';
+import { useAuthStore } from '@/stores/auth.store';
 
 type IconType = ComponentType<{ size?: number; color?: ColorValue; strokeWidth?: number }>;
 
@@ -66,6 +67,7 @@ export default function PayScreen() {
   const { groupId, code } = useLocalSearchParams<{ groupId: string; code?: string }>();
   const { data: group, isPending, error: groupError } = useGroup(groupId, code);
   const pay = usePayToken();
+  const user = useAuthStore((state) => state.user);
   const outcome = pay.data?.outcome;
 
   if (isPending || !group) {
@@ -126,6 +128,18 @@ export default function PayScreen() {
           onPress={goToGroup}
           className="mt-6"
         />
+      </StackScreen>
+    );
+  }
+
+  // Google accounts add a verified mobile number once before the first token (F4)
+  if (!user?.phone) {
+    return (
+      <StackScreen title={t('pay.title')}>
+        <Animated.View entering={enterUp(0)} className="gap-4">
+          <Notice tone="info" title={t('phoneLink.payTitle')} message={t('phoneLink.payBody')} />
+          <Button label={t('phoneLink.addNumber')} onPress={() => router.push('/verify-phone')} />
+        </Animated.View>
       </StackScreen>
     );
   }

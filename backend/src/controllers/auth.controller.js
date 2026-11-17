@@ -35,6 +35,21 @@ const verifyOtp = asyncHandler(async (req, res) => {
   return sendSuccess(res, { message: 'Logged in', data });
 });
 
+/** POST /api/auth/google — Google sign-in (F4). */
+const verifyGoogle = asyncHandler(async (req, res) => {
+  const data = await authService.verifyGoogleLogin({
+    idToken: req.body.idToken,
+    context: getRequestContext(req),
+  });
+  return sendSuccess(res, { message: 'Logged in', data });
+});
+
+/** POST /api/users/me/phone — add a verified phone (Google accounts, before paying). */
+const linkPhone = asyncHandler(async (req, res) => {
+  const user = await authService.linkPhone(req.auth.userId, req.body.idToken);
+  return sendSuccess(res, { message: 'Phone number added', data: { user } });
+});
+
 /** POST /api/auth/refresh — rotate the refresh token. */
 const refresh = asyncHandler(async (req, res) => {
   const tokens = await authService.refreshAppSession(req.body.refreshToken, { ip: req.ip });
@@ -53,4 +68,12 @@ const getMe = asyncHandler(async (req, res) => {
   return sendSuccess(res, { message: 'User fetched', data });
 });
 
-module.exports = { requestOtp, verifyOtp, refresh, logout, getMe };
+module.exports = {
+  verifyGoogle,
+  linkPhone,
+  requestOtp,
+  verifyOtp,
+  refresh,
+  logout,
+  getMe,
+};

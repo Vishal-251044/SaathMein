@@ -4,6 +4,7 @@
  */
 import { PhoneAuthError } from '@/lib/phoneAuth';
 import { ApiClientError } from '@/services/api';
+import { GoogleAuthError } from '@/lib/googleAuth';
 
 const ERROR_KEYS: Record<string, string> = {
   // Backend (ApiClientError.code)
@@ -87,6 +88,16 @@ const ERROR_KEYS: Record<string, string> = {
   CODE_EXPIRED: 'errors.codeExpired',
   TOO_MANY_ATTEMPTS: 'errors.tooManyAttempts',
   PHONE_AUTH_UNAVAILABLE: 'errors.phoneAuthUnavailable',
+  // Google sign-in (F4)
+  GOOGLE_UNAVAILABLE: 'errors.googleUnavailable',
+  GOOGLE_PLAY_SERVICES: 'errors.googlePlayServices',
+  GOOGLE_FAILED: 'errors.googleFailed',
+  GOOGLE_LOGIN_REQUIRED: 'errors.googleFailed',
+  GOOGLE_EMAIL_UNVERIFIED: 'errors.googleEmailUnverified',
+  EMAIL_TAKEN: 'errors.googleEmailTaken',
+  STAFF_ACCOUNT: 'errors.googleStaffAccount',
+  PHONE_IN_USE: 'errors.phoneInUse',
+  PHONE_REQUIRED: 'errors.phoneRequired',
 };
 
 /**
@@ -95,7 +106,11 @@ const ERROR_KEYS: Record<string, string> = {
  * @returns i18n key such as "errors.invalidCode"
  */
 export function getErrorMessageKey(error: unknown): string {
-  if (error instanceof ApiClientError || error instanceof PhoneAuthError) {
+  if (
+    error instanceof ApiClientError ||
+    error instanceof PhoneAuthError ||
+    error instanceof GoogleAuthError
+  ) {
     return ERROR_KEYS[error.code] ?? 'errors.generic';
   }
   // Local errors thrown with a code as the message (photo permission, upload failed)

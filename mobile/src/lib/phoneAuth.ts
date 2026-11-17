@@ -41,7 +41,7 @@ export class PhoneAuthError extends Error {
  * Load the native Firebase Auth module once (lazily, so Expo Go does not crash on import).
  * @returns The module, or null when it is not compiled into this build
  */
-function loadAuthModule(): AuthModule | null {
+export function loadAuthModule(): AuthModule | null {
   if (authModule !== undefined) return authModule;
   if (Platform.OS === 'web') {
     authModule = null;

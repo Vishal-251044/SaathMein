@@ -95,6 +95,13 @@ const createTokenOrder = async (userId, { groupId, code }) => {
     getPaymentSettings(),
   ]);
   const productName = product ? `${product.brand} ${product.model}` : 'Group token';
+  // Google accounts verify a phone once before paying (decided 17 Nov 2026): Razorpay
+  // contact, OTP-based fraud limits and the dealer reaching the buyer after a win need it
+  if (!user?.phone) {
+    throw new ApiError(403, 'Add your mobile number before paying the token.', {
+      code: 'PHONE_REQUIRED',
+    });
+  }
 
   // Same buyer tapping Join again: reuse the open checkout (one order per seat)
   const open = await Payment.findOne({
